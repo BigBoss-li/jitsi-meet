@@ -163,6 +163,8 @@ MiddlewareRegistry.register(store => next => action => {
             break;
         }
 
+        // console.log(SET_SHARED_VIDEO_STATUS, action);
+
         if (localParticipantId === ownerId) {
             sendShareVideoCommand({
                 conference,
@@ -190,6 +192,8 @@ MiddlewareRegistry.register(store => next => action => {
         if (typeof APP !== 'undefined') {
             APP.API.notifyAudioOrVideoSharingToggled(MEDIA_TYPE.VIDEO, 'stop', stateOwnerId);
         }
+
+        // console.log(RESET_SHARED_VIDEO_STATUS, state, stateOwnerId, statevideoUrl);
 
         if (localParticipantId === stateOwnerId) {
             const conference = getCurrentConference(state);

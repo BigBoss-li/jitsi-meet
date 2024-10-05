@@ -97,6 +97,8 @@ export function stopSharedVideo() {
         const localParticipant = getLocalParticipant(state);
 
         if (ownerId === localParticipant?.id) {
+            // console.log('stopSharedVideo');
+
             dispatch(resetSharedVideoStatus());
         }
     };
@@ -116,6 +118,8 @@ export function playSharedVideo(videoUrl: string) {
             return;
         }
         const conference = getCurrentConference(getState());
+
+        // console.log('playSharedVideo', videoUrl)
 
         if (conference) {
             const localParticipant = getLocalParticipant(getState());
@@ -143,6 +147,8 @@ export function toggleSharedVideo() {
     return (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
         const state = getState();
         const { status = '' } = state['features/shared-video'];
+
+        // console.log('toggleSharedVideo', status);
 
         if ([ PLAYBACK_STATUSES.PLAYING, PLAYBACK_START, PLAYBACK_STATUSES.PAUSED ].includes(status)) {
             dispatch(stopSharedVideo());

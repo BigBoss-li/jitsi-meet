@@ -25,6 +25,8 @@ MiddlewareRegistry.register(({ dispatch, getState }) => next => action => {
             const { from } = attributes;
             const status = attributes.state;
 
+            // console.log(SHARED_VIDEO, attributes);
+
             if (status === PLAYBACK_STATUSES.PLAYING) {
                 if (localParticipantId !== from) {
                     dispatch(setDisableButton(true));
