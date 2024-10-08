@@ -11,12 +11,17 @@ import AbstractVideoManager, {
     _mapStateToProps
 } from './AbstractVideoManager';
 
+
+interface IState {
+    empty: any;
+}
+
 /**
  * Manager of shared video.
  *
  * @returns {void}
  */
-class YoutubeVideoManager extends AbstractVideoManager {
+class YoutubeVideoManager extends AbstractVideoManager<IState> {
     isPlayerAPILoaded: boolean;
     player?: any;
 

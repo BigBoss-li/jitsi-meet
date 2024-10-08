@@ -10,10 +10,14 @@ import AbstractVideoManager, {
 } from './AbstractVideoManager';
 
 
+interface IState {
+    empty: any;
+}
+
 /**
  * Manager of shared video.
  */
-class VideoManager extends AbstractVideoManager {
+class VideoManager extends AbstractVideoManager<IState> {
     playerRef: React.RefObject<HTMLVideoElement>;
 
     /**

@@ -9,6 +9,7 @@ import { getVerticalViewMaxWidth } from '../../../filmstrip/functions.web';
 import { getToolboxHeight } from '../../../toolbox/functions.web';
 import { isSharedVideoEnabled } from '../../functions';
 
+import ExtendedVideoManager from './ExtendedVideoManager';
 import VideoManager from './VideoManager';
 import YoutubeVideoManager from './YoutubeVideoManager';
 
@@ -111,6 +112,12 @@ class SharedVideo extends Component<IProps> {
         }
 
         if (videoUrl.match(/http/)) {
+            const vUrl = new URL(videoUrl);
+
+            if (vUrl.pathname.endsWith('.flv') || vUrl.pathname.endsWith('.m3u8')) {
+                return <ExtendedVideoManager videoId = { videoUrl } />;
+            }
+
             return <VideoManager videoId = { videoUrl } />;
         }
 
