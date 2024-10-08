@@ -129,7 +129,9 @@ jobs:
     - run: sudo apt-get install -y debhelper
     - run: dpkg-buildpackage -A -rfakeroot -us -uc -d
     # - run: make source-package
-    - run: cd .. && ls
-    # - name: Upload a Build Artifact
-    #   uses: actions/upload-artifact@v4.4.1
+    # - run: cd .. && ls
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.4.1
+      with:
+        path: ./*.deb
             
