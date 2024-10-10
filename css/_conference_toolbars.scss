@@ -3,12 +3,12 @@
         margin-bottom: unset;
         .toolbox-content-wrapper {
             display: block;
-            margin: unset;
             width: 100%;
 
             .toolbox-content-items {
                 background: #1f2928;
                 border-radius: 0;
+                justify-content: center;
             }
         }
     }
