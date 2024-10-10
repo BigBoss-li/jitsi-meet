@@ -35,6 +35,7 @@ import Separator from './Separator';
  * The type of the React {@code Component} props of {@link Toolbox}.
  */
 interface IProps {
+    isConferenceJoined?: boolean;
 
     /**
      * Explicitly passed array with the buttons which this Toolbox should display.
@@ -73,7 +74,8 @@ const useStyles = makeStyles()(() => {
  * @returns {ReactElement}
  */
 export default function Toolbox({
-    toolbarButtons
+    toolbarButtons,
+    isConferenceJoined
 }: IProps) {
     const { classes, cx } = useStyles();
     const { t } = useTranslation();
@@ -216,7 +218,8 @@ export default function Toolbox({
     const isMobile = isMobileBrowser();
 
     const rootClassNames = `new-toolbox ${toolbarVisible ? 'visible' : ''} ${
-        toolbarButtonsToUse.length ? '' : 'no-buttons'} ${chatOpen ? 'shift-right' : ''}`;
+        toolbarButtonsToUse.length ? '' : 'no-buttons'} ${chatOpen ? 'shift-right' : ''} 
+        ${isConferenceJoined ? 'conference-joined-toolbox' : ''}`;
 
     const toolbarAccLabel = 'toolbar.accessibilityLabel.moreActionsMenu';
     const containerClassName = `toolbox-content${isMobile || isNarrowLayout ? ' toolbox-content-mobile' : ''}`;

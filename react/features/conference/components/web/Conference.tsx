@@ -252,7 +252,7 @@ class Conference extends AbstractConference<IProps, any> {
                                 role = 'heading'>
                                 { t('toolbar.accessibilityLabel.heading') }
                             </span>
-                            <Toolbox />
+                            <Toolbox isConferenceJoined = { true } />
                         </>
                     )}
 
