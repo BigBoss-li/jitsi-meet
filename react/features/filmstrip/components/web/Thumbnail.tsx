@@ -305,7 +305,7 @@ const defaultStyles = (theme: Theme) => {
             height: '100%',
             width: '100%',
             borderRadius: '4px',
-            backgroundColor: theme.palette.ui02
+            backgroundColor: '#1f2928'
         },
 
         borderIndicator: {
@@ -356,7 +356,6 @@ const defaultStyles = (theme: Theme) => {
             zIndex: 1,
             width: '100%',
             height: '100%',
-            backgroundColor: `${theme.palette.uiBackground}`,
             opacity: 0.8
         },
 

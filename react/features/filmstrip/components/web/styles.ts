@@ -1,6 +1,7 @@
 import { Theme } from '@mui/material';
 
 const BACKGROUND_COLOR = 'rgba(51, 51, 51, .5)';
+const FILM_BACKGROUND_COLOR = '#263332';
 
 /**
  * Creates the styles for the component.
@@ -72,7 +73,7 @@ export const styles = (theme: Theme) => {
 
             '&:hover, &:focus-within': {
                 '& .resizable-filmstrip': {
-                    backgroundColor: BACKGROUND_COLOR
+                    backgroundColor: FILM_BACKGROUND_COLOR
                 },
 
                 '& .filmstrip-hover': {
