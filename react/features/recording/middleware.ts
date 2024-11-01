@@ -20,7 +20,7 @@ import {
     stopSound
 } from '../base/sounds/actions';
 import { TRACK_ADDED } from '../base/tracks/actionTypes';
-import { hideNotification, showErrorNotification } from '../notifications/actions';
+import { hideNotification, showErrorNotification, showNotification } from '../notifications/actions';
 import { NOTIFICATION_TIMEOUT_TYPE } from '../notifications/constants';
 import { isRecorderTranscriptionsRunning } from '../transcribing/functions';
 
@@ -119,11 +119,19 @@ MiddlewareRegistry.register(({ dispatch, getState }) => next => action => {
             getState
         }, action.onlySelf)
         .then(() => {
+            const props = {
+                descriptionKey: 'recording.on',
+                titleKey: 'dialog.recording'
+            };
 
             if (localRecording?.notifyAllParticipants && !onlySelf) {
                 dispatch(playSound(RECORDING_ON_SOUND_ID));
             }
-
+            dispatch(showNotification(props, NOTIFICATION_TIMEOUT_TYPE.MEDIUM));
+            dispatch(showNotification({
+                titleKey: 'recording.localRecordingStartWarningTitle',
+                descriptionKey: 'recording.localRecordingStartWarning'
+            }, NOTIFICATION_TIMEOUT_TYPE.STICKY));
             dispatch(updateLocalRecordingStatus(true, onlySelf));
             sendAnalytics(createRecordingEvent('started', `local${onlySelf ? '.self' : ''}`));
             if (typeof APP !== 'undefined') {

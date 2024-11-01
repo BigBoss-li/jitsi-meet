@@ -12,6 +12,9 @@ import { isMobileBrowser } from '../../../base/environment/utils';
 import { translate } from '../../../base/i18n/functions';
 import { setColorAlpha } from '../../../base/util/helpers';
 import Chat from '../../../chat/components/web/Chat';
+import MainFilmstrip from '../../../filmstrip/components/web/MainFilmstrip';
+import ScreenshareFilmstrip from '../../../filmstrip/components/web/ScreenshareFilmstrip';
+import StageFilmstrip from '../../../filmstrip/components/web/StageFilmstrip';
 import CalleeInfoContainer from '../../../invite/components/callee-info/CalleeInfoContainer';
 import LargeVideo from '../../../large-video/components/LargeVideo.web';
 import LobbyScreen from '../../../lobby/components/web/LobbyScreen';
@@ -232,6 +235,13 @@ class Conference extends AbstractConference<IProps, any> {
                         id = 'videospace'
                         onTouchStart = { this._onVidespaceTouchStart }>
                         <LargeVideo />
+                        {
+                            _showPrejoin || _showLobby || (<>
+                                <StageFilmstrip />
+                                <ScreenshareFilmstrip />
+                                <MainFilmstrip />
+                            </>)
+                        }
                     </div>
 
                     { _showPrejoin || _showLobby || (
