@@ -70,14 +70,15 @@ export const styles = (theme: Theme) => {
             transition: 'background .2s ease-in-out, right 1s, bottom 1s, top 1s, height .3s ease-in',
             right: 0,
             bottom: 0,
+            backgroundColor: FILM_BACKGROUND_COLOR,
 
             '&:hover, &:focus-within': {
                 '& .resizable-filmstrip': {
-                    backgroundColor: FILM_BACKGROUND_COLOR
+                    backgroundColor: BACKGROUND_COLOR
                 },
 
                 '& .filmstrip-hover': {
-                    backgroundColor: BACKGROUND_COLOR
+                    backgroundColor: FILM_BACKGROUND_COLOR
                 },
 
                 '& .toggleFilmstripContainer': {
