@@ -114,9 +114,7 @@ class SharedVideo extends Component<IProps> {
         if (videoUrl.match(/http/)) {
             const vUrl = new URL(videoUrl);
 
-            if (vUrl.pathname.endsWith('.flv')) {
-                // console.log('should use ExtendedVideoPlayer');
-
+            if (vUrl.pathname.endsWith('.flv') || vUrl.pathname.endsWith('.m3u8')) {
                 return <ExtendedVideoManager videoId = { videoUrl } />;
             }
 

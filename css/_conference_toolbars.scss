@@ -1,0 +1,16 @@
+.conference-joined-toolbox {
+    .toolbox-content {
+        margin-bottom: unset;
+        .toolbox-content-wrapper {
+            display: block;
+            width: 100%;
+
+            .toolbox-content-items {
+                background: #1f2928;
+                border-radius: 0;
+                justify-content: center;
+                box-shadow: unset;
+            }
+        }
+    }
+}

@@ -7,7 +7,7 @@ import { IReduxState } from '../../../app/types';
 import { isMobileBrowser } from '../../../base/environment/utils';
 import { getLocalParticipant, isLocalParticipantModerator } from '../../../base/participants/functions';
 import ContextMenu from '../../../base/ui/components/web/ContextMenu';
-import { isReactionsButtonEnabled, shouldDisplayReactionsButtons } from '../../../reactions/functions.web';
+import { isTranscribing } from '../../../transcribing/functions';
 import {
     setHangupMenuVisible,
     setOverflowMenuVisible,
@@ -21,19 +21,18 @@ import {
     isToolboxVisible
 } from '../../functions.web';
 import { useKeyboardShortcuts, useToolboxButtons } from '../../hooks.web';
-import { IToolboxButton } from '../../types';
 import HangupButton from '../HangupButton';
 
 import { EndConferenceButton } from './EndConferenceButton';
 import HangupMenuButton from './HangupMenuButton';
 import { LeaveConferenceButton } from './LeaveConferenceButton';
-import OverflowMenuButton from './OverflowMenuButton';
 import Separator from './Separator';
 
 /**
  * The type of the React {@code Component} props of {@link Toolbox}.
  */
 interface IProps {
+    isConferenceJoined?: boolean;
 
     /**
      * Explicitly passed array with the buttons which this Toolbox should display.
@@ -72,7 +71,8 @@ const useStyles = makeStyles()(() => {
  * @returns {ReactElement}
  */
 export default function Toolbox({
-    toolbarButtons
+    toolbarButtons,
+    isConferenceJoined
 }: IProps) {
     const { classes, cx } = useStyles();
     const { t } = useTranslation();
@@ -99,10 +99,11 @@ export default function Toolbox({
     const isDialogVisible = useSelector((state: IReduxState) => Boolean(state['features/base/dialog'].component));
     const jwt = useSelector((state: IReduxState) => state['features/base/jwt'].jwt);
     const localParticipant = useSelector(getLocalParticipant);
-    const jwtDisabledButtons = useSelector((state: IReduxState) =>
-        getJwtDisabledButtons(state, jwt, localParticipant?.features));
-    const reactionsButtonEnabled = useSelector(isReactionsButtonEnabled);
-    const _shouldDisplayReactionsButtons = useSelector(shouldDisplayReactionsButtons);
+    const transcribing = useSelector(isTranscribing);
+
+    // Do not convert to selector, it returns new array and will cause re-rendering of toolbox on every action.
+    const jwtDisabledButtons = getJwtDisabledButtons(transcribing, isModerator, jwt, localParticipant?.features);
+
     const toolbarVisible = useSelector(isToolboxVisible);
     const mainToolbarButtonsThresholds
         = useSelector((state: IReduxState) => state['features/toolbox'].mainToolbarButtonsThresholds);
@@ -212,7 +213,8 @@ export default function Toolbox({
     const isMobile = isMobileBrowser();
 
     const rootClassNames = `new-toolbox ${toolbarVisible ? 'visible' : ''} ${
-        toolbarButtonsToUse.length ? '' : 'no-buttons'} ${chatOpen ? 'shift-right' : ''}`;
+        toolbarButtonsToUse.length ? '' : 'no-buttons'} ${chatOpen ? 'shift-right' : ''} 
+        ${isConferenceJoined ? 'conference-joined-toolbox' : ''}`;
 
     const toolbarAccLabel = 'toolbar.accessibilityLabel.moreActionsMenu';
     const containerClassName = `toolbox-content${isMobile || isNarrowLayout ? ' toolbox-content-mobile' : ''}`;
@@ -225,12 +227,7 @@ export default function Toolbox({
         jwtDisabledButtons,
         mainToolbarButtonsThresholds
     });
-    const raiseHandInOverflowMenu = overflowMenuButtons.some(({ key }) => key === 'raisehand');
-    const showReactionsInOverflowMenu = _shouldDisplayReactionsButtons
-        && (
-            (!reactionsButtonEnabled && (raiseHandInOverflowMenu || isNarrowLayout || isMobile))
-            || overflowMenuButtons.some(({ key }) => key === 'reactions'));
-    const showRaiseHandInReactionsMenu = showReactionsInOverflowMenu && raiseHandInOverflowMenu;
+    const toolMainMenuButtons = [ ...mainMenuButtons, ...overflowMenuButtons ];
 
     return (
         <div
@@ -248,46 +245,11 @@ export default function Toolbox({
                     <div
                         className = 'toolbox-content-items'
                         ref = { _toolboxRef }>
-                        {mainMenuButtons.map(({ Content, key, ...rest }) => Content !== Separator && (
+                        {toolMainMenuButtons.map(({ Content, key, ...rest }) => Content !== Separator && (
                             <Content
                                 { ...rest }
                                 buttonKey = { key }
                                 key = { key } />))}
-
-                        {Boolean(overflowMenuButtons.length) && (
-                            <OverflowMenuButton
-                                ariaControls = 'overflow-menu'
-                                buttons = { overflowMenuButtons.reduce<Array<IToolboxButton[]>>((acc, val) => {
-                                    if (val.key === 'reactions' && showReactionsInOverflowMenu) {
-                                        return acc;
-                                    }
-
-                                    if (val.key === 'raisehand' && showRaiseHandInReactionsMenu) {
-                                        return acc;
-                                    }
-
-                                    if (acc.length) {
-                                        const prev = acc[acc.length - 1];
-                                        const group = prev[prev.length - 1].group;
-
-                                        if (group === val.group) {
-                                            prev.push(val);
-                                        } else {
-                                            acc.push([ val ]);
-                                        }
-                                    } else {
-                                        acc.push([ val ]);
-                                    }
-
-                                    return acc;
-                                }, []) }
-                                isOpen = { overflowMenuVisible }
-                                key = 'overflow-menu'
-                                onToolboxEscKey = { onEscKey }
-                                onVisibilityChange = { onSetOverflowVisible }
-                                showRaiseHandInReactionsMenu = { showRaiseHandInReactionsMenu }
-                                showReactionsMenu = { showReactionsInOverflowMenu } />
-                        )}
 
                         {isButtonEnabled('hangup', toolbarButtonsToUse) && (
                             endConferenceSupported

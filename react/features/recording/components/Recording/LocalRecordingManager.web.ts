@@ -149,6 +149,19 @@ const LocalRecordingManager: ILocalRecordingManager = {
         a.click();
     },
 
+    async sendBlobRecording(recordingData) {
+        const blob = await fixWebmDuration(new Blob(recordingData, { type: this.mediaType }));
+        const extension = this.mediaType.slice(this.mediaType.indexOf('/') + 1, this.mediaType.indexOf(';'));
+
+        window.parent.postMessage({
+            type: 'recorder_full_data',
+            data: {
+                blob,
+                extension
+            }
+        }, '*');
+    },
+
     /**
      * Stops local recording.
      *
@@ -163,7 +176,14 @@ const LocalRecordingManager: ILocalRecordingManager = {
             this.totalSize = MAX_SIZE;
             setTimeout(() => {
                 if (this.recordingData.length > 0) {
-                    this.saveRecording(this.recordingData, this.getFilename());
+                    // this.saveRecording(this.recordingData, this.getFilename());
+                    console.log('recording END');
+                    this.sendBlobRecording(this.recordingData);
+
+                    // window.parent.postMessage({
+                    //     type: 'recorder_full_data',
+                    //     data: this.recordingData
+                    // }, '*');
                 }
             }, 1000);
         }
@@ -244,8 +264,10 @@ const LocalRecordingManager: ILocalRecordingManager = {
 
             // @ts-ignore
             gdmStream = await navigator.mediaDevices.getDisplayMedia({
-                video: { displaySurface: 'browser',
-                    frameRate: 30 },
+                video: {
+                    displaySurface: 'browser',
+                    frameRate: 30
+                },
                 audio: false, // @ts-ignore
                 preferCurrentTab: true
             });

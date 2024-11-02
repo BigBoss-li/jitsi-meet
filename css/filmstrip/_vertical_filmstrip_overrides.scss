@@ -55,3 +55,9 @@
 .stage-filmstrip .self-view-mobile-portrait #localVideo_container {
     object-fit: contain;
 }
+
+.vertical-filmstrip, .stage-filmstrip {
+    .filmstrip__videos {
+        background-color: #263332;
+    }
+}
