@@ -270,7 +270,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
         this.state = {
             isMouseDown: false,
             mousePosition: null,
-            dragFilmstripWidth: null
+            dragFilmstripWidth: null,
+            tabActiveKey: '1'
         };
 
         // Bind event handlers so they are only bound once for every instance.
@@ -393,6 +394,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
             toolbar = this._renderToggleButton();
         }
 
+        const tabbar = this._renderTabbar();
+
         const filmstrip = (<>
             <div
                 className = { clsx(this.props._videosClassName,
@@ -401,6 +404,7 @@ class Filmstrip extends PureComponent <IProps, IState> {
                     && !_resizableFilmstrip && 'filmstrip-hover',
                     _verticalViewGrid && 'vertical-view-grid') }
                 id = 'remoteVideos'>
+                {tabbar}
                 {!_disableSelfView && !_verticalViewGrid && (
                     <div
                         className = 'filmstrip__videos'
@@ -870,6 +874,37 @@ class Filmstrip extends PureComponent <IProps, IState> {
                 </button>
             </div>
         );
+    }
+
+    /**
+     * Created Tabbar.
+     *
+     * @returns {ReactElement}
+     */
+    _renderTabbar() {
+        const { tabActiveKey } = this.state;
+
+        return (
+            <div className = 'filmstrip-tabs'>
+                <div
+                    className = { clsx('filmstrip-tab', tabActiveKey === '1' && 'filmstrip-tab--active') }>成员</div>
+                <div
+                    className = { clsx('filmstrip-tab', tabActiveKey === '2' && 'filmstrip-tab--active') }>信号源</div>
+            </div>
+        );
+    }
+
+    /**
+     * Tabbar click.
+     *
+     *  @param {Object} key - TabbarActiveKey.
+     * @returns {void}
+     */
+    _onTabbarClick(key: String) {
+        console.log('tabbar clicked');
+        this.setState({
+            tabActiveKey: key
+        });
     }
 }
 

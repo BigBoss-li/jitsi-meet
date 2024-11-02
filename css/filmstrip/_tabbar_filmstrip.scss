@@ -1,0 +1,30 @@
+.filmstrip-tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: rgba(255,255,255, .8);
+    .filmstrip-tab {
+        width: 100px;
+        text-align: center;
+        line-height: 40px;
+
+        &.filmstrip-tab--active {
+            color: #ffffff;
+            font-weight: 600;
+            position: relative;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 30px;
+                height: 2px;
+                border-radius: 4px;
+                background-color: #ffffff;
+            }
+        }
+    }
+}
