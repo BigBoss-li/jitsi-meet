@@ -1,57 +1,124 @@
-/**
- * Overrides for video containers that should not be centered aligned to avoid=
- * clashing with the filmstrip.
- */
-.vertical-filmstrip #etherpad,
-.stage-filmstrip #etherpad,
-.vertical-filmstrip #sharedvideo,
-.stage-filmstrip #sharedvideo {
-    text-align: left;
-}
+.vertical-filmstrip, .stage-filmstrip {
+    span:not(.tile-view) .filmstrip.cssw_hacked {
+        background-color: #233332;
+        flex-direction: column;
 
-/**
- * Overrides for small videos in vertical filmstrip mode.
- */
-.vertical-filmstrip .filmstrip__videos .videocontainer,
-.stage-filmstrip .filmstrip__videos .videocontainer {
-    .self-view-mobile-portrait video {
-        object-fit: contain;
+        .cssw_hacked_title_tabs {
+            width: 100%;
+        }
+
+        &.hide-videos {
+            .remote-videos {
+                & > div {
+                }
+            }
+        }
+
+        @mixin minHWAutoFix() {
+            min-height: 0;
+            min-width: 0;
+        }
+
+
+        &.no-vertical-padding {
+            padding: 0;
+        }
+
+        .filmstrip__videos {
+            &#remoteVideos {
+                box-sizing: border-box;
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-top: 12px;
+                justify-content: flex-start;
+            }
+        }
+
+        /**
+         * Re-styles the local Video to better fit vertical filmstrip layout.
+         */
+        #filmstripLocalVideo {
+            margin-bottom: 0;
+            #filmstripLocalVideoThumbnail {
+                width: 100%;
+
+                .videocontainer {
+                }
+            }
+        }
+
+        #filmstripLocalScreenShare {
+
+            #filmstripLocalScreenShareThumbnail {
+
+                .videocontainer {
+                }
+            }
+        }
+
+        /**
+         * Remove unnecessary padding that is normally used to prevent horizontal
+         * filmstrip from overlapping the left edge of the screen.
+         */
+        #filmstripLocalVideo,
+        #filmstripLocalScreenShare,
+        .remote-videos {
+        }
+
+        #remoteVideos {
+            .filmstrip__videos .videocontainer {
+                border: none;
+                border-radius: 8px;
+                background-color: '#1C2928';
+                margin-bottom: 12px;
+                &.display-avatar-only {
+                    .avatar-container {
+                        max-width: initial;
+                        max-height: initial;
+                    }
+                }
+                .cssw_hacked_top_indicators {
+                    padding: 8px;
+                }
+                .bottom-indicators {
+                    .displayname {
+                        font-size: 18px !important;
+                    }
+                }
+            }
+        }
+
+        .resizable-filmstrip #remoteVideos .videocontainer {
+        }
+
+        &.reduce-height {
+        }
+
+        .filmstrip__videos.vertical-view-grid#remoteVideos {
+            &.has-scroll {
+            }
+
+            .remote-videos {
+                > div {
+                }
+            }
+
+            .videocontainer {
+            }
+        }
+
+        .remote-videos {
+            &.height-transition {
+                &#filmstripRemoteVideos {
+                    flex: 1;
+                }
+            }
+
+            & > div {
+            }
+
+            &.is-not-overflowing > div {
+            }
+        }
     }
-}
-
-/**
- * Overrides for quality labels in filmstrip only mode. The styles adjust the
- * labels' positioning as the filmstrip itself or filmstrip's remote videos
- * appear and disappear.
- *
- * The class with-filmstrip is for when the filmstrip is visible.
- * The class without-filmstrip is for when the filmstrip has been toggled to
- * be hidden.
- * The class opening is for when the filmstrip is transitioning from hidden
- * to visible.
- */
-.vertical-filmstrip .large-video-labels,
-.stage-filmstrip .large-video-labels {
-    &.with-filmstrip {
-        right: 150px;
-    }
-
-    &.with-filmstrip.opening {
-        transition: 0.9s;
-        transition-timing-function: ease-in-out;
-    }
-
-    &.without-filmstrip {
-        transition: 1.2s ease-in-out;
-        transition-delay: 0.1s;
-    }
-}
-
-/**
- * Overrides for self view when in portrait mode on mobile.
- * This is done in order to keep the aspect ratio.
- */
-.vertical-filmstrip .self-view-mobile-portrait #localVideo_container,
-.stage-filmstrip .self-view-mobile-portrait #localVideo_container {
-    object-fit: contain;
 }

@@ -312,9 +312,10 @@ class LargeVideo extends Component<IProps> {
             styles.backgroundSize = 'cover';
         }
 
-        if (_visibleFilmstrip && Number(_verticalFilmstripWidth) >= FILMSTRIP_BREAKPOINT) {
-            styles.width = `calc(100% - ${_verticalViewMaxWidth || 0}px)`;
-        }
+        // if (_visibleFilmstrip && Number(_verticalFilmstripWidth) >= FILMSTRIP_BREAKPOINT) {
+        styles.width = `calc(100% - ${_verticalViewMaxWidth || 0}px)`;
+
+        // }
 
         return styles;
     }

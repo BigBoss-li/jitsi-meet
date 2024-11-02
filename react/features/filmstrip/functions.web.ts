@@ -651,19 +651,20 @@ export function showGridInVerticalView(state: IReduxState) {
  * @returns {number}
  */
 export function getVerticalViewMaxWidth(state: IReduxState) {
-    const { width } = state['features/filmstrip'];
-    const _resizableFilmstrip = isFilmstripResizable(state);
-    const _verticalViewGrid = showGridInVerticalView(state);
-    let maxWidth = _resizableFilmstrip
-        ? width.current || DEFAULT_FILMSTRIP_WIDTH
-        : interfaceConfig.FILM_STRIP_MAX_HEIGHT || DEFAULT_FILMSTRIP_WIDTH;
+
+    // const { width } = state['features/filmstrip'];
+    // const _resizableFilmstrip = isFilmstripResizable(state);
+    // const _verticalViewGrid = showGridInVerticalView(state);
+    // let maxWidth = _resizableFilmstrip
+    //     ? width.current || DEFAULT_FILMSTRIP_WIDTH
+    //     : interfaceConfig.FILM_STRIP_MAX_HEIGHT || DEFAULT_FILMSTRIP_WIDTH;
 
     // Adding 4px for the border-right and margin-right.
     // On non-resizable filmstrip add 4px for the left margin and border.
     // Also adding 7px for the scrollbar. Also adding 9px for the drag handle.
-    maxWidth += (_verticalViewGrid ? 0 : 11) + (_resizableFilmstrip ? 9 : 4);
+    // maxWidth += (_verticalViewGrid ? 0 : 11) + (_resizableFilmstrip ? 9 : 4);
 
-    return maxWidth;
+    return DEFAULT_FILMSTRIP_WIDTH;
 }
 
 /**

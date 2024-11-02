@@ -233,7 +233,8 @@ export const INDICATORS_TOOLTIP_POSITION: {
 /**
  * The default (and minimum) width for the vertical filmstrip (user resizable).
  */
-export const DEFAULT_FILMSTRIP_WIDTH = 120;
+// export const DEFAULT_FILMSTRIP_WIDTH = 120;
+export const DEFAULT_FILMSTRIP_WIDTH = 380;
 
 /**
  * The default aspect ratio for the local tile.

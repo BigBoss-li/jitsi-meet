@@ -1,3 +1,5 @@
+import { Tab, Tabs } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import { throttle } from 'lodash-es';
 import React, { PureComponent } from 'react';
@@ -48,6 +50,61 @@ import AudioTracksContainer from './AudioTracksContainer';
 import Thumbnail from './Thumbnail';
 import ThumbnailWrapper from './ThumbnailWrapper';
 import { styles } from './styles';
+
+
+interface IFilmstripTitleTabsProps {
+    children?: React.ReactNode;
+    onChange: (event: React.SyntheticEvent, newValue: number) => void;
+    value: number;
+}
+
+const FilmstripTitleTabs = styled((props: IFilmstripTitleTabsProps) => (
+    <Tabs
+        { ...props }
+        TabIndicatorProps = {{ children: <span className = 'MuiTabs-indicatorSpan' /> }}
+        variant = 'fullWidth' />
+))({
+    '& .MuiTabs-indicator': {
+        display: 'flex',
+        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        height: '4px',
+        borderRadius: '2px'
+    },
+    '& .MuiTabs-indicatorSpan': {
+        maxWidth: 40,
+        width: '100%',
+        backgroundColor: '#fff'
+    }
+});
+
+
+interface IFilmstripTitleTabProps {
+    label: string;
+}
+
+const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (
+    <Tab
+        disableRipple = { true }
+        { ...props } />
+))({
+    textTransform: 'none',
+    lineHeight: '28px',
+    fontSize: '20px',
+
+    // fontWeight: theme.typography.fontWeightRegular,
+    // fontSize: theme.typography.pxToRem(15),
+    // marginRight: theme.spacing(1),
+    color: 'rgba(255, 255, 255, 0.8)',
+    '&.Mui-selected': {
+        fontWeight: 'bold',
+        color: '#fff'
+    }
+
+    // '&.Mui-focusVisible': {
+    // backgroundColor: 'rgba(100, 95, 228, 0.32)'
+    // }
+});
 
 /**
  * The type of the React {@code Component} props of {@link Filmstrip}.
@@ -246,6 +303,8 @@ interface IState {
      * Initial mouse position on drag handle mouse down.
      */
     mousePosition?: number | null;
+
+    titleTabIndex: number;
 }
 
 /**
@@ -270,7 +329,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
         this.state = {
             isMouseDown: false,
             mousePosition: null,
-            dragFilmstripWidth: null
+            dragFilmstripWidth: null,
+            titleTabIndex: 0
         };
 
         // Bind event handlers so they are only bound once for every instance.
@@ -285,6 +345,7 @@ class Filmstrip extends PureComponent <IProps, IState> {
         this._onDragHandleMouseDown = this._onDragHandleMouseDown.bind(this);
         this._onDragMouseUp = this._onDragMouseUp.bind(this);
         this._onFilmstripResize = this._onFilmstripResize.bind(this);
+        this._onTitleTabChange = this._onTitleTabChange.bind(this);
 
         this._throttledResize = throttle(
             this._onFilmstripResize,
@@ -352,7 +413,7 @@ class Filmstrip extends PureComponent <IProps, IState> {
             t
         } = this.props;
         const classes = withStyles.getClasses(this.props);
-        const { isMouseDown } = this.state;
+        const { isMouseDown, titleTabIndex } = this.state;
         const tileViewActive = _currentLayout === LAYOUTS.TILE_VIEW;
 
         if (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.STAGE) {
@@ -440,7 +501,9 @@ class Filmstrip extends PureComponent <IProps, IState> {
                     this.props._className,
                     classes.filmstrip,
                     _verticalViewGrid && 'no-vertical-padding',
-                    _verticalViewBackground && classes.filmstripBackground) }
+                    _verticalViewBackground && classes.filmstripBackground,
+                    'cssw_hacked')
+                }
                 style = { filmstripStyle }>
                 <span
                     aria-level = { 1 }
@@ -448,23 +511,34 @@ class Filmstrip extends PureComponent <IProps, IState> {
                     role = 'heading'>
                     { t('filmstrip.accessibilityLabel.heading') }
                 </span>
-                { toolbar }
-                {_resizableFilmstrip
-                    ? <div
-                        className = { clsx('resizable-filmstrip', classes.resizableFilmstripContainer,
-                            _topPanelFilmstrip && 'top-panel-filmstrip') }>
-                        <div
-                            className = { clsx('dragHandleContainer',
-                                classes.dragHandleContainer,
-                                isMouseDown && 'visible',
-                                _topPanelFilmstrip && 'top-panel')
-                            }
-                            onMouseDown = { this._onDragHandleMouseDown }>
-                            <div className = { clsx(classes.dragHandle, 'dragHandle') } />
+                {/* { toolbar } */}
+                <div className = 'cssw_hacked_title_tabs'>
+                    <FilmstripTitleTabs
+                        onChange = { this._onTitleTabChange }
+                        value = { titleTabIndex } >
+                        <FilmstripTitleTab label = '成员' />
+                        <FilmstripTitleTab label = '信号源' />
+                    </FilmstripTitleTabs>
+                </div>
+                {/* {
+                    _resizableFilmstrip
+                        ? <div
+                            className = { clsx('resizable-filmstrip', classes.resizableFilmstripContainer,
+                                _topPanelFilmstrip && 'top-panel-filmstrip') }>
+                            <div
+                                className = { clsx('dragHandleContainer',
+                                    classes.dragHandleContainer,
+                                    isMouseDown && 'visible',
+                                    _topPanelFilmstrip && 'top-panel')
+                                }
+                                onMouseDown = { this._onDragHandleMouseDown }>
+                                <div className = { clsx(classes.dragHandle, 'dragHandle') } />
+                            </div>
+                            {filmstrip}
                         </div>
-                        {filmstrip}
-                    </div>
-                    : filmstrip
+                        : filmstrip
+                } */
+                    filmstrip
                 }
                 <AudioTracksContainer />
             </div>
@@ -501,6 +575,19 @@ class Filmstrip extends PureComponent <IProps, IState> {
             });
             this.props.dispatch(setUserIsResizing(false));
         }
+    }
+
+    /**
+     * Update selected tab - hacked by cssw.
+     *
+     * @param {React.SyntheticEvent} e - React event.
+     * @param {number} value - The new index.
+     * @returns {void}
+     */
+    _onTitleTabChange(e: React.SyntheticEvent, value: number) {
+        this.setState({
+            titleTabIndex: value
+        });
     }
 
     /**
@@ -720,18 +807,25 @@ class Filmstrip extends PureComponent <IProps, IState> {
             );
         }
 
-
         const props: any = {
+            id: 'filmstripRemoteVideos',
             itemCount: _remoteParticipantsLength,
+
+            // className: 'filmstrip__videos remote-videos height-transition',
+
             className: `filmstrip__videos remote-videos ${_resizableFilmstrip ? '' : 'height-transition'}`,
-            height: _filmstripHeight,
+
+            // height: _filmstripHeight,
             itemKey: this._listItemKey,
             itemSize: 0,
             onItemsRendered: this._onListItemsRendered,
             overscanCount: 1,
-            width: _filmstripWidth,
+
+            // width: _filmstripWidth,
             style: {
-                willChange: 'auto'
+                willChange: 'auto',
+                flex: 1,
+                marginBottom: '16px'
             }
         };
 
@@ -746,7 +840,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
             }
 
         } else if (_isVerticalFilmstrip) {
-            const itemSize = _thumbnailHeight + TILE_VERTICAL_MARGIN;
+            // const itemSize = _thumbnailHeight + TILE_VERTICAL_MARGIN;
+            const itemSize = 208;
             const isNotOverflowing = !_hasScroll;
 
             if (isNotOverflowing) {
@@ -757,12 +852,14 @@ class Filmstrip extends PureComponent <IProps, IState> {
         }
 
         return (
-            <FixedSizeList { ...props }>
-                {
-                    ThumbnailWrapper
-                }
-            </FixedSizeList>
+            <></>
         );
+
+        // <FixedSizeList { ...props }>
+        //     {
+        //         ThumbnailWrapper
+        //     }
+        // </FixedSizeList>
     }
 
     /**
