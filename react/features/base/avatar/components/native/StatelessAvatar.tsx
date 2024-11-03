@@ -75,7 +75,7 @@ export default class StatelessAvatar extends Component<IProps> {
                     ] }>
                     { avatar }
                 </View>
-                { this._renderAvatarStatus() }
+                {/* { this._renderAvatarStatus() } */}
             </View>
         );
     }

@@ -10,15 +10,11 @@
         &.hide-videos {
             .remote-videos {
                 & > div {
+                    opacity: 1;
+                    pointer-events: initial;
                 }
             }
         }
-
-        @mixin minHWAutoFix() {
-            min-height: 0;
-            min-width: 0;
-        }
-
 
         &.no-vertical-padding {
             padding: 0;
@@ -50,71 +46,44 @@
         #filmstripLocalScreenShare {
 
             #filmstripLocalScreenShareThumbnail {
-
-                .videocontainer {
-                }
+                width: 100%;
             }
-        }
-
-        /**
-         * Remove unnecessary padding that is normally used to prevent horizontal
-         * filmstrip from overlapping the left edge of the screen.
-         */
-        #filmstripLocalVideo,
-        #filmstripLocalScreenShare,
-        .remote-videos {
         }
 
         #remoteVideos {
-            .filmstrip__videos .videocontainer {
-                border: none;
-                border-radius: 8px;
-                background-color: '#1C2928';
-                margin-bottom: 12px;
-                &.display-avatar-only {
-                    .avatar-container {
-                        max-width: initial;
-                        max-height: initial;
+            .filmstrip__videos {
+                &.remote-videos {
+                    flex-direction: row;
+                }
+                .videocontainer {
+                    border: none;
+                    border-radius: 8px;
+                    background-color: #1C2928;
+                    margin-bottom: 12px;
+                    &.display-avatar-only {
+                        .avatar-container {
+                            max-width: initial;
+                            max-height: initial;
+                        }
+                    }
+                    .cssw_hacked_top_indicators {
+                        padding: 8px;
+                    }
+                    .bottom-indicators {
+                        .displayname {
+                            font-size: 18px !important;
+                        }
                     }
                 }
-                .cssw_hacked_top_indicators {
-                    padding: 8px;
-                }
-                .bottom-indicators {
-                    .displayname {
-                        font-size: 18px !important;
-                    }
-                }
-            }
-        }
-
-        .resizable-filmstrip #remoteVideos .videocontainer {
-        }
-
-        &.reduce-height {
-        }
-
-        .filmstrip__videos.vertical-view-grid#remoteVideos {
-            &.has-scroll {
-            }
-
-            .remote-videos {
-                > div {
-                }
-            }
-
-            .videocontainer {
             }
         }
 
         .remote-videos {
             &.height-transition {
-                &#filmstripRemoteVideos {
-                    flex: 1;
-                }
             }
 
             & > div {
+                position: initial;
             }
 
             &.is-not-overflowing > div {

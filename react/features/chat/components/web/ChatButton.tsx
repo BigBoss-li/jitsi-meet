@@ -59,7 +59,7 @@ class ChatButton extends AbstractButton<IProps> {
                 className = 'toolbar-button-with-badge'
                 key = 'chatcontainer'>
                 {super.render()}
-                <ChatCounter />
+                {/* <ChatCounter /> */}
             </div>
         );
     }

@@ -967,7 +967,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
             className: `filmstrip__videos remote-videos ${_resizableFilmstrip ? '' : 'height-transition'}`,
 
-            // height: _filmstripHeight,
+            height: _filmstripHeight,
             itemKey: this._listItemKey,
             itemSize: 0,
             onItemsRendered: this._onListItemsRendered,
@@ -976,8 +976,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
             // width: _filmstripWidth,
             style: {
                 willChange: 'auto',
-                flex: 1,
-                marginBottom: '16px'
+                boxSizing: 'border-box',
+                paddingBottom: '88px'
+                // flex: 1,
+                // marginBottom: '16px'
             }
         };
 
@@ -1002,13 +1004,13 @@ class Filmstrip extends PureComponent<IProps, IState> {
             props.itemSize = itemSize;
         }
 
-        return <></>;
+        // return <></>;
 
-        // <FixedSizeList { ...props }>
-        //     {
-        //         ThumbnailWrapper
-        //     }
-        // </FixedSizeList>
+        return <FixedSizeList { ...props }>
+            {
+                ThumbnailWrapper
+            }
+        </FixedSizeList>
     }
 
     /**

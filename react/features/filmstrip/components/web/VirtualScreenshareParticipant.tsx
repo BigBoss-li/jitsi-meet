@@ -155,7 +155,7 @@ const VirtualScreenshareParticipant = ({
             style = { styles.thumbnail }>
             {video}
             <div className = { classes?.containerBackground } />
-            <div
+            {/* <div
                 className = { cx(classes?.indicatorsContainer,
                         classes?.indicatorsTopContainer,
                         currentLayout === LAYOUTS.TILE_VIEW && 'tile-view-mode'
@@ -164,8 +164,9 @@ const VirtualScreenshareParticipant = ({
                     isHovered = { isHovered }
                     participantId = { participantId }
                     thumbnailType = { thumbnailType } />
-            </div>
-            {shouldDisplayTintBackground && <div className = { classes?.tintBackground } />}
+            </div> */}
+            <div className = { classes?.tintBackground } />
+            {/* {shouldDisplayTintBackground && <div className = { classes?.tintBackground } />} */}
             <div
                 className = { cx(classes?.indicatorsContainer,
                         classes?.indicatorsBottomContainer,

@@ -243,7 +243,7 @@ class LargeVideo extends Component<IProps> {
                 </div>
                 { interfaceConfig.DISABLE_TRANSCRIPTION_SUBTITLES
                     || <Captions /> }
-                {_showDominantSpeakerBadge && <StageParticipantNameLabel />}
+                {/* {_showDominantSpeakerBadge && <StageParticipantNameLabel />} */}
             </div>
         );
     }
