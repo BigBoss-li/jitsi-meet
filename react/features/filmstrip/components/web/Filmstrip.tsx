@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@mui/material';
+import { Switch, Tab, Tabs } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import { throttle } from 'lodash-es';
@@ -104,6 +104,39 @@ const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (
     // '&.Mui-focusVisible': {
     // backgroundColor: 'rgba(100, 95, 228, 0.32)'
     // }
+});
+
+interface IFilmstripSignalSwitchProps {
+    checked: boolean;
+    onChange: (event: React.SyntheticEvent, newValue: number) => void;
+}
+
+const SignalSwitch = styled((props: IFilmstripSignalSwitchProps) =>
+    <Switch { ...props } />
+)(() => {
+    return {
+        padding: 0,
+        width: '70px',
+        '& .MuiSwitch-switchBase': {
+            padding: '4px',
+            left: '2px'
+        },
+        '& .MuiSwitch-switchBase.Mui-checked': {
+            color: '#ffffff',
+            transform: 'translateX(30px)'
+        },
+        '& .MuiSwitch-switchBase .MuiSwitch-thumb': {
+            width: '30px',
+            height: '30px'
+        },
+        '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+            borderRadius: '50px'
+        },
+        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+            backgroundColor: '#008F84',
+            borderRadius: '50px'
+        }
+    };
 });
 
 /**
@@ -330,7 +363,25 @@ class Filmstrip extends PureComponent <IProps, IState> {
             isMouseDown: false,
             mousePosition: null,
             dragFilmstripWidth: null,
-            titleTabIndex: 0
+            titleTabIndex: 0,
+            signalList: [
+                {
+                    'id': 1,
+                    'type': 'NDI',
+                    'name': '手术室中摄像头(Channel-1)',
+                    'ip': '10.20.3.37:586',
+                    'isSelected': false,
+                    'url': 'https://live-play.jyit.ltd/centaur-chiron/bigboss.flv'
+                },
+                {
+                    'id': 2,
+                    'type': 'NDI',
+                    'name': '手术室右摄像头(Channel-1)',
+                    'ip': '10.20.3.37:586',
+                    'isSelected': false,
+                    'url': 'https://live-play.jyit.ltd/centaur-chiron/bigboss.flv'
+                }
+            ]
         };
 
         // Bind event handlers so they are only bound once for every instance.
@@ -346,6 +397,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
         this._onDragMouseUp = this._onDragMouseUp.bind(this);
         this._onFilmstripResize = this._onFilmstripResize.bind(this);
         this._onTitleTabChange = this._onTitleTabChange.bind(this);
+        this._onSwitchChange = this._onSwitchChange.bind(this);
+        this._renderSignalItem = this._renderSignalItem.bind(this);
 
         this._throttledResize = throttle(
             this._onFilmstripResize,
@@ -495,6 +548,32 @@ class Filmstrip extends PureComponent <IProps, IState> {
             </div>
         </>);
 
+        const signalstrip = (<>
+            <div
+                className = { clsx(this.props._videosClassName,
+                    !tileViewActive && (filmstripType === FILMSTRIP_TYPE.MAIN
+                    || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+                    && !_resizableFilmstrip && 'filmstrip-hover',
+                    _verticalViewGrid && 'vertical-view-grid') }
+                id = 'remoteVideos'>
+                {!_disableSelfView && !_verticalViewGrid && (
+                    <div
+                        className = 'filmstrip__videos'
+                        id = 'filmstripLocalVideo'>
+                        {
+                            !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
+                            && <div id = 'filmstripLocalVideoThumbnail'>
+                                {
+                                    this._renderSignalItem()
+                                }
+
+                            </div>
+                        }
+                    </div>
+                )}
+            </div>
+        </>);
+
         return (
             <div
                 className = { clsx('filmstrip',
@@ -538,7 +617,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
                         </div>
                         : filmstrip
                 } */
-                    filmstrip
+                    // filmstrip
+                    titleTabIndex === 0 ? filmstrip : signalstrip
                 }
                 <AudioTracksContainer />
             </div>
@@ -588,6 +668,60 @@ class Filmstrip extends PureComponent <IProps, IState> {
         this.setState({
             titleTabIndex: value
         });
+    }
+
+    /**
+     * Switch change.
+     *
+     * @param {React.SyntheticEvent} e - React event.
+     * @param {boolean} value - The new value.
+     * @param {number} id - The signal id.
+     * @returns {void}
+     */
+    _onSwitchChange(e: React.SyntheticEvent, value: boolean, id: number) {
+        const { signalList } = this.state;
+
+        const newSignalList = signalList.map(signal => {
+            return {
+                ...signal,
+                isSelected: signal.id === id && value
+            };
+        });
+
+        this.setState({
+            signalList: newSignalList
+        });
+    }
+
+    /**
+     * Render signal.
+     *
+     * @returns {React.DOMElement}
+     */
+    _renderSignalItem() {
+        const { signalList } = this.state;
+
+        return (
+            signalList.map(signal => (
+                <div
+                    className = 'signalstrip-wrapper'
+                    key = { signal.id }>
+                    <div className = 'signalstrip__top'>
+                        <span className = 'signalstrip-type'>{ signal.type}</span>
+                        <span className = 'signalstrip-name'>{ signal.name }</span>
+                    </div>
+                    <div className = 'signalstrip__footer'>
+                        <div className = 'signalstrip-ip'>{ signal.ip }</div>
+                        <SignalSwitch
+                            checked = { signal.isSelected }
+                            // eslint-disable-next-line react/jsx-no-bind
+                            onChange = {
+                                (e, value) => this._onSwitchChange(e, value, signal.id)
+                            } />
+                    </div>
+                </div>
+            ))
+        );
     }
 
     /**
