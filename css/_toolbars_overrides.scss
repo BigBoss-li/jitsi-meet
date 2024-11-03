@@ -8,7 +8,7 @@
             border-radius: 0;
             .toolbox-content-items {
                 box-sizing: border-box;
-                background: #1C2928;
+                background: #1c2928;
                 border-radius: 0;
                 width: 100%;
                 height: 88px;
@@ -23,36 +23,45 @@
                         }
                         &.hangup-button {
                             background-color: #cb2233;
-                            &:hover {
-                                background-color: #e04757;
-                            }
+                        }
+                        &.hangup-button:hover {
+                            background-color: #e04757;
+                        }
+                        &.toggled {
+                            background-color: #2a3d3c;
                         }
                     }
                 }
                 .settings-button-container {
-                  display: flex;
-                  align-items: center;
-                  .settings-button-small-icon {
-                    background: transparent;
-                    box-shadow: none;
-                    padding: 0;
-                    position: initial;
-                    padding: 4px;
-                    color: #ffffff;
-                    &:hover {
-                      background-color: #2a3d3c;
-                      box-shadow: none;
+                    display: flex;
+                    align-items: center;
+                    .settings-button-small-icon {
+                        background: transparent;
+                        box-shadow: none;
+                        padding: 0;
+                        position: initial;
+                        padding: 4px;
+                        color: #ffffff;
+                        &:hover {
+                            background-color: #2a3d3c;
+                            box-shadow: none;
+                            svg {
+                                fill: #ffffff;
+                            }
+                        }
                     }
-                  }
-                  .settings-button-small-icon-container {
-                    position: initial;
-                    padding: 4px;
-                    color: #ffffff;
-                    &:hover {
-                      background-color: #2a3d3c;
-                      box-shadow: none;
+                    .settings-button-small-icon-container {
+                        position: initial;
+                        padding: 4px;
+                        color: #ffffff;
+                        &:hover {
+                            background-color: #2a3d3c;
+                            box-shadow: none;
+                            svg {
+                                fill: #ffffff;
+                            }
+                        }
                     }
-                  }
                 }
             }
         }
