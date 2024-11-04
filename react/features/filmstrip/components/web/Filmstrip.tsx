@@ -675,7 +675,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
         this.setState({
             signalList: newSignalList
         });
-
         let url;
 
         if (value) {
@@ -683,17 +682,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
             url = signal.url;
         }
-        console.log('========');
 
-        window.parent.postMessage(
-            {
-                type: 'share_video',
-                data: {
-                    url
-                }
-            },
-            '*'
-        );
+        window.parent.postMessage({
+            type: 'share_video',
+            data: { url }
+        }, '*');
     }
 
     /**
@@ -730,7 +723,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {void}
      */
     _onMessageListener(e: Object) {
-        console.log('==============', e.data);
         if (e.data.type === 'signal_list') {
             this.setState({
                 signalList: e.data.signalList
@@ -978,6 +970,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 willChange: 'auto',
                 boxSizing: 'border-box',
                 paddingBottom: '88px'
+
                 // flex: 1,
                 // marginBottom: '16px'
             }
@@ -1006,11 +999,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
         // return <></>;
 
-        return <FixedSizeList { ...props }>
+        return (<FixedSizeList { ...props }>
             {
                 ThumbnailWrapper
             }
-        </FixedSizeList>
+        </FixedSizeList>);
     }
 
     /**
