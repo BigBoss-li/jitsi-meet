@@ -438,24 +438,24 @@ export class VideoContainer extends LargeContainer {
 
         this._updateBackground();
 
-        const { horizontalIndent, verticalIndent }
-            = this.getVideoPosition(width, height, containerWidth, containerHeight, verticalFilmstripWidth);
+        // const { horizontalIndent, verticalIndent }
+        //     = this.getVideoPosition(width, height, containerWidth, containerHeight, verticalFilmstripWidth);
 
-        APP.store.dispatch(setLargeVideoDimensions(height, width));
+        // APP.store.dispatch(setLargeVideoDimensions(height, width));
 
-        this.$wrapper.animate({
-            width,
-            height,
+        // this.$wrapper.animate({
+        //     width,
+        //     height,
 
-            top: verticalIndent,
-            bottom: verticalIndent,
+        //     top: verticalIndent,
+        //     bottom: verticalIndent,
 
-            left: horizontalIndent,
-            right: horizontalIndent
-        }, {
-            queue: false,
-            duration: animate ? 500 : 0
-        });
+        //     left: horizontalIndent,
+        //     right: horizontalIndent
+        // }, {
+        //     queue: false,
+        //     duration: animate ? 500 : 0
+        // });
     }
 
     /**

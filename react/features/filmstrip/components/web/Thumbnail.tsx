@@ -260,7 +260,8 @@ const defaultStyles = (theme: Theme) => {
     return {
         indicatorsContainer: {
             position: 'absolute' as const,
-            padding: theme.spacing(1),
+
+            // padding: theme.spacing(1),
             zIndex: 10,
             width: '100%',
             boxSizing: 'border-box' as const,
@@ -282,15 +283,16 @@ const defaultStyles = (theme: Theme) => {
         },
 
         indicatorsBackground: {
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            borderRadius: '4px',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            borderRadius: '0 8px 0 0',
             display: 'flex',
             alignItems: 'center',
             maxWidth: '100%',
             overflow: 'hidden',
+            height: '28px',
 
             '&:not(:empty)': {
-                padding: '4px 8px'
+                padding: '0px 12px'
             },
 
             '& > *:not(:last-child)': {
@@ -304,8 +306,9 @@ const defaultStyles = (theme: Theme) => {
             left: 0,
             height: '100%',
             width: '100%',
-            borderRadius: '4px',
-            backgroundColor: '#1f2928'
+            borderRadius: '8px'
+
+            // backgroundColor: theme.palette.ui02
         },
 
         borderIndicator: {
@@ -356,7 +359,10 @@ const defaultStyles = (theme: Theme) => {
             zIndex: 1,
             width: '100%',
             height: '100%',
-            opacity: 0.8
+            backgroundColor: '#1C2928',
+
+            // backgroundColor: `${theme.palette.uiBackground}`,
+            opacity: 0.6
         },
 
         keyboardPinButton: {
@@ -643,9 +649,10 @@ class Thumbnail extends Component<IProps, IState> {
      * @returns {number}
      */
     _getAvatarSize() {
-        const { _height, _width } = this.props;
+        // const { _height, _width } = this.props;
 
-        return Math.min(_height / 2, _width - 30, 200);
+        // return Math.min(_height / 2, _width - 30, 200);
+        return 96;
     }
 
     /**
@@ -715,10 +722,13 @@ class Thumbnail extends Component<IProps, IState> {
             thumbnail: {
                 ...style,
                 left,
-                height: `${_height}px`,
-                minHeight: `${_height}px`,
-                minWidth: `${_width}px`,
-                width: `${_width}px`
+                height: '196px',
+                width: '100%'
+
+                // height: `${_height}px`,
+                // minHeight: `${_height}px`,
+                // minWidth: `${_width}px`,
+                // width: `${_width}px`
             },
             avatar: {
                 height: `${avatarSize}px`,
@@ -1114,10 +1124,11 @@ class Thumbnail extends Component<IProps, IState> {
                         showStatusIndicators = { !isWhiteboardParticipant(_participant) }
                         thumbnailType = { _thumbnailType } />
                 </div>
-                <div
+                {/* <div
                     className = { clsx(classes.indicatorsContainer,
                         classes.indicatorsTopContainer,
-                        _thumbnailType === THUMBNAIL_TYPE.TILE && 'tile-view-mode'
+                        _thumbnailType === THUMBNAIL_TYPE.TILE && 'tile-view-mode',
+                        'cssw_hacked_top_indicators'
                     ) }>
                     <ThumbnailTopIndicators
                         disableConnectionIndicator = { isWhiteboardParticipant(_participant) }
@@ -1129,8 +1140,9 @@ class Thumbnail extends Component<IProps, IState> {
                         popoverVisible = { popoverVisible }
                         showPopover = { this._showPopover }
                         thumbnailType = { _thumbnailType } />
-                </div>
-                {_shouldDisplayTintBackground && <div className = { classes.tintBackground } />}
+                </div> */}
+                <div className = { classes.tintBackground } />
+                {/* {_shouldDisplayTintBackground && <div className = { classes.tintBackground } />} */}
                 {!_gifSrc && this._renderAvatar(styles.avatar) }
                 { !local && (
                     <div className = 'presence-label-container'>

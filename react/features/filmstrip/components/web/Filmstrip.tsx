@@ -1,3 +1,5 @@
+import { Switch, Tab, Tabs } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import { throttle } from 'lodash-es';
 import React, { PureComponent } from 'react';
@@ -37,17 +39,95 @@ import {
     TILE_VERTICAL_MARGIN,
     TOP_FILMSTRIP_HEIGHT
 } from '../../constants';
-import {
-    getVerticalViewMaxWidth,
-    isStageFilmstripTopPanel,
-    shouldRemoteVideosBeVisible
-} from '../../functions';
+import { getVerticalViewMaxWidth, isStageFilmstripTopPanel, shouldRemoteVideosBeVisible } from '../../functions';
 import { isFilmstripDisabled } from '../../functions.web';
 
 import AudioTracksContainer from './AudioTracksContainer';
 import Thumbnail from './Thumbnail';
 import ThumbnailWrapper from './ThumbnailWrapper';
 import { styles } from './styles';
+
+interface IFilmstripTitleTabsProps {
+    children?: React.ReactNode;
+    onChange: (event: React.SyntheticEvent, newValue: number) => void;
+    value: number;
+}
+
+const FilmstripTitleTabs = styled((props: IFilmstripTitleTabsProps) =>
+    (<Tabs
+        { ...props }
+        TabIndicatorProps = {{ children: <span className = 'MuiTabs-indicatorSpan' /> }}
+        variant = 'fullWidth' />)
+)({
+    '& .MuiTabs-indicator': {
+        display: 'flex',
+        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        height: '4px',
+        borderRadius: '2px'
+    },
+    '& .MuiTabs-indicatorSpan': {
+        maxWidth: 40,
+        width: '100%',
+        backgroundColor: '#fff'
+    }
+});
+
+interface IFilmstripTitleTabProps {
+    label: string;
+}
+
+const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (<Tab
+    disableRipple = { true }
+    { ...props } />))({
+    textTransform: 'none',
+    lineHeight: '28px',
+    fontSize: '20px',
+
+    // fontWeight: theme.typography.fontWeightRegular,
+    // fontSize: theme.typography.pxToRem(15),
+    // marginRight: theme.spacing(1),
+    color: 'rgba(255, 255, 255, 0.8)',
+    '&.Mui-selected': {
+        fontWeight: 'bold',
+        color: '#fff'
+    }
+
+    // '&.Mui-focusVisible': {
+    // backgroundColor: 'rgba(100, 95, 228, 0.32)'
+    // }
+});
+
+interface IFilmstripSignalSwitchProps {
+    checked: boolean;
+    onChange: (event: React.SyntheticEvent, newValue: number) => void;
+}
+
+const SignalSwitch = styled((props: IFilmstripSignalSwitchProps) => <Switch { ...props } />)(() => {
+    return {
+        padding: 0,
+        width: '70px',
+        '& .MuiSwitch-switchBase': {
+            padding: '4px',
+            left: '2px'
+        },
+        '& .MuiSwitch-switchBase.Mui-checked': {
+            color: '#ffffff',
+            transform: 'translateX(30px)'
+        },
+        '& .MuiSwitch-switchBase .MuiSwitch-thumb': {
+            width: '30px',
+            height: '30px'
+        },
+        '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+            borderRadius: '50px'
+        },
+        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+            backgroundColor: '#008F84',
+            borderRadius: '50px'
+        }
+    };
+});
 
 /**
  * The type of the React {@code Component} props of {@link Filmstrip}.
@@ -105,8 +185,8 @@ interface IProps extends WithTranslation {
     _isFilmstripButtonEnabled: boolean;
 
     /**
-    * Whether or not the toolbox is displayed.
-    */
+     * Whether or not the toolbox is displayed.
+     */
     _isToolboxVisible: Boolean;
 
     /**
@@ -246,6 +326,8 @@ interface IState {
      * Initial mouse position on drag handle mouse down.
      */
     mousePosition?: number | null;
+
+    titleTabIndex: number;
 }
 
 /**
@@ -254,8 +336,7 @@ interface IState {
  *
  * @augments Component
  */
-class Filmstrip extends PureComponent <IProps, IState> {
-
+class Filmstrip extends PureComponent<IProps, IState> {
     _throttledResize: Function;
 
     /**
@@ -271,7 +352,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
             isMouseDown: false,
             mousePosition: null,
             dragFilmstripWidth: null,
-            tabActiveKey: '1'
+            titleTabIndex: 0,
+            signalList: []
         };
 
         // Bind event handlers so they are only bound once for every instance.
@@ -286,14 +368,16 @@ class Filmstrip extends PureComponent <IProps, IState> {
         this._onDragHandleMouseDown = this._onDragHandleMouseDown.bind(this);
         this._onDragMouseUp = this._onDragMouseUp.bind(this);
         this._onFilmstripResize = this._onFilmstripResize.bind(this);
+        this._onTitleTabChange = this._onTitleTabChange.bind(this);
+        this._onSwitchChange = this._onSwitchChange.bind(this);
+        this._renderSignalItem = this._renderSignalItem.bind(this);
+        this._onMessageListener = this._onMessageListener.bind(this);
+        window.addEventListener('message', this._onMessageListener, false);
 
-        this._throttledResize = throttle(
-            this._onFilmstripResize,
-            50,
-            {
-                leading: true,
-                trailing: false
-            });
+        this._throttledResize = throttle(this._onFilmstripResize, 50, {
+            leading: true,
+            trailing: false
+        });
     }
 
     /**
@@ -302,11 +386,13 @@ class Filmstrip extends PureComponent <IProps, IState> {
      * @inheritdoc
      */
     componentDidMount() {
-        this.props.dispatch(registerShortcut({
-            character: 'F',
-            helpDescription: 'keyboardShortcuts.toggleFilmstrip',
-            handler: this._onShortcutToggleFilmstrip
-        }));
+        this.props.dispatch(
+            registerShortcut({
+                character: 'F',
+                helpDescription: 'keyboardShortcuts.toggleFilmstrip',
+                handler: this._onShortcutToggleFilmstrip
+            })
+        );
 
         document.addEventListener('mouseup', this._onDragMouseUp);
 
@@ -335,7 +421,7 @@ class Filmstrip extends PureComponent <IProps, IState> {
      * @returns {ReactElement}
      */
     render() {
-        const filmstripStyle: any = { };
+        const filmstripStyle: any = {};
         const {
             _currentLayout,
             _disableSelfView,
@@ -353,7 +439,7 @@ class Filmstrip extends PureComponent <IProps, IState> {
             t
         } = this.props;
         const classes = withStyles.getClasses(this.props);
-        const { isMouseDown } = this.state;
+        const { isMouseDown, titleTabIndex } = this.state;
         const tileViewActive = _currentLayout === LAYOUTS.TILE_VIEW;
 
         if (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.STAGE) {
@@ -377,8 +463,10 @@ class Filmstrip extends PureComponent <IProps, IState> {
             }
             filmstripStyle.bottom = 0;
             filmstripStyle.top = 'auto';
-        } else if (_currentLayout === LAYOUTS.VERTICAL_FILMSTRIP_VIEW
-            || (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.MAIN)) {
+        } else if (
+            _currentLayout === LAYOUTS.VERTICAL_FILMSTRIP_VIEW
+            || (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.MAIN)
+        ) {
             filmstripStyle.maxWidth = _verticalViewMaxWidth;
             if (!_mainFilmstripVisible) {
                 filmstripStyle.right = `-${filmstripStyle.maxWidth}px`;
@@ -387,88 +475,134 @@ class Filmstrip extends PureComponent <IProps, IState> {
 
         let toolbar = null;
 
-        if (!this.props._iAmRecorder && this.props._isFilmstripButtonEnabled
+        if (
+            !this.props._iAmRecorder
+            && this.props._isFilmstripButtonEnabled
             && _currentLayout !== LAYOUTS.TILE_VIEW
             && ((filmstripType === FILMSTRIP_TYPE.MAIN && !_filmstripDisabled)
-                || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))) {
+                || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+        ) {
             toolbar = this._renderToggleButton();
         }
 
-        const tabbar = this._renderTabbar();
-
-        const filmstrip = (<>
-            <div
-                className = { clsx(this.props._videosClassName,
-                    !tileViewActive && (filmstripType === FILMSTRIP_TYPE.MAIN
-                    || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
-                    && !_resizableFilmstrip && 'filmstrip-hover',
-                    _verticalViewGrid && 'vertical-view-grid') }
-                id = 'remoteVideos'>
-                {tabbar}
-                {!_disableSelfView && !_verticalViewGrid && (
-                    <div
-                        className = 'filmstrip__videos'
-                        id = 'filmstripLocalVideo'>
-                        {
-                            !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
-                            && <div id = 'filmstripLocalVideoThumbnail'>
-                                <Thumbnail
-                                    filmstripType = { FILMSTRIP_TYPE.MAIN }
-                                    key = 'local' />
+        const filmstrip = (
+            <>
+                <div
+                    className = { clsx(
+                        this.props._videosClassName,
+                        !tileViewActive
+                            && (filmstripType === FILMSTRIP_TYPE.MAIN
+                                || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+                            && !_resizableFilmstrip
+                            && 'filmstrip-hover',
+                        _verticalViewGrid && 'vertical-view-grid'
+                    ) }
+                    id = 'remoteVideos'>
+                    {!_disableSelfView && !_verticalViewGrid && (
+                        <div
+                            className = 'filmstrip__videos'
+                            id = 'filmstripLocalVideo'>
+                            {!tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN && (
+                                <div id = 'filmstripLocalVideoThumbnail'>
+                                    <Thumbnail
+                                        filmstripType = { FILMSTRIP_TYPE.MAIN }
+                                        key = 'local' />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {_localScreenShareId && !_disableSelfView && !_verticalViewGrid && (
+                        <div
+                            className = 'filmstrip__videos'
+                            id = 'filmstripLocalScreenShare'>
+                            <div id = 'filmstripLocalScreenShareThumbnail'>
+                                {!tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
+                                    && <Thumbnail
+                                        key = 'localScreenShare'
+                                        participantID = { _localScreenShareId } />
+                                }
                             </div>
-                        }
-                    </div>
-                )}
-                {_localScreenShareId && !_disableSelfView && !_verticalViewGrid && (
-                    <div
-                        className = 'filmstrip__videos'
-                        id = 'filmstripLocalScreenShare'>
-                        <div id = 'filmstripLocalScreenShareThumbnail'>
-                            {
-                                !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN && <Thumbnail
-                                    key = 'localScreenShare'
-                                    participantID = { _localScreenShareId } />
+                        </div>
+                    )}
+                    {this._renderRemoteParticipants()}
+                </div>
+            </>
+        );
+
+        const signalstrip = (
+            <>
+                <div
+                    className = { clsx(
+                        this.props._videosClassName,
+                        !tileViewActive
+                            && (filmstripType === FILMSTRIP_TYPE.MAIN
+                                || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+                            && !_resizableFilmstrip
+                            && 'filmstrip-hover',
+                        _verticalViewGrid && 'vertical-view-grid'
+                    ) }
+                    id = 'remoteVideos'>
+                    {!_disableSelfView && !_verticalViewGrid && (
+                        <div
+                            className = 'filmstrip__videos'
+                            id = 'filmstripLocalVideo'>
+                            {!tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
+                                && <div id = 'filmstripLocalVideoThumbnail'>{this._renderSignalItem()}</div>
                             }
                         </div>
-                    </div>
-                )}
-                {
-                    this._renderRemoteParticipants()
-                }
-            </div>
-        </>);
+                    )}
+                </div>
+            </>
+        );
 
         return (
             <div
-                className = { clsx('filmstrip',
+                className = { clsx(
+                    'filmstrip',
                     this.props._className,
                     classes.filmstrip,
                     _verticalViewGrid && 'no-vertical-padding',
-                    _verticalViewBackground && classes.filmstripBackground) }
+                    _verticalViewBackground && classes.filmstripBackground,
+                    'cssw_hacked'
+                ) }
                 style = { filmstripStyle }>
                 <span
                     aria-level = { 1 }
                     className = 'sr-only'
                     role = 'heading'>
-                    { t('filmstrip.accessibilityLabel.heading') }
+                    {t('filmstrip.accessibilityLabel.heading')}
                 </span>
-                { toolbar }
-                {_resizableFilmstrip
-                    ? <div
-                        className = { clsx('resizable-filmstrip', classes.resizableFilmstripContainer,
-                            _topPanelFilmstrip && 'top-panel-filmstrip') }>
-                        <div
-                            className = { clsx('dragHandleContainer',
-                                classes.dragHandleContainer,
-                                isMouseDown && 'visible',
-                                _topPanelFilmstrip && 'top-panel')
-                            }
-                            onMouseDown = { this._onDragHandleMouseDown }>
-                            <div className = { clsx(classes.dragHandle, 'dragHandle') } />
+                {/* { toolbar } */}
+                <div className = 'cssw_hacked_title_tabs'>
+                    <FilmstripTitleTabs
+                        onChange = { this._onTitleTabChange }
+                        value = { titleTabIndex }>
+                        <FilmstripTitleTab label = '成员' />
+                        <FilmstripTitleTab label = '信号源' />
+                    </FilmstripTitleTabs>
+                </div>
+                {
+
+                    /* {
+                    _resizableFilmstrip
+                        ? <div
+                            className = { clsx('resizable-filmstrip', classes.resizableFilmstripContainer,
+                                _topPanelFilmstrip && 'top-panel-filmstrip') }>
+                            <div
+                                className = { clsx('dragHandleContainer',
+                                    classes.dragHandleContainer,
+                                    isMouseDown && 'visible',
+                                    _topPanelFilmstrip && 'top-panel')
+                                }
+                                onMouseDown = { this._onDragHandleMouseDown }>
+                                <div className = { clsx(classes.dragHandle, 'dragHandle') } />
+                            </div>
+                            {filmstrip}
                         </div>
-                        {filmstrip}
-                    </div>
-                    : filmstrip
+                        : filmstrip
+                } */
+                    // filmstrip
+                    titleTabIndex === 0 ? filmstrip : signalstrip
                 }
                 <AudioTracksContainer />
             </div>
@@ -504,6 +638,95 @@ class Filmstrip extends PureComponent <IProps, IState> {
                 isMouseDown: false
             });
             this.props.dispatch(setUserIsResizing(false));
+        }
+    }
+
+    /**
+     * Update selected tab - hacked by cssw.
+     *
+     * @param {React.SyntheticEvent} e - React event.
+     * @param {number} value - The new index.
+     * @returns {void}
+     */
+    _onTitleTabChange(e: React.SyntheticEvent, value: number) {
+        this.setState({
+            titleTabIndex: value
+        });
+    }
+
+    /**
+     * Switch change.
+     *
+     * @param {React.SyntheticEvent} e - React event.
+     * @param {boolean} value - The new value.
+     * @param {number} id - The signal id.
+     * @returns {void}
+     */
+    _onSwitchChange(e: React.SyntheticEvent, value: boolean, id: number) {
+        const { signalList } = this.state;
+
+        const newSignalList = signalList.map(signal => {
+            return {
+                ...signal,
+                isSelected: signal.id === id && value
+            };
+        });
+
+        this.setState({
+            signalList: newSignalList
+        });
+        let url;
+
+        if (value) {
+            const signal = signalList.find(i => i.id === id);
+
+            url = signal.url;
+        }
+
+        window.parent.postMessage({
+            type: 'share_video',
+            data: { url }
+        }, '*');
+    }
+
+    /**
+     * Render signal.
+     *
+     * @returns {React.DOMElement}
+     */
+    _renderSignalItem() {
+        const { signalList } = this.state;
+
+        return signalList.map(signal => (
+            <div
+                className = 'signalstrip-wrapper'
+                key = { signal.id }>
+                <div className = 'signalstrip__top'>
+                    <span className = 'signalstrip-type'>{signal.type}</span>
+                    <span className = 'signalstrip-name'>{signal.name}</span>
+                </div>
+                <div className = 'signalstrip__footer'>
+                    <div className = 'signalstrip-ip'>{signal.ip}</div>
+                    <SignalSwitch
+                        checked = { signal.isSelected }
+                        // eslint-disable-next-line react/jsx-no-bind
+                        onChange = { (e, value) => this._onSwitchChange(e, value, signal.id) } />
+                </div>
+            </div>
+        ));
+    }
+
+    /**
+     * Message listener.
+     *
+     * @param {Object} e -received data.
+     * @returns {void}
+     */
+    _onMessageListener(e: Object) {
+        if (e.data.type === 'signal_list') {
+            this.setState({
+                signalList: e.data.signalList
+            });
         }
     }
 
@@ -610,14 +833,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
      * @returns {string} - The key.
      */
     _gridItemKey({ columnIndex, rowIndex }: { columnIndex: number; rowIndex: number; }): string {
-        const {
-            _disableSelfView,
-            _columns,
-            _iAmRecorder,
-            _remoteParticipants,
-            _remoteParticipantsLength
-        } = this.props;
-        const index = (rowIndex * _columns) + columnIndex;
+        const { _disableSelfView, _columns, _iAmRecorder, _remoteParticipants, _remoteParticipantsLength } = this.props;
+        const index = rowIndex * _columns + columnIndex;
 
         // When the thumbnails are reordered, local participant is inserted at index 0.
         const localIndex = _disableSelfView ? _remoteParticipantsLength : 0;
@@ -640,8 +857,13 @@ class Filmstrip extends PureComponent <IProps, IState> {
      * @param {Object} data - Information about the rendered items.
      * @returns {void}
      */
-    _onListItemsRendered({ visibleStartIndex, visibleStopIndex }: {
-        visibleStartIndex: number; visibleStopIndex: number; }) {
+    _onListItemsRendered({
+        visibleStartIndex,
+        visibleStopIndex
+    }: {
+        visibleStartIndex: number;
+        visibleStopIndex: number;
+    }) {
         const { dispatch } = this.props;
         const { startIndex, stopIndex } = this._calculateIndices(visibleStartIndex, visibleStopIndex);
 
@@ -666,8 +888,8 @@ class Filmstrip extends PureComponent <IProps, IState> {
         visibleRowStopIndex: number;
     }) {
         const { _columns, dispatch } = this.props;
-        const start = (visibleRowStartIndex * _columns) + visibleColumnStartIndex;
-        const stop = (visibleRowStopIndex * _columns) + visibleColumnStopIndex;
+        const start = visibleRowStartIndex * _columns + visibleColumnStartIndex;
+        const stop = visibleRowStopIndex * _columns + visibleColumnStopIndex;
         const { startIndex, stopIndex } = this._calculateIndices(start, stop);
 
         dispatch(setVisibleRemoteParticipants(startIndex, stopIndex));
@@ -695,9 +917,16 @@ class Filmstrip extends PureComponent <IProps, IState> {
             filmstripType
         } = this.props;
 
-        if (!_thumbnailWidth || isNaN(_thumbnailWidth) || !_thumbnailHeight
-            || isNaN(_thumbnailHeight) || !_filmstripHeight || isNaN(_filmstripHeight) || !_filmstripWidth
-            || isNaN(_filmstripWidth)) {
+        if (
+            !_thumbnailWidth
+            || isNaN(_thumbnailWidth)
+            || !_thumbnailHeight
+            || isNaN(_thumbnailHeight)
+            || !_filmstripHeight
+            || isNaN(_filmstripHeight)
+            || !_filmstripWidth
+            || isNaN(_filmstripWidth)
+        ) {
             return null;
         }
 
@@ -717,25 +946,33 @@ class Filmstrip extends PureComponent <IProps, IState> {
                     rowCount = { _rows }
                     rowHeight = { _thumbnailHeight + TILE_VERTICAL_MARGIN }
                     width = { _filmstripWidth }>
-                    {
-                        ThumbnailWrapper
-                    }
+                    {ThumbnailWrapper}
                 </FixedSizeGrid>
             );
         }
 
-
         const props: any = {
+            id: 'filmstripRemoteVideos',
             itemCount: _remoteParticipantsLength,
+
+            // className: 'filmstrip__videos remote-videos height-transition',
+
             className: `filmstrip__videos remote-videos ${_resizableFilmstrip ? '' : 'height-transition'}`,
+
             height: _filmstripHeight,
             itemKey: this._listItemKey,
             itemSize: 0,
             onItemsRendered: this._onListItemsRendered,
             overscanCount: 1,
-            width: _filmstripWidth,
+
+            // width: _filmstripWidth,
             style: {
-                willChange: 'auto'
+                willChange: 'auto',
+                boxSizing: 'border-box',
+                paddingBottom: '88px'
+
+                // flex: 1,
+                // marginBottom: '16px'
             }
         };
 
@@ -748,9 +985,9 @@ class Filmstrip extends PureComponent <IProps, IState> {
             if (isNotOverflowing) {
                 props.className += ' is-not-overflowing';
             }
-
         } else if (_isVerticalFilmstrip) {
-            const itemSize = _thumbnailHeight + TILE_VERTICAL_MARGIN;
+            // const itemSize = _thumbnailHeight + TILE_VERTICAL_MARGIN;
+            const itemSize = 208;
             const isNotOverflowing = !_hasScroll;
 
             if (isNotOverflowing) {
@@ -760,13 +997,13 @@ class Filmstrip extends PureComponent <IProps, IState> {
             props.itemSize = itemSize;
         }
 
-        return (
-            <FixedSizeList { ...props }>
-                {
-                    ThumbnailWrapper
-                }
-            </FixedSizeList>
-        );
+        // return <></>;
+
+        return (<FixedSizeList { ...props }>
+            {
+                ThumbnailWrapper
+            }
+        </FixedSizeList>);
     }
 
     /**
@@ -791,12 +1028,11 @@ class Filmstrip extends PureComponent <IProps, IState> {
      * @returns {void}
      */
     _onShortcutToggleFilmstrip() {
-        sendAnalytics(createShortcutEvent(
-            'toggle.filmstrip',
-            ACTION_SHORTCUT_TRIGGERED,
-            {
+        sendAnalytics(
+            createShortcutEvent('toggle.filmstrip', ACTION_SHORTCUT_TRIGGERED, {
                 enable: this.props._mainFilmstripVisible
-            }));
+            })
+        );
 
         this._doToggleFilmstrip();
     }
@@ -809,11 +1045,11 @@ class Filmstrip extends PureComponent <IProps, IState> {
      * @returns {void}
      */
     _onToolbarToggleFilmstrip() {
-        sendAnalytics(createToolbarEvent(
-            'toggle.filmstrip.button',
-            {
+        sendAnalytics(
+            createToolbarEvent('toggle.filmstrip.button', {
                 enable: this.props._mainFilmstripVisible
-            }));
+            })
+        );
 
         this._doToggleFilmstrip();
     }
@@ -839,13 +1075,7 @@ class Filmstrip extends PureComponent <IProps, IState> {
      * @returns {ReactElement}
      */
     _renderToggleButton() {
-        const {
-            t,
-            _isVerticalFilmstrip,
-            _mainFilmstripVisible,
-            _topPanelFilmstrip,
-            _topPanelVisible
-        } = this.props;
+        const { t, _isVerticalFilmstrip, _mainFilmstripVisible, _topPanelFilmstrip, _topPanelVisible } = this.props;
         const classes = withStyles.getClasses(this.props);
         const icon = (_topPanelFilmstrip ? _topPanelVisible : _mainFilmstripVisible) ? IconArrowDown : IconArrowUp;
         const actions = isMobileBrowser()
@@ -854,11 +1084,13 @@ class Filmstrip extends PureComponent <IProps, IState> {
 
         return (
             <div
-                className = { clsx(classes.toggleFilmstripContainer,
+                className = { clsx(
+                    classes.toggleFilmstripContainer,
                     _isVerticalFilmstrip && classes.toggleVerticalFilmstripContainer,
                     _topPanelFilmstrip && classes.toggleTopPanelContainer,
                     _topPanelFilmstrip && !_topPanelVisible && classes.toggleTopPanelContainerHidden,
-                    'toggleFilmstripContainer') }>
+                    'toggleFilmstripContainer'
+                ) }>
                 <button
                     aria-expanded = { this.props._mainFilmstripVisible }
                     aria-label = { t('toolbar.accessibilityLabel.toggleFilmstrip') }
@@ -929,9 +1161,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
     const { clientWidth, clientHeight } = state['features/base/responsive-ui'];
     const filmstripDisabled = isFilmstripDisabled(state);
 
-    const collapseTileView = reduceHeight
-        && isMobileBrowser()
-        && clientWidth <= ASPECT_RATIO_BREAKPOINT;
+    const collapseTileView = reduceHeight && isMobileBrowser() && clientWidth <= ASPECT_RATIO_BREAKPOINT;
 
     const shouldReduceHeight = reduceHeight && isMobileBrowser();
     const _topPanelVisible = isStageFilmstripTopPanel(state) && topPanelVisible;
@@ -948,7 +1178,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
     } ${shiftRight ? 'shift-right' : ''} ${collapseTileView ? 'collapse' : ''} ${isVisible ? '' : 'hidden'}`.trim();
 
     const _currentLayout = getCurrentLayout(state);
-    const _isVerticalFilmstrip = _currentLayout === LAYOUTS.VERTICAL_FILMSTRIP_VIEW
+    const _isVerticalFilmstrip
+        = _currentLayout === LAYOUTS.VERTICAL_FILMSTRIP_VIEW
         || (filmstripType === FILMSTRIP_TYPE.MAIN && _currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW);
 
     return {

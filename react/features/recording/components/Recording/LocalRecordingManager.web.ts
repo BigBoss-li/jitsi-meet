@@ -177,13 +177,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
             setTimeout(() => {
                 if (this.recordingData.length > 0) {
                     // this.saveRecording(this.recordingData, this.getFilename());
-                    console.log('recording END');
                     this.sendBlobRecording(this.recordingData);
-
-                    // window.parent.postMessage({
-                    //     type: 'recorder_full_data',
-                    //     data: this.recordingData
-                    // }, '*');
                 }
             }, 1000);
         }
@@ -328,6 +322,10 @@ const LocalRecordingManager: ILocalRecordingManager = {
         }
 
         this.recorder.start(5000);
+        window.parent.postMessage({
+            type: 'recorder_start',
+            data: true
+        }, '*');
     },
 
     /**

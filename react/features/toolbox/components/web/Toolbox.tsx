@@ -213,8 +213,7 @@ export default function Toolbox({
     const isMobile = isMobileBrowser();
 
     const rootClassNames = `new-toolbox ${toolbarVisible ? 'visible' : ''} ${
-        toolbarButtonsToUse.length ? '' : 'no-buttons'} ${chatOpen ? 'shift-right' : ''} 
-        ${isConferenceJoined ? 'conference-joined-toolbox' : ''}`;
+        toolbarButtonsToUse.length ? '' : 'no-buttons'} ${chatOpen ? 'shift-right' : ''} cssw_hacked`;
 
     const toolbarAccLabel = 'toolbar.accessibilityLabel.moreActionsMenu';
     const containerClassName = `toolbox-content${isMobile || isNarrowLayout ? ' toolbox-content-mobile' : ''}`;

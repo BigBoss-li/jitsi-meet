@@ -1,0 +1,69 @@
+.new-toolbox.cssw_hacked {
+    bottom: 0;
+    .toolbox-content {
+        width: 100%;
+        margin-bottom: 0;
+        .toolbox-content-wrapper {
+            width: 100%;
+            border-radius: 0;
+            .toolbox-content-items {
+                box-sizing: border-box;
+                background: #1c2928;
+                border-radius: 0;
+                width: 100%;
+                height: 88px;
+                padding: 8px;
+                justify-content: center;
+                align-items: center;
+                box-shadow: none;
+                .toolbox-button {
+                    .toolbox-icon {
+                        &:hover {
+                            background-color: #2a3d3c;
+                        }
+                        &.hangup-button {
+                            background-color: #cb2233;
+                        }
+                        &.hangup-button:hover {
+                            background-color: #e04757;
+                        }
+                        &.toggled {
+                            background-color: #2a3d3c;
+                        }
+                    }
+                }
+                .settings-button-container {
+                    display: flex;
+                    align-items: center;
+                    .settings-button-small-icon {
+                        background: transparent;
+                        box-shadow: none;
+                        padding: 0;
+                        position: initial;
+                        padding: 4px;
+                        color: #ffffff;
+                        &:hover {
+                            background-color: #2a3d3c;
+                            box-shadow: none;
+                            svg {
+                                fill: #ffffff;
+                            }
+                        }
+                    }
+                    .settings-button-small-icon-container {
+                        position: initial;
+                        padding: 4px;
+                        color: #ffffff;
+                        &:hover {
+                            background-color: #2a3d3c;
+                            box-shadow: none;
+                            svg {
+                                fill: #ffffff;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

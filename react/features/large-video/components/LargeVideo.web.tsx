@@ -243,7 +243,7 @@ class LargeVideo extends Component<IProps> {
                 </div>
                 { interfaceConfig.DISABLE_TRANSCRIPTION_SUBTITLES
                     || <Captions /> }
-                {_showDominantSpeakerBadge && <StageParticipantNameLabel />}
+                {/* {_showDominantSpeakerBadge && <StageParticipantNameLabel />} */}
             </div>
         );
     }
@@ -312,9 +312,10 @@ class LargeVideo extends Component<IProps> {
             styles.backgroundSize = 'cover';
         }
 
-        if (_visibleFilmstrip && Number(_verticalFilmstripWidth) >= FILMSTRIP_BREAKPOINT) {
-            styles.width = `calc(100% - ${_verticalViewMaxWidth || 0}px)`;
-        }
+        // if (_visibleFilmstrip && Number(_verticalFilmstripWidth) >= FILMSTRIP_BREAKPOINT) {
+        styles.width = `calc(100% - ${_verticalViewMaxWidth || 0}px)`;
+
+        // }
 
         return styles;
     }

@@ -38,17 +38,20 @@ export function getCurrentLayout(state: IReduxState) {
     if (navigator.product === 'ReactNative') {
         // FIXME: what should this return?
         return undefined;
-    } else if (shouldDisplayTileView(state)) {
-        return LAYOUTS.TILE_VIEW;
-    } else if (interfaceConfig.VERTICAL_FILMSTRIP) {
-        if (isStageFilmstripAvailable(state, 2)) {
-            return LAYOUTS.STAGE_FILMSTRIP_VIEW;
-        }
-
-        return LAYOUTS.VERTICAL_FILMSTRIP_VIEW;
     }
 
-    return LAYOUTS.HORIZONTAL_FILMSTRIP_VIEW;
+    // else if (shouldDisplayTileView(state)) {
+    //     return LAYOUTS.TILE_VIEW;
+    // } else if (interfaceConfig.VERTICAL_FILMSTRIP) {
+    //     // if (isStageFilmstripAvailable(state, 2)) {
+    //     //     return LAYOUTS.STAGE_FILMSTRIP_VIEW;
+    //     // }
+
+    //     return LAYOUTS.VERTICAL_FILMSTRIP_VIEW;
+    // }
+
+    // return LAYOUTS.HORIZONTAL_FILMSTRIP_VIEW;
+    return LAYOUTS.VERTICAL_FILMSTRIP_VIEW;
 }
 
 /**
