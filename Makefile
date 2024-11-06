@@ -10,6 +10,11 @@ EXCALIDRAW_DIR_DEV = node_modules/@jitsi/excalidraw/dist/excalidraw-assets-dev
 TFLITE_WASM = react/features/stream-effects/virtual-background/vendor/tflite
 MEET_MODELS_DIR  = react/features/stream-effects/virtual-background/vendor/models
 FACE_MODELS_DIR = node_modules/@vladmandic/human-models/models
+
+FLVJS_DIR = node_modules/flv.js/dist/
+HLSJS_DIR = node_modules/hls.js/dist/
+DASHJS_DIR = node_modules/dashjs/dist/
+
 NODE_SASS = ./node_modules/.bin/sass
 NPM = npm
 OUTPUT_DIR = .
@@ -34,7 +39,7 @@ clean:
 	rm -fr $(BUILD_DIR)
 
 .NOTPARALLEL:
-deploy: deploy-init deploy-appbundle deploy-rnnoise-binary deploy-excalidraw deploy-tflite deploy-meet-models deploy-lib-jitsi-meet deploy-olm deploy-tf-wasm deploy-css deploy-local deploy-face-landmarks
+deploy: deploy-init deploy-appbundle deploy-rnnoise-binary deploy-excalidraw deploy-tflite deploy-meet-models deploy-lib-jitsi-meet deploy-olm deploy-tf-wasm deploy-css deploy-local deploy-face-landmarks deploy-reactplayer
 
 deploy-init:
 	rm -fr $(DEPLOY_DIR)
@@ -56,13 +61,25 @@ deploy-appbundle:
 		$(BUILD_DIR)/noise-suppressor-worklet.min.js.map \
 		$(BUILD_DIR)/screenshot-capture-worker.min.js \
 		$(BUILD_DIR)/screenshot-capture-worker.min.js.map \
-		$(BUILD_DIR)/reactPlayer*.min.js \
-		$(BUILD_DIR)/reactPlayer*.min.js.map \
 		$(DEPLOY_DIR)
 	cp \
 		$(BUILD_DIR)/close3.min.js \
 		$(BUILD_DIR)/close3.min.js.map \
 		$(DEPLOY_DIR) || true
+
+deploy-reactplayer:
+	cp \
+		$(BUILD_DIR)/reactPlayer*.min.js \
+		$(BUILD_DIR)/reactPlayer*.min.js.map \
+		$(DEPLOY_DIR)
+	cp \
+		$(FLVJS_DIR)/flv.min.js \
+		$(FLVJS_DIR)/flv.min.js.map \
+		$(HLSJS_DIR)/hls.min.js \
+		$(HLSJS_DIR)/hls.min.js.map \
+		$(DASHJS_DIR)/dash.all.js \
+		$(DASHJS_DIR)/dash.all.js.map \
+		$(DEPLOY_DIR)
 
 deploy-lib-jitsi-meet:
 	cp \
