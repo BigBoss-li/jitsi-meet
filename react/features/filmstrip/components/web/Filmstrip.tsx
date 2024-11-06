@@ -450,7 +450,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             t
         } = this.props;
         const classes = withStyles.getClasses(this.props);
-        const { isMouseDown, titleTabIndex } = this.state;
+        const { titleTabIndex } = this.state; // { isMouseDown, titleTabIndex }
         const tileViewActive = _currentLayout === LAYOUTS.TILE_VIEW;
 
         if (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.STAGE) {
@@ -484,7 +484,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             }
         }
 
-        let toolbar = null;
+        // let toolbar = null;
 
         if (
             !this.props._iAmRecorder
@@ -493,7 +493,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
             && ((filmstripType === FILMSTRIP_TYPE.MAIN && !_filmstripDisabled)
                 || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
         ) {
-            toolbar = this._renderToggleButton();
+
+            // toolbar = this._renderToggleButton();
         }
 
         const filmstrip = (
@@ -849,7 +850,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _gridItemKey({ columnIndex, rowIndex }: { columnIndex: number; rowIndex: number; }): string {
         const { _disableSelfView, _columns, _iAmRecorder, _remoteParticipants, _remoteParticipantsLength } = this.props;
-        const index = rowIndex * _columns + columnIndex;
+        const index = (rowIndex * _columns) + columnIndex;
 
         // When the thumbnails are reordered, local participant is inserted at index 0.
         const localIndex = _disableSelfView ? _remoteParticipantsLength : 0;
@@ -903,8 +904,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
         visibleRowStopIndex: number;
     }) {
         const { _columns, dispatch } = this.props;
-        const start = visibleRowStartIndex * _columns + visibleColumnStartIndex;
-        const stop = visibleRowStopIndex * _columns + visibleColumnStopIndex;
+        const start = (visibleRowStartIndex * _columns) + visibleColumnStartIndex;
+        const stop = (visibleRowStopIndex * _columns) + visibleColumnStopIndex;
         const { startIndex, stopIndex } = this._calculateIndices(start, stop);
 
         dispatch(setVisibleRemoteParticipants(startIndex, stopIndex));

@@ -10,7 +10,7 @@ import AbstractButton, { IProps as AbstractButtonProps } from '../../../base/too
 import { closeOverflowMenuIfOpen } from '../../../toolbox/actions.web';
 import { toggleChat } from '../../actions.web';
 
-import ChatCounter from './ChatCounter';
+// import ChatCounter from './ChatCounter';
 
 /**
  * The type of the React {@code Component} props of {@link ChatButton}.

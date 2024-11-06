@@ -4,7 +4,7 @@ import { getFeatureFlag } from '../base/flags/functions';
 import { pinParticipant } from '../base/participants/actions';
 import { getParticipantCount, getPinnedParticipant } from '../base/participants/functions';
 import { FakeParticipant } from '../base/participants/types';
-import { isStageFilmstripAvailable, isTileViewModeDisabled } from '../filmstrip/functions';
+import { isTileViewModeDisabled } from '../filmstrip/functions'; // import { isStageFilmstripAvailable }
 import { isVideoPlaying } from '../shared-video/functions';
 import { VIDEO_QUALITY_LEVELS } from '../video-quality/constants';
 import { getReceiverVideoQualityLevel } from '../video-quality/functions';
@@ -27,6 +27,8 @@ export function getAutoPinSetting() {
         : 'remote-only';
 }
 
+// export function getCurrentLayout(state: IReduxState) {
+
 /**
  * Returns the {@code LAYOUTS} constant associated with the layout
  * the application should currently be in.
@@ -34,7 +36,7 @@ export function getAutoPinSetting() {
  * @param {Object} state - The redux state.
  * @returns {string}
  */
-export function getCurrentLayout(state: IReduxState) {
+export function getCurrentLayout() {
     if (navigator.product === 'ReactNative') {
         // FIXME: what should this return?
         return undefined;

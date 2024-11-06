@@ -650,7 +650,7 @@ export function showGridInVerticalView(state: IReduxState) {
  * @param {Object} state - Redux state.
  * @returns {number}
  */
-export function getVerticalViewMaxWidth(state: IReduxState) {
+export function getVerticalViewMaxWidth() { // state: IReduxState
 
     // const { width } = state['features/filmstrip'];
     // const _resizableFilmstrip = isFilmstripResizable(state);

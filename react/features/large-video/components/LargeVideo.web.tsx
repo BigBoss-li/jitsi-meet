@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+// import StageParticipantNameLabel from '../../display-name/components/web/StageParticipantNameLabel';
+
 // @ts-expect-error
 import VideoLayout from '../../../../modules/UI/videolayout/VideoLayout';
 import { IReduxState, IStore } from '../../app/types';
@@ -10,7 +12,6 @@ import Watermarks from '../../base/react/components/web/Watermarks';
 import { getHideSelfView } from '../../base/settings/functions.any';
 import { getVideoTrackByParticipant } from '../../base/tracks/functions.web';
 import { setColorAlpha } from '../../base/util/helpers';
-import StageParticipantNameLabel from '../../display-name/components/web/StageParticipantNameLabel';
 import { FILMSTRIP_BREAKPOINT } from '../../filmstrip/constants';
 import { getVerticalViewMaxWidth, isFilmstripResizable } from '../../filmstrip/functions.web';
 import SharedVideo from '../../shared-video/components/web/SharedVideo';
@@ -192,7 +193,8 @@ class LargeVideo extends Component<IProps> {
             _displayScreenSharingPlaceholder,
             _isChatOpen,
             _noAutoPlayVideo,
-            _showDominantSpeakerBadge,
+
+            // _showDominantSpeakerBadge,
             _whiteboardEnabled
         } = this.props;
         const style = this._getCustomStyles();
@@ -294,9 +296,11 @@ class LargeVideo extends Component<IProps> {
         const {
             _customBackgroundColor,
             _customBackgroundImageUrl,
-            _verticalFilmstripWidth,
-            _verticalViewMaxWidth,
-            _visibleFilmstrip
+
+            // _verticalFilmstripWidth,
+            _verticalViewMaxWidth
+
+            // _visibleFilmstrip
         } = this.props;
 
         styles.backgroundColor = _customBackgroundColor || interfaceConfig.DEFAULT_BACKGROUND;

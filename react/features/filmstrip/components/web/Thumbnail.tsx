@@ -61,8 +61,9 @@ import {
 
 import ThumbnailAudioIndicator from './ThumbnailAudioIndicator';
 import ThumbnailBottomIndicators from './ThumbnailBottomIndicators';
-import ThumbnailTopIndicators from './ThumbnailTopIndicators';
 import VirtualScreenshareParticipant from './VirtualScreenshareParticipant';
+
+// import ThumbnailTopIndicators from './ThumbnailTopIndicators';
 
 /**
  * The type of the React {@code Component} state of {@link Thumbnail}.
@@ -664,7 +665,8 @@ class Thumbnail extends Component<IProps, IState> {
         const { canPlayEventReceived } = this.state;
         const {
             _disableTileEnlargement,
-            _height,
+
+            // _height,
             _isVirtualScreenshareParticipant,
             _isHidden,
             _isScreenSharing,
@@ -672,7 +674,8 @@ class Thumbnail extends Component<IProps, IState> {
             _thumbnailType,
             _videoObjectPosition,
             _videoTrack,
-            _width,
+
+            // _width,
             horizontalOffset,
             style
         } = this.props;
@@ -1034,7 +1037,8 @@ class Thumbnail extends Component<IProps, IState> {
             _isScreenSharing,
             _localFlipX,
             _participant,
-            _shouldDisplayTintBackground,
+
+            // _shouldDisplayTintBackground,
             _thumbnailType,
             _videoTrack,
             filmstripType,
@@ -1042,7 +1046,8 @@ class Thumbnail extends Component<IProps, IState> {
         } = this.props;
         const classes = withStyles.getClasses(this.props);
         const { id, name, pinned } = _participant || {};
-        const { isHovered, popoverVisible } = this.state;
+
+        // const { isHovered, popoverVisible } = this.state;
         const styles = this._getStyles();
         let containerClassName = this._getContainerClassName();
         const videoTrackClassName
