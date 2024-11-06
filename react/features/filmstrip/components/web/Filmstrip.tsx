@@ -100,7 +100,7 @@ const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (<Tab
 
 interface IFilmstripSignalSwitchProps {
     checked: boolean;
-    onChange: (event: React.SyntheticEvent, newValue: number) => void;
+    onChange: (event: React.SyntheticEvent, newValue: boolean) => void;
 }
 
 const SignalSwitch = styled((props: IFilmstripSignalSwitchProps) => <Switch { ...props } />)(() => {
@@ -326,6 +326,8 @@ interface IState {
      * Initial mouse position on drag handle mouse down.
      */
     mousePosition?: number | null;
+
+    signalList: Array<any> | [];
 
     titleTabIndex: number;
 }
@@ -665,7 +667,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
     _onSwitchChange(e: React.SyntheticEvent, value: boolean, id: number) {
         const { signalList } = this.state;
 
-        const newSignalList = signalList.map(signal => {
+        const newSignalList = signalList.map((signal: any) => {
             return {
                 ...signal,
                 isSelected: signal.id === id && value
@@ -678,7 +680,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
         let url;
 
         if (value) {
-            const signal = signalList.find(i => i.id === id);
+            const signal = signalList.find((i: any) => i.id === id);
 
             url = signal.url;
         }
@@ -697,7 +699,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
     _renderSignalItem() {
         const { signalList } = this.state;
 
-        return signalList.map(signal => (
+        return signalList.map((signal: any) => (
             <div
                 className = 'signalstrip-wrapper'
                 key = { signal.id }>
@@ -710,7 +712,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
                     <SignalSwitch
                         checked = { signal.isSelected }
                         // eslint-disable-next-line react/jsx-no-bind
-                        onChange = { (e, value) => this._onSwitchChange(e, value, signal.id) } />
+                        onChange = { (e: React.SyntheticEvent, value: boolean) =>
+                            this._onSwitchChange(e, value, signal.id) } />
                 </div>
             </div>
         ));
@@ -719,10 +722,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
     /**
      * Message listener.
      *
-     * @param {Object} e -received data.
+     * @param {any} e -received data.
      * @returns {void}
      */
-    _onMessageListener(e: Object) {
+    _onMessageListener(e: any) {
         if (e.data.type === 'signal_list') {
             this.setState({
                 signalList: e.data.signalList
@@ -1106,37 +1109,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 </button>
             </div>
         );
-    }
-
-    /**
-     * Created Tabbar.
-     *
-     * @returns {ReactElement}
-     */
-    _renderTabbar() {
-        const { tabActiveKey } = this.state;
-
-        return (
-            <div className = 'filmstrip-tabs'>
-                <div
-                    className = { clsx('filmstrip-tab', tabActiveKey === '1' && 'filmstrip-tab--active') }>成员</div>
-                <div
-                    className = { clsx('filmstrip-tab', tabActiveKey === '2' && 'filmstrip-tab--active') }>信号源</div>
-            </div>
-        );
-    }
-
-    /**
-     * Tabbar click.
-     *
-     *  @param {Object} key - TabbarActiveKey.
-     * @returns {void}
-     */
-    _onTabbarClick(key: String) {
-        console.log('tabbar clicked');
-        this.setState({
-            tabActiveKey: key
-        });
     }
 }
 

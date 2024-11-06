@@ -28,6 +28,7 @@ interface ILocalRecordingManager {
     roomName: string;
     saveRecording: (recordingData: Blob[], filename: string) => void;
     selfRecording: ISelfRecording;
+    sendBlobRecording: (recordingData: Blob[]) => void;
     startLocalRecording: (store: IStore, onlySelf: boolean) => Promise<void>;
     stopLocalRecording: () => void;
     stream: MediaStream | undefined;
