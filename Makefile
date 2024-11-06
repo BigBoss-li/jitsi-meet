@@ -11,9 +11,9 @@ TFLITE_WASM = react/features/stream-effects/virtual-background/vendor/tflite
 MEET_MODELS_DIR  = react/features/stream-effects/virtual-background/vendor/models
 FACE_MODELS_DIR = node_modules/@vladmandic/human-models/models
 
-FLVJS_DIR = node_modules/flv.js/dist/
-HLSJS_DIR = node_modules/hls.js/dist/
-DASHJS_DIR = node_modules/dashjs/dist/
+FLVJS_DIR = node_modules/flv.js/dist
+HLSJS_DIR = node_modules/hls.js/dist
+DASHJS_DIR = node_modules/dashjs/dist
 
 NODE_SASS = ./node_modules/.bin/sass
 NPM = npm
@@ -77,8 +77,8 @@ deploy-reactplayer:
 		$(FLVJS_DIR)/flv.min.js.map \
 		$(HLSJS_DIR)/hls.min.js \
 		$(HLSJS_DIR)/hls.min.js.map \
-		$(DASHJS_DIR)/dash.all.js \
-		$(DASHJS_DIR)/dash.all.js.map \
+		$(DASHJS_DIR)/dash.all.min.js \
+		$(DASHJS_DIR)/dash.all.min.js.map \
 		$(DEPLOY_DIR)
 
 deploy-lib-jitsi-meet:
