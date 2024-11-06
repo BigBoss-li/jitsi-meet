@@ -112,7 +112,7 @@
     "react-native-webrtc": "124.0.4",
     "react-native-webview": "13.8.7",
     "react-native-youtube-iframe": "2.3.0",
-    "react-player": "file:3rd/react-player-fix-1832",
+    "react-player": "file:3rd/react-player-fix-1832-dist",
     "react-redux": "7.2.9",
     "react-textarea-autosize": "8.3.0",
     "react-window": "1.8.6",
