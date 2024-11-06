@@ -151,6 +151,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
     },
 
     async sendBlobRecording(recordingData) {
+        // @ts-ignore
         const blob = await fixWebmDuration(new Blob(recordingData, { type: this.mediaType }));
         const extension = this.mediaType.slice(this.mediaType.indexOf('/') + 1, this.mediaType.indexOf(';'));
 
