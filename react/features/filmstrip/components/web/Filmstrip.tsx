@@ -724,7 +724,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                     <SignalSwitch
                         checked = { signal.isSelected }
                         // eslint-disable-next-line react/jsx-no-bind
-                        onChange = { (e: React.SyntheticEvent, value: boolean) =>
+                        onChange = { (e: React.ChangeEvent, value: boolean) =>
                             this._onSwitchChange(e, value, signal.id) } />
                 </div>
             </div>

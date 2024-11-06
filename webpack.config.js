@@ -12,7 +12,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
  * development with webpack-dev-server.
  */
 const devServerProxyTarget
-    = process.env.WEBPACK_DEV_SERVER_PROXY_TARGET || 'https://alpha.jitsi.net';
+    = process.env.WEBPACK_DEV_SERVER_PROXY_TARGET || 'https://jitsi.jyit.ltd';
 
 /**
  * Build a Performance configuration object for the given size.
@@ -238,8 +238,9 @@ function getDevServerConfig() {
                 warnings: false
             }
         },
-        host: '127.0.0.1',
+        host: '0.0.0.0',
         hot: true,
+        port: '39090',
         proxy: {
             '/': {
                 bypass: devServerProxyBypass,
