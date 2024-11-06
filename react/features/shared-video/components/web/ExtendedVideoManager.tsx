@@ -193,6 +193,10 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
             height: '100%',
             width: '100%',
             progressInterval: 5000,
+            config: {
+                hlsSdkUrl: 'libs/hls.min.js',
+                flvSdkUrl: 'libs/flv.min.js'
+            },
             onReady: () => this.onPlayerReady(),
             onPlay: () => this.onPlayerPlay(),
             onError: () => this.onError()
