@@ -1,8 +1,9 @@
+/* eslint-disable linebreak-style */
 import { Switch, Tab, Tabs } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import { throttle } from 'lodash-es';
-import React, { PureComponent } from 'react';
+import React, { ChangeEvent, PureComponent } from 'react';
 import { WithTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 import { FixedSizeGrid, FixedSizeList } from 'react-window';
@@ -100,7 +101,7 @@ const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (<Tab
 
 interface IFilmstripSignalSwitchProps {
     checked: boolean;
-    onChange: (event: React.SyntheticEvent, newValue: number) => void;
+    onChange: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void;
 }
 
 const SignalSwitch = styled((props: IFilmstripSignalSwitchProps) => <Switch { ...props } />)(() => {
@@ -327,7 +328,17 @@ interface IState {
      */
     mousePosition?: number | null;
 
+    signalList: Array<{
+        id: string;
+        ip: string;
+        isSelected: boolean;
+        name: string;
+        type: string;
+        url: string;
+      }>;
+
     titleTabIndex: number;
+
 }
 
 /**
@@ -657,12 +668,12 @@ class Filmstrip extends PureComponent<IProps, IState> {
     /**
      * Switch change.
      *
-     * @param {React.SyntheticEvent} e - React event.
+     * @param {React.ChangeEvent} e - React event.
      * @param {boolean} value - The new value.
      * @param {number} id - The signal id.
      * @returns {void}
      */
-    _onSwitchChange(e: React.SyntheticEvent, value: boolean, id: number) {
+    _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
         const { signalList } = this.state;
 
         const newSignalList = signalList.map(signal => {
@@ -679,8 +690,9 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
         if (value) {
             const signal = signalList.find(i => i.id === id);
-
-            url = signal.url;
+            if(signal) {
+                url = signal.url;
+            }
         }
 
         window.parent.postMessage({
@@ -722,7 +734,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @param {Object} e -received data.
      * @returns {void}
      */
-    _onMessageListener(e: Object) {
+    _onMessageListener(e: any) {
         if (e.data.type === 'signal_list') {
             this.setState({
                 signalList: e.data.signalList
