@@ -8,7 +8,8 @@ import { LAYOUTS } from '../../../video-layout/constants';
 import { getCurrentLayout } from '../../../video-layout/functions.web';
 
 import ThumbnailBottomIndicators from './ThumbnailBottomIndicators';
-import ThumbnailTopIndicators from './ThumbnailTopIndicators';
+
+// import ThumbnailTopIndicators from './ThumbnailTopIndicators';
 
 interface IProps {
 
@@ -109,7 +110,8 @@ interface IProps {
 const VirtualScreenshareParticipant = ({
     classes,
     containerClassName,
-    isHovered,
+
+    // isHovered,
     isLocal,
     isMobile,
     onClick,
@@ -120,10 +122,12 @@ const VirtualScreenshareParticipant = ({
     onTouchMove,
     onTouchStart,
     participantId,
-    shouldDisplayTintBackground,
+
+    // shouldDisplayTintBackground,
     styles,
-    videoTrack,
-    thumbnailType
+    videoTrack
+
+    // thumbnailType
 }: IProps) => {
     const currentLayout = useSelector(getCurrentLayout);
     const videoTrackId = videoTrack?.jitsiTrack?.getId();

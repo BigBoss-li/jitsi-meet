@@ -71,8 +71,9 @@ const useStyles = makeStyles()(() => {
  * @returns {ReactElement}
  */
 export default function Toolbox({
-    toolbarButtons,
-    isConferenceJoined
+    toolbarButtons
+
+    // isConferenceJoined
 }: IProps) {
     const { classes, cx } = useStyles();
     const { t } = useTranslation();

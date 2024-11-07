@@ -12,7 +12,7 @@ import {
 import { closeOverflowMenuIfOpen } from '../../../toolbox/actions.web';
 import { isParticipantsPaneEnabled } from '../../functions';
 
-import ParticipantsCounter from './ParticipantsCounter';
+// import ParticipantsCounter from './ParticipantsCounter';
 
 
 /**

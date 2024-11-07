@@ -110,7 +110,7 @@ class SharedVideo extends Component<IProps> {
         if (!videoUrl) {
             return null;
         }
-        // console.log(videoUrl);
+
         if (videoUrl.match(/http/)) {
             const vUrl = new URL(videoUrl);
 
