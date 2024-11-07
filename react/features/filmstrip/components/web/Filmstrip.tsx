@@ -548,12 +548,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
                         !tileViewActive
                             && (filmstripType === FILMSTRIP_TYPE.MAIN
                                 || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
-                            && !_resizableFilmstrip
-                            && 'filmstrip-hover',
-                        _verticalViewGrid && 'vertical-view-grid'
+                            && 'filmstrip-hover'
                     ) }
                     id = 'remoteVideos'>
-                    {!_disableSelfView && !_verticalViewGrid && (
+                    {!_disableSelfView && (
                         <div
                             className = 'filmstrip__videos'
                             id = 'filmstripLocalVideo'>
