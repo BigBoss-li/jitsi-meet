@@ -116,7 +116,7 @@ function _mapStateToProps(state: IReduxState, _ownProps: any) {
 
     return {
         _columns: 1,
-        _currentLayout: getCurrentLayout(state),
+        _currentLayout: getCurrentLayout(),
         _filmstripHeight: filmstripHeight,
         _filmstripWidth: filmstripWidth,
         _remoteParticipants: id ? [ id ] : [],

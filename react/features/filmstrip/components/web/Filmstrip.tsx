@@ -1160,7 +1160,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         shouldReduceHeight ? 'reduce-height' : ''
     } ${shiftRight ? 'shift-right' : ''} ${collapseTileView ? 'collapse' : ''} ${isVisible ? '' : 'hidden'}`.trim();
 
-    const _currentLayout = getCurrentLayout(state);
+    const _currentLayout = getCurrentLayout();
     const _isVerticalFilmstrip
         = _currentLayout === LAYOUTS.VERTICAL_FILMSTRIP_VIEW
         || (filmstripType === FILMSTRIP_TYPE.MAIN && _currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW);
@@ -1185,7 +1185,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _topPanelMaxHeight: topPanelHeight.current || TOP_FILMSTRIP_HEIGHT,
         _topPanelVisible,
         _verticalFilmstripWidth: verticalFilmstripWidth.current,
-        _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
+        _verticalViewMaxWidth: getVerticalViewMaxWidth(),
         _videosClassName: videosClassName
     };
 }

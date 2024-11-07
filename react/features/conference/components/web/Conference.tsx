@@ -406,7 +406,7 @@ function _mapStateToProps(state: IReduxState) {
         ...abstractMapStateToProps(state),
         _backgroundAlpha: backgroundAlpha,
         _isAnyOverlayVisible: Boolean(getOverlayToRender(state)),
-        _layoutClassName: LAYOUT_CLASSNAMES[getCurrentLayout(state) ?? ''],
+        _layoutClassName: LAYOUT_CLASSNAMES[getCurrentLayout() ?? ''],
         _mouseMoveCallbackInterval: mouseMoveCallbackInterval,
         _overflowDrawer: overflowDrawer,
         _roomName: getConferenceNameForTitle(state),

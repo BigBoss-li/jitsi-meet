@@ -408,7 +408,7 @@ export class VideoContainer extends LargeContainer {
             return;
         }
         const state = APP.store.getState();
-        const currentLayout = getCurrentLayout(state);
+        const currentLayout = getCurrentLayout();
 
         const verticalFilmstripWidth = state['features/filmstrip'].width?.current;
 
