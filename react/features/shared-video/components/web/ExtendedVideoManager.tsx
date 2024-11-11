@@ -181,7 +181,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     };
 
     getPlayerOptions = () => {
-        const { _isOwner, videoId, showControls, _isMuted } = this.props;
+        const { _isOwner, videoId, showControls } = this.props;
         const { isPlaying } = this.state;
 
         let options: any = {
@@ -189,7 +189,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
             playing: isPlaying,
             controls: showControls,
             volume: 0.5,
-            muted: _isMuted,
+            muted: true,
             height: '100%',
             width: '100%',
             progressInterval: 5000,

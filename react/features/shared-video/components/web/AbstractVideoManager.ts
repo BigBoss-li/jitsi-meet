@@ -108,12 +108,12 @@ export interface IProps {
     /**
      * The video show controls.
      */
-    showControls: boolean;
+    showControls?: boolean;
 
     /**
       * The video id.
       */
-    videoId: string;
+    videoId?: string;
 }
 
 /**

@@ -106,7 +106,7 @@ class SharedVideo extends Component<IProps> {
      * @param {string} videoUrl - The video url.
      * @returns {Component}
      */
-    getManager(videoUrl) {
+    getManager(videoUrl: string) {
 
         if (!videoUrl) {
             return null;
@@ -118,9 +118,6 @@ class SharedVideo extends Component<IProps> {
             if (vUrl.pathname.endsWith('.flv') || vUrl.pathname.endsWith('.m3u8')) {
                 return (
                     <ExtendedVideoManager
-                        _isOwner = { false }
-                        _muted = { true }
-                        hasControls = { false }
                         videoId = { videoUrl } />
                 );
             }

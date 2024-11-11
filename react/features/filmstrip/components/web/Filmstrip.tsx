@@ -679,7 +679,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
         const selected = signalList.filter((signal: any) => signal.isSelected);
         const selectedSize = selected.length;
 
-        let stopId;
+        let stopId: string;
 
         if (selectedSize >= 2) {
             stopId = selected[0].id;
