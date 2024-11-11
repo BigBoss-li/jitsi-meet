@@ -106,6 +106,11 @@ export interface IProps {
     _videoUrl?: string;
 
     /**
+     * The video show controls.
+     */
+    showControls: boolean;
+
+    /**
       * The video id.
       */
     videoId: string;

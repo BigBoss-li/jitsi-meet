@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
@@ -102,10 +103,10 @@ class SharedVideo extends Component<IProps> {
     /**
      * Retrieves the manager to be used for playing the shared video.
      *
+     * @param {string} videoUrl - The video url.
      * @returns {Component}
      */
-    getManager() {
-        const { videoUrl } = this.props;
+    getManager(videoUrl) {
 
         if (!videoUrl) {
             return null;
@@ -115,7 +116,13 @@ class SharedVideo extends Component<IProps> {
             const vUrl = new URL(videoUrl);
 
             if (vUrl.pathname.endsWith('.flv') || vUrl.pathname.endsWith('.m3u8')) {
-                return <ExtendedVideoManager videoId = { videoUrl } />;
+                return (
+                    <ExtendedVideoManager
+                        _isOwner = { false }
+                        _muted = { true }
+                        hasControls = { false }
+                        videoId = { videoUrl } />
+                );
             }
 
             return <VideoManager videoId = { videoUrl } />;
@@ -134,20 +141,43 @@ class SharedVideo extends Component<IProps> {
     render() {
         // console.log('SharedVideo render', this.props);
 
-        const { isEnabled, isOwner, isResizing } = this.props;
+        const { isEnabled, isOwner, isResizing, videoUrl } = this.props;
 
         if (!isEnabled) {
             return null;
         }
 
+        const videoUrls = videoUrl?.split(',');
+
         const className = !isResizing && isOwner ? '' : 'disable-pointer';
+
+        const videoClassName = `shared-video-size-${videoUrls?.length}`;
 
         return (
             <div
                 className = { className }
                 id = 'sharedVideo'
                 style = { this.getDimensions() }>
-                {this.getManager()}
+
+                { videoUrls && videoUrls?.length > 0 ? (
+                    <div
+                        className = { clsx(
+                        'shared-video-wrapper',
+                        videoClassName
+                        ) }>
+                        {
+                            videoUrls?.map((url, idx) => (
+                                <div
+                                    className = 'shared-video'
+                                    key = { idx }>
+                                    {this.getManager(url)}
+                                </div>
+                            ))
+                        }
+
+                    </div>
+                ) : ''}
+
             </div>
         );
     }

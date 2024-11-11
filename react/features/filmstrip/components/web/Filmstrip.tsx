@@ -18,6 +18,7 @@ import Icon from '../../../base/icons/components/Icon';
 import { IconArrowDown, IconArrowUp } from '../../../base/icons/svg';
 import { getHideSelfView } from '../../../base/settings/functions.any';
 import { registerShortcut, unregisterShortcut } from '../../../keyboard-shortcuts/actions';
+import { playSharedVideo, stopSharedVideo } from '../../../shared-video/actions.any';
 import { showToolbox } from '../../../toolbox/actions.web';
 import { isButtonEnabled, isToolboxVisible } from '../../../toolbox/functions.web';
 import { LAYOUTS } from '../../../video-layout/constants';
@@ -675,31 +676,40 @@ class Filmstrip extends PureComponent<IProps, IState> {
     _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
         const { signalList } = this.state;
 
+        const selected = signalList.filter((signal: any) => signal.isSelected);
+        const selectedSize = selected.length;
+
+        let stopId;
+
+        if (selectedSize >= 2) {
+            stopId = selected[0].id;
+        }
+
         const newSignalList = signalList.map((signal: any) => {
+            let isSelected = signal.isSelected;
+
+            if (signal.id === id) {
+                isSelected = value;
+            }
+            if (signal.id === stopId) {
+                isSelected = false;
+            }
+
             return {
                 ...signal,
-                isSelected: signal.id === id && value
+                isSelected
             };
         });
 
         this.setState({
             signalList: newSignalList
         });
-        let url;
 
-        if (value) {
+        const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
 
-            const signal = signalList.find(i => i.id === id);
+        APP.store.dispatch(stopSharedVideo());
+        APP.store.dispatch(playSharedVideo(urls.join(',')));
 
-            if (signal) {
-                url = signal.url;
-            }
-        }
-
-        window.parent.postMessage({
-            type: 'share_video',
-            data: { url }
-        }, '*');
     }
 
     /**
