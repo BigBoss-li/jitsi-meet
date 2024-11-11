@@ -26,7 +26,7 @@ interface IState {
  */
 class ExtendedVideoManager extends AbstractVideoManager<IState> {
     playerRef: React.RefObject<HTMLDivElement>;
-    reactPlayersRef: Array<RefObject<ReactPlayer>>;
+    reactPlayersRef: Array<ReactPlayer | null>;
 
 
     // player?: any;
@@ -253,6 +253,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                             <ReactPlayer
                                 // eslint-disable-next-line react/jsx-no-bind
                                 ref = { refItem => {
+                                    // eslint-disable-next-line react/jsx-no-bind
                                     this.reactPlayersRef[idx] = refItem;
                                 } }
                                 { ...this.getPlayerOptions(url) } />
