@@ -1,3 +1,5 @@
+import { createApiEvent } from '../analytics/AnalyticsEvents';
+import { sendAnalytics } from '../analytics/functions';
 import { IStore } from '../app/types';
 import { getCurrentConference } from '../base/conference/functions';
 import { hideDialog, openDialog } from '../base/dialog/actions';
@@ -146,13 +148,14 @@ export function playSharedVideo(videoUrl: string) {
  * @returns {Function}
  */
 export function playSharedVideos(videoUrl: string) {
-    return async (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
+    return (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
         const state = getState();
         const { ownerId } = state['features/shared-video'];
         const localParticipant = getLocalParticipant(state);
 
         if (ownerId === localParticipant?.id) {
-            await dispatch(resetSharedVideoStatus());
+            sendAnalytics(createApiEvent('share.video.stop'));
+            dispatch(resetSharedVideoStatus());
         }
 
         if (!isSharedVideoEnabled(getState())) {
@@ -160,7 +163,7 @@ export function playSharedVideos(videoUrl: string) {
         }
         const conference = getCurrentConference(getState());
 
-        if (conference) {
+        if (conference && videoUrl) {
 
             // we will send the command and will create local video fake participant
             // and start playing once we receive ourselves the command

@@ -18,7 +18,7 @@ import Icon from '../../../base/icons/components/Icon';
 import { IconArrowDown, IconArrowUp } from '../../../base/icons/svg';
 import { getHideSelfView } from '../../../base/settings/functions.any';
 import { registerShortcut, unregisterShortcut } from '../../../keyboard-shortcuts/actions';
-import { playSharedVideos, stopSharedVideo } from '../../../shared-video/actions.any';
+import { playSharedVideos } from '../../../shared-video/actions.any';
 import { showToolbox } from '../../../toolbox/actions.web';
 import { isButtonEnabled, isToolboxVisible } from '../../../toolbox/functions.web';
 import { LAYOUTS } from '../../../video-layout/constants';
@@ -675,15 +675,12 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     async _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
         const { signalList } = this.state;
-
-        const selected = signalList.filter((signal: any) => signal.isSelected);
-        const selectedSize = selected.length;
         const MAX_SHARED_VIDEO_LENGTH = 4;
 
-        let stopId: string;
+        const selected = signalList.filter((signal: any) => signal.isSelected);
 
-        if (selectedSize >= MAX_SHARED_VIDEO_LENGTH) {
-            stopId = selected[0].id;
+        if (selected.length >= MAX_SHARED_VIDEO_LENGTH && value) {
+            return;
         }
 
         const newSignalList = signalList.map((signal: any) => {
@@ -692,9 +689,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
             if (signal.id === id) {
                 isSelected = value;
             }
-            if (signal.id === stopId) {
-                isSelected = false;
-            }
 
             return {
                 ...signal,
@@ -702,19 +696,14 @@ class Filmstrip extends PureComponent<IProps, IState> {
             };
         });
 
+
         this.setState({
             signalList: newSignalList
         });
 
         const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
 
-        APP.store.dispatch(stopSharedVideo()).then(() => {
-            if (urls.length) {
-                APP.store.dispatch(playSharedVideos(urls.join(',')));
-            }
-        });
-
-
+        APP.store.dispatch(playSharedVideos(urls.join(',')));
     }
 
     /**

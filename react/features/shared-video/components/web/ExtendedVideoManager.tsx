@@ -1,4 +1,5 @@
 /* eslint-disable no-invalid-this */
+import clsx from 'clsx';
 import React from 'react';
 import ReactPlayer from 'react-player';
 import { connect } from 'react-redux';
@@ -20,10 +21,13 @@ interface IState {
 /**
  * Manager of shared video.
  *
+ * @param {string} videoId - Video url.
  * @returns {void}
  */
 class ExtendedVideoManager extends AbstractVideoManager<IState> {
-    playerRef: React.RefObject<ReactPlayer>;
+    playerRef: React.RefObject<HTMLDivElement>;
+    reactPlayersRef: Array<RefObject<ReactPlayer>>;
+
 
     // player?: any;
 
@@ -38,12 +42,29 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         super(props);
 
         this.state = {
-            isPlaying: false,
+            isPlaying: true,
             isMuted: false
         };
 
-        this.playerRef = React.createRef<ReactPlayer>();
+        this.playerRef = React.createRef<HTMLDivElement>();
     }
+
+    /**
+     * Removes all listeners.
+     *
+     * @inheritdoc
+     * @returns {void}
+     */
+    componentWillUnmount() {
+        if (this.reactPlayersRef && this.reactPlayersRef.length > 0) {
+            this.reactPlayersRef.forEach(ref => {
+                if (ref !== null) {
+                    ref.getInternalPlayer('flv')?.destroy();
+                }
+            });
+        }
+    }
+
 
     /**
      * Retrieves the current player ref.
@@ -76,22 +97,22 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @returns {number}
      */
     getTime() {
-        if (this.player === undefined || this.player === null || this.player.getCurrentTime() === null) {
-            return -1;
-        }
+        // if (this.player === undefined || this.player === null || this.player.getCurrentTime() === null) {
+        //     return -1;
+        // }
 
-        return this.player.getCurrentTime();
+        return -1;
     }
 
     /**
      * Seeks video to provided time.
      *
-     * @param {number} time - The time to seek to.
+     * @param {number} _time - The time to seek to.
      *
      * @returns {void}
      */
-    seek(time: number) {
-        return this.player?.seekTo(time);
+    seek(_time: number) {
+        return;
     }
 
     /**
@@ -180,36 +201,24 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         }
     };
 
-    getPlayerOptions = () => {
-        const { _isOwner, videoId, showControls } = this.props;
+    getPlayerOptions = (videoId: string) => {
+        const { showControls } = this.props;
         const { isPlaying } = this.state;
 
-        let options: any = {
+        const options: any = {
             url: videoId,
             playing: isPlaying,
             controls: showControls,
             volume: 0.5,
-            muted: true,
+            muted: false,
             height: '100%',
             width: '100%',
             progressInterval: 5000,
             config: {
                 hlsSdkUrl: 'libs/hls.min.js',
                 flvSdkUrl: 'libs/flv.min.js'
-            },
-            onReady: () => this.onPlayerReady(),
-            onPlay: () => this.onPlayerPlay(),
-            onError: () => this.onError()
+            }
         };
-
-        if (_isOwner) {
-            options = {
-                ...options,
-                onPause: () => this.onPlayerPause(),
-                onProgress: this.throttledFireUpdateSharedVideoEvent
-            };
-
-        }
 
         return options;
     };
@@ -220,12 +229,38 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @inheritdoc
      */
     render() {
-        console.log('ExtendedVideoManager', this.state);
+        const { videoId } = this.props;
+
+        const videoUrls = videoId?.split(',');
+        const videoClassName = `shared-video-size-${videoUrls?.length}`;
+
+        if (videoUrls && videoUrls?.length > 0) {
+            this.reactPlayersRef = new Array(videoUrls.length);
+        }
 
         return (
-            <ReactPlayer
-                ref = { this.playerRef }
-                { ...this.getPlayerOptions() } />
+            <div
+                className = { clsx(
+            'shared-video-wrapper',
+            videoClassName
+                ) }
+                ref = { this.playerRef }>
+                { videoUrls && videoUrls?.length > 0
+                    ? videoUrls?.map((url, idx) => (
+                        <div
+                            className = 'shared-video'
+                            key = { idx }>
+                            <ReactPlayer
+                                // eslint-disable-next-line react/jsx-no-bind
+                                ref = { refItem => {
+                                    this.reactPlayersRef[idx] = refItem;
+                                } }
+                                { ...this.getPlayerOptions(url) } />
+                        </div>
+                    ))
+                    : ''}
+            </div>
+
         );
     }
 }

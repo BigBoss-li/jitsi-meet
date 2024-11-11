@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
@@ -103,13 +102,23 @@ class SharedVideo extends Component<IProps> {
     /**
      * Retrieves the manager to be used for playing the shared video.
      *
-     * @param {string} videoUrl - The video url.
      * @returns {Component}
      */
-    getManager(videoUrl: string) {
+    getManager() {
+
+        const { videoUrl } = this.props;
 
         if (!videoUrl) {
             return null;
+        }
+
+        const videoUrls = videoUrl.split(',');
+
+        if (videoUrls.length > 1) {
+            return (
+                <ExtendedVideoManager
+                    videoId = { videoUrl } />)
+            ;
         }
 
         if (videoUrl.match(/http/)) {
@@ -138,42 +147,19 @@ class SharedVideo extends Component<IProps> {
     render() {
         // console.log('SharedVideo render', this.props);
 
-        const { isEnabled, isOwner, isResizing, videoUrl } = this.props;
+        const { isEnabled, isResizing, isOwner } = this.props;
 
         if (!isEnabled) {
             return null;
         }
-
-        const videoUrls = videoUrl?.split(',');
-
         const className = !isResizing && isOwner ? '' : 'disable-pointer';
-
-        const videoClassName = `shared-video-size-${videoUrls?.length}`;
 
         return (
             <div
                 className = { className }
                 id = 'sharedVideo'
                 style = { this.getDimensions() }>
-
-                { videoUrls && videoUrls?.length > 0 ? (
-                    <div
-                        className = { clsx(
-                        'shared-video-wrapper',
-                        videoClassName
-                        ) }>
-                        {
-                            videoUrls?.map((url, idx) => (
-                                <div
-                                    className = 'shared-video'
-                                    key = { idx }>
-                                    {this.getManager(url)}
-                                </div>
-                            ))
-                        }
-
-                    </div>
-                ) : ''}
+                {this.getManager()}
 
             </div>
         );
