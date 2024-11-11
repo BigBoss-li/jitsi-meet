@@ -324,9 +324,11 @@ const _throttledNotifyParticipantLeft = throttle((dispatch: IStore['dispatch'], 
  * @returns {Function}
  */
 export function showParticipantJoinedNotification(displayName: string) {
-    if (displayName !== VIDEO_PLAYER_PARTICIPANT_NAME) {
-        joinedParticipantsNames.push(displayName);
+    if (displayName === VIDEO_PLAYER_PARTICIPANT_NAME) {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        return () => {};
     }
+    joinedParticipantsNames.push(displayName);
 
     return (dispatch: IStore['dispatch'], getState: IStore['getState']) =>
         _throttledNotifyParticipantConnected(dispatch, getState);
@@ -341,9 +343,11 @@ export function showParticipantJoinedNotification(displayName: string) {
  * @returns {Function}
  */
 export function showParticipantLeftNotification(displayName: string) {
-    if (displayName !== VIDEO_PLAYER_PARTICIPANT_NAME) {
-        leftParticipantsNames.push(displayName);
+    if (displayName === VIDEO_PLAYER_PARTICIPANT_NAME) {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        return () => {};
     }
+    leftParticipantsNames.push(displayName);
 
     return (dispatch: IStore['dispatch'], getState: IStore['getState']) =>
         _throttledNotifyParticipantLeft(dispatch, getState);

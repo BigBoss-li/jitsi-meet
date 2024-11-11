@@ -18,7 +18,7 @@ import Icon from '../../../base/icons/components/Icon';
 import { IconArrowDown, IconArrowUp } from '../../../base/icons/svg';
 import { getHideSelfView } from '../../../base/settings/functions.any';
 import { registerShortcut, unregisterShortcut } from '../../../keyboard-shortcuts/actions';
-import { playSharedVideos } from '../../../shared-video/actions.any';
+import { playSharedVideos, stopSharedVideo } from '../../../shared-video/actions.any';
 import { showToolbox } from '../../../toolbox/actions.web';
 import { isButtonEnabled, isToolboxVisible } from '../../../toolbox/functions.web';
 import { LAYOUTS } from '../../../video-layout/constants';
@@ -708,7 +708,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
         const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
 
-        APP.store.dispatch(playSharedVideos(urls.join(',')));
+        APP.store.dispatch(stopSharedVideo()).then(() => {
+            if (urls.length) {
+                APP.store.dispatch(playSharedVideos(urls.join(',')));
+            }
+        });
 
 
     }
