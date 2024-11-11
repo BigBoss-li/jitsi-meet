@@ -18,7 +18,7 @@ import Icon from '../../../base/icons/components/Icon';
 import { IconArrowDown, IconArrowUp } from '../../../base/icons/svg';
 import { getHideSelfView } from '../../../base/settings/functions.any';
 import { registerShortcut, unregisterShortcut } from '../../../keyboard-shortcuts/actions';
-import { playSharedVideo, stopSharedVideo } from '../../../shared-video/actions.any';
+import { playSharedVideos } from '../../../shared-video/actions.any';
 import { showToolbox } from '../../../toolbox/actions.web';
 import { isButtonEnabled, isToolboxVisible } from '../../../toolbox/functions.web';
 import { LAYOUTS } from '../../../video-layout/constants';
@@ -673,15 +673,16 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @param {number} id - The signal id.
      * @returns {void}
      */
-    _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
+    async _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
         const { signalList } = this.state;
 
         const selected = signalList.filter((signal: any) => signal.isSelected);
         const selectedSize = selected.length;
+        const MAX_SHARED_VIDEO_LENGTH = 4;
 
         let stopId: string;
 
-        if (selectedSize >= 2) {
+        if (selectedSize >= MAX_SHARED_VIDEO_LENGTH) {
             stopId = selected[0].id;
         }
 
@@ -707,8 +708,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
         const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
 
-        APP.store.dispatch(stopSharedVideo());
-        APP.store.dispatch(playSharedVideo(urls.join(',')));
+        APP.store.dispatch(playSharedVideos(urls.join(',')));
+
 
     }
 
