@@ -37,7 +37,7 @@ interface ILocalRecordingManager {
 
 const getMimeType = (): string => {
     const possibleTypes = [
-        'video/webm;codecs=vp8'
+        'video/mp4'
     ];
 
     for (const type of possibleTypes) {
