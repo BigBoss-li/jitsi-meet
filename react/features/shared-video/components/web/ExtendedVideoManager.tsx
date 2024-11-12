@@ -15,6 +15,7 @@ import AbstractVideoManager, {
 interface IState {
   isMuted: boolean;
   isPlaying: boolean;
+  layout: string;
 }
 
 
@@ -43,10 +44,24 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
         this.state = {
             isPlaying: true,
-            isMuted: false
+            isMuted: false,
+            layout: 'horizontal'
         };
 
         this.playerRef = React.createRef<HTMLDivElement>();
+    }
+
+    /**
+     * Add listenners.
+     *
+     * @inheritdoc
+     * @returns {void}
+     */
+    componentDidMount() {
+        this._onMessageListener = this._onMessageListener.bind(this);
+
+        // window.addEventListener('message', this._onMessageListener);
+
     }
 
     /**
@@ -64,7 +79,6 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
             });
         }
     }
-
 
     /**
      * Retrieves the current player ref.
@@ -201,6 +215,20 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         }
     };
 
+    /**
+     * Message listener.
+     *
+     * @param {any} e -received data.
+     * @returns {void}
+     */
+    _onMessageListener(e: any) {
+        if (e.data.type === 'video_layout') {
+            this.setState({
+                layout: e.data.layout
+            });
+        }
+    }
+
     getPlayerOptions = (videoId: string) => {
         const { showControls } = this.props;
         const { isPlaying } = this.state;
@@ -224,42 +252,87 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     };
 
     /**
+     * Render video players.
+     *
+     * @param { Array } videoUrls - Video urls.
+     * @param {number} playerRefStartIdx - PlayerRef start idx.
+     * @returns {React.DOMElement}
+     */
+    renderVideoPlayers(videoUrls: Array, playerRefStartIdx = 0) {
+        return videoUrls.map((url, idx) => (
+            <div
+                className = 'shared-video'
+                key = { idx }>
+                <ReactPlayer
+                    // eslint-disable-next-line react/jsx-no-bind
+                    ref = { refItem => {
+                        // eslint-disable-next-line react/jsx-no-bind
+                        this.reactPlayersRef[idx + playerRefStartIdx] = refItem;
+                    } }
+                    { ...this.getPlayerOptions(url) } />
+            </div>
+        ));
+    }
+
+    /**
+     * Render horizontal videos.
+     *
+     * @param {Array} videoUrls - Video urls.
+     * @returns {React.DOMElement}
+     */
+    renderVideoHorizontal(videoUrls: Array) {
+        const videoClassName = `shared-video-size-${videoUrls?.length}`;
+
+        return (
+            <div className = { clsx('shared-video__horizontal', videoClassName) }>
+                { this.renderVideoPlayers(videoUrls) }
+            </div>
+        );
+    }
+
+    /**
+     * Render vertical videos.
+     *
+     * @param {Array} videoUrls - Video urls.
+     * @returns {React.DOMElement}
+     */
+    renderVideoVertical(videoUrls: Array) {
+        return (
+            <div className = 'shared-video__vertical'>
+                <div className = 'shared-video_large'>
+                    { this.renderVideoPlayers(videoUrls?.slice(0, 1)) }
+                </div>
+                <div className = 'shared-video__small'>
+                    { this.renderVideoPlayers(videoUrls?.slice(1, videoUrls.length), 1) }
+                </div>
+            </div>
+        );
+    }
+
+    /**
      * Implements React Component's render.
      *
      * @inheritdoc
      */
     render() {
         const { videoId } = this.props;
+        const { layout } = this.state;
 
         const videoUrls = videoId?.split(',');
-        const videoClassName = `shared-video-size-${videoUrls?.length}`;
 
         if (videoUrls && videoUrls?.length > 0) {
             this.reactPlayersRef = new Array(videoUrls.length);
         }
 
+        const ele = videoUrls && videoUrls?.length > 0
+            ? layout === 'horizontal' ? this.renderVideoHorizontal(videoUrls) : this.renderVideoVertical(videoUrls)
+            : '';
+
         return (
             <div
-                className = { clsx(
-            'shared-video-wrapper',
-            videoClassName
-                ) }
+                className = 'shared-video-wrapper'
                 ref = { this.playerRef }>
-                { videoUrls && videoUrls?.length > 0
-                    ? videoUrls?.map((url, idx) => (
-                        <div
-                            className = 'shared-video'
-                            key = { idx }>
-                            <ReactPlayer
-                                // eslint-disable-next-line react/jsx-no-bind
-                                ref = { refItem => {
-                                    // eslint-disable-next-line react/jsx-no-bind
-                                    this.reactPlayersRef[idx] = refItem;
-                                } }
-                                { ...this.getPlayerOptions(url) } />
-                        </div>
-                    ))
-                    : ''}
+                { ele }
             </div>
 
         );
