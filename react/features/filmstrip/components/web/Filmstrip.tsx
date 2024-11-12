@@ -484,7 +484,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             }
         }
 
-        // let toolbar = null;
+        let toolbar = null;
 
         if (
             !this.props._iAmRecorder
@@ -494,7 +494,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
         ) {
 
-            // toolbar = this._renderToggleButton();
+            toolbar = this._renderToggleButton();
         }
 
         const filmstrip = (
@@ -584,7 +584,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                     role = 'heading'>
                     {t('filmstrip.accessibilityLabel.heading')}
                 </span>
-                {/* { toolbar } */}
+                { toolbar }
                 <div className = 'cssw_hacked_title_tabs'>
                     <FilmstripTitleTabs
                         onChange = { this._onTitleTabChange }
@@ -712,24 +712,28 @@ class Filmstrip extends PureComponent<IProps, IState> {
     _renderSignalItem() {
         const { signalList } = this.state;
 
-        return signalList.map((signal: any) => (
-            <div
-                className = 'signalstrip-wrapper'
-                key = { signal.id }>
-                <div className = 'signalstrip__top'>
-                    <span className = 'signalstrip-type'>{signal.type}</span>
-                    <span className = 'signalstrip-name'>{signal.name}</span>
-                </div>
-                <div className = 'signalstrip__footer'>
-                    <div className = 'signalstrip-ip'>{signal.ip}</div>
-                    <SignalSwitch
-                        checked = { signal.isSelected }
-                        // eslint-disable-next-line react/jsx-no-bind
-                        onChange = { (e: React.ChangeEvent, value: boolean) =>
-                            this._onSwitchChange(e, value, signal.id) } />
-                </div>
-            </div>
-        ));
+        return (<div className = 'signalstrip__list'>
+            {
+                signalList.map((signal: any) => (
+                    <div
+                        className = 'signalstrip-wrapper'
+                        key = { signal.id }>
+                        <div className = 'signalstrip__top'>
+                            <span className = 'signalstrip-type'>{signal.type}</span>
+                            <span className = 'signalstrip-name'>{signal.name}</span>
+                        </div>
+                        <div className = 'signalstrip__footer'>
+                            <div className = 'signalstrip-ip'>{signal.ip}</div>
+                            <SignalSwitch
+                                checked = { signal.isSelected }
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onChange = { (e: React.ChangeEvent, value: boolean) =>
+                                    this._onSwitchChange(e, value, signal.id) } />
+                        </div>
+                    </div>
+                ))
+            }
+        </div>);
     }
 
     /**

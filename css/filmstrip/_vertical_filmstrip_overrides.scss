@@ -3,6 +3,12 @@
         background-color: #233332;
         flex-direction: column;
 
+        &.hidden {
+            .signalstrip__list {
+                display: none;
+            }
+        }
+
         .cssw_hacked_title_tabs {
             width: 100%;
         }
