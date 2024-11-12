@@ -1203,7 +1203,9 @@ class Thumbnail extends Component<IProps, IState> {
             && !isWhiteboardParticipant(_participant)
             && !_isVirtualScreenshareParticipant
         ) {
-            return this._renderFakeParticipant();
+            return null;
+
+            // return this._renderFakeParticipant();
         }
 
         if (_isVirtualScreenshareParticipant) {
