@@ -1,3 +1,5 @@
+import { createApiEvent } from '../analytics/AnalyticsEvents';
+import { sendAnalytics } from '../analytics/functions';
 import { IStore } from '../app/types';
 import { getCurrentConference } from '../base/conference/functions';
 import { hideDialog, openDialog } from '../base/dialog/actions';
@@ -121,6 +123,45 @@ export function playSharedVideo(videoUrl: string) {
 
         if (conference) {
             const localParticipant = getLocalParticipant(getState());
+
+            // we will send the command and will create local video fake participant
+            // and start playing once we receive ourselves the command
+            sendShareVideoCommand({
+                conference,
+                id: videoUrl,
+                localParticipantId: localParticipant?.id,
+                status: PLAYBACK_START,
+                time: 0
+            });
+        }
+    };
+}
+
+/**
+ *
+ * Plays a shared video.
+ *
+ * @param {string} videoUrl - The video url to be played.
+ *
+ * @returns {Function}
+ */
+export function playSharedVideos(videoUrl: string) {
+    return (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
+        const state = getState();
+        const { ownerId } = state['features/shared-video'];
+        const localParticipant = getLocalParticipant(state);
+
+        if (ownerId === localParticipant?.id) {
+            sendAnalytics(createApiEvent('share.video.stop'));
+            dispatch(resetSharedVideoStatus());
+        }
+
+        if (!isSharedVideoEnabled(getState())) {
+            return;
+        }
+        const conference = getCurrentConference(getState());
+
+        if (conference && videoUrl) {
 
             // we will send the command and will create local video fake participant
             // and start playing once we receive ourselves the command

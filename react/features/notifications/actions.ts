@@ -4,6 +4,7 @@ import { IStore } from '../app/types';
 import { NOTIFICATIONS_ENABLED } from '../base/flags/constants';
 import { getFeatureFlag } from '../base/flags/functions';
 import { getParticipantCount } from '../base/participants/functions';
+import { VIDEO_PLAYER_PARTICIPANT_NAME } from '../shared-video/constants';
 
 import {
     CLEAR_NOTIFICATIONS,
@@ -58,7 +59,7 @@ export function clearNotifications() {
 }
 
 /**
- * Removes the notification with the passed in id.
+ * Remov es the notification with the passed in id.
  *
  * @param {string} uid - The unique identifier for the notification to be
  * removed.
@@ -323,6 +324,10 @@ const _throttledNotifyParticipantLeft = throttle((dispatch: IStore['dispatch'], 
  * @returns {Function}
  */
 export function showParticipantJoinedNotification(displayName: string) {
+    if (displayName === VIDEO_PLAYER_PARTICIPANT_NAME) {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        return () => {};
+    }
     joinedParticipantsNames.push(displayName);
 
     return (dispatch: IStore['dispatch'], getState: IStore['getState']) =>
@@ -338,6 +343,10 @@ export function showParticipantJoinedNotification(displayName: string) {
  * @returns {Function}
  */
 export function showParticipantLeftNotification(displayName: string) {
+    if (displayName === VIDEO_PLAYER_PARTICIPANT_NAME) {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        return () => {};
+    }
     leftParticipantsNames.push(displayName);
 
     return (dispatch: IStore['dispatch'], getState: IStore['getState']) =>

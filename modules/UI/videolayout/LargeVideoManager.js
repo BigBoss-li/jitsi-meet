@@ -484,7 +484,7 @@ export default class LargeVideoManager {
         }
 
         if (resizableFilmstrip && visible && filmstripWidth.current >= FILMSTRIP_BREAKPOINT) {
-            widthToUse -= getVerticalViewMaxWidth(state);
+            widthToUse -= getVerticalViewMaxWidth();
         }
 
         this.width = widthToUse;

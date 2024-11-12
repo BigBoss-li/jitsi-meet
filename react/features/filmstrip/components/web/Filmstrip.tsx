@@ -18,6 +18,7 @@ import Icon from '../../../base/icons/components/Icon';
 import { IconArrowDown, IconArrowUp } from '../../../base/icons/svg';
 import { getHideSelfView } from '../../../base/settings/functions.any';
 import { registerShortcut, unregisterShortcut } from '../../../keyboard-shortcuts/actions';
+import { playSharedVideos } from '../../../shared-video/actions.any';
 import { showToolbox } from '../../../toolbox/actions.web';
 import { isButtonEnabled, isToolboxVisible } from '../../../toolbox/functions.web';
 import { LAYOUTS } from '../../../video-layout/constants';
@@ -549,12 +550,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
                         !tileViewActive
                             && (filmstripType === FILMSTRIP_TYPE.MAIN
                                 || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
-                            && !_resizableFilmstrip
-                            && 'filmstrip-hover',
-                        _verticalViewGrid && 'vertical-view-grid'
+                            && 'filmstrip-hover'
                     ) }
                     id = 'remoteVideos'>
-                    {!_disableSelfView && !_verticalViewGrid && (
+                    {!_disableSelfView && (
                         <div
                             className = 'filmstrip__videos'
                             id = 'filmstripLocalVideo'>
@@ -674,34 +673,37 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @param {number} id - The signal id.
      * @returns {void}
      */
-    _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
+    async _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
         const { signalList } = this.state;
+        const MAX_SHARED_VIDEO_LENGTH = 4;
+
+        const selected = signalList.filter((signal: any) => signal.isSelected);
+
+        if (selected.length >= MAX_SHARED_VIDEO_LENGTH && value) {
+            return;
+        }
 
         const newSignalList = signalList.map((signal: any) => {
+            let isSelected = signal.isSelected;
+
+            if (signal.id === id) {
+                isSelected = value;
+            }
+
             return {
                 ...signal,
-                isSelected: signal.id === id && value
+                isSelected
             };
         });
+
 
         this.setState({
             signalList: newSignalList
         });
-        let url;
 
-        if (value) {
+        const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
 
-            const signal = signalList.find(i => i.id === id);
-
-            if (signal) {
-                url = signal.url;
-            }
-        }
-
-        window.parent.postMessage({
-            type: 'share_video',
-            data: { url }
-        }, '*');
+        APP.store.dispatch(playSharedVideos(urls.join(',')));
     }
 
     /**
@@ -1166,7 +1168,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         shouldReduceHeight ? 'reduce-height' : ''
     } ${shiftRight ? 'shift-right' : ''} ${collapseTileView ? 'collapse' : ''} ${isVisible ? '' : 'hidden'}`.trim();
 
-    const _currentLayout = getCurrentLayout(state);
+    const _currentLayout = getCurrentLayout();
     const _isVerticalFilmstrip
         = _currentLayout === LAYOUTS.VERTICAL_FILMSTRIP_VIEW
         || (filmstripType === FILMSTRIP_TYPE.MAIN && _currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW);
@@ -1191,7 +1193,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _topPanelMaxHeight: topPanelHeight.current || TOP_FILMSTRIP_HEIGHT,
         _topPanelVisible,
         _verticalFilmstripWidth: verticalFilmstripWidth.current,
-        _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
+        _verticalViewMaxWidth: getVerticalViewMaxWidth(),
         _videosClassName: videosClassName
     };
 }

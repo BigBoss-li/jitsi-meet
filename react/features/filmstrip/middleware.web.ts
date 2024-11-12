@@ -233,7 +233,7 @@ MiddlewareRegistry.register(store => next => action => {
             }
         }
 
-        if (getCurrentLayout(state) === LAYOUTS.TILE_VIEW) {
+        if (getCurrentLayout() === LAYOUTS.TILE_VIEW) {
             dispatch(setTileView(false));
         }
         break;
@@ -262,7 +262,7 @@ MiddlewareRegistry.register(store => next => action => {
         const state = store.getState();
         const stageFilmstrip = isStageFilmstripAvailable(state);
         const local = getLocalParticipant(state);
-        const currentLayout = getCurrentLayout(state);
+        const currentLayout = getCurrentLayout();
         const dominantSpeaker = getDominantSpeakerParticipant(state);
 
         if (dominantSpeaker?.id === id || id === local?.id || currentLayout === LAYOUTS.TILE_VIEW) {

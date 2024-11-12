@@ -381,7 +381,7 @@ function _mapStateToProps(state: IReduxState) {
         _seeWhatIsBeingShared: Boolean(seeWhatIsBeingShared),
         _showDominantSpeakerBadge: !hideDominantSpeakerBadge,
         _verticalFilmstripWidth: verticalFilmstripWidth.current,
-        _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
+        _verticalViewMaxWidth: getVerticalViewMaxWidth(),
         _visibleFilmstrip: visible,
         _whiteboardEnabled: isWhiteboardEnabled(state)
     };

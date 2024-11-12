@@ -89,7 +89,7 @@ StateListenerRegistry.register(
             participantCount: getParticipantCount(state),
             clientHeight,
             clientWidth,
-            isTileView: isLayoutTileView(state)
+            isTileView: isLayoutTileView()
         };
     },
     /* listener */({ clientHeight, isTileView }, store, previousState) => {

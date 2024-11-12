@@ -143,7 +143,7 @@ function _mapStateToProps(state: IReduxState, _ownProps: any) {
 
     return {
         _columns: gridDimensions.columns ?? 1,
-        _currentLayout: getCurrentLayout(state),
+        _currentLayout: getCurrentLayout(),
         _filmstripHeight: remoteFilmstripHeight,
         _filmstripWidth: filmstripWidth,
         _remoteParticipants: activeParticipants,

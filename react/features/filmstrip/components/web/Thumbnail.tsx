@@ -1259,7 +1259,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any): Object {
     const _audioTrack = isLocal
         ? getLocalAudioTrack(tracks)
         : getTrackByMediaTypeAndParticipant(tracks, MEDIA_TYPE.AUDIO, id);
-    const _currentLayout = getCurrentLayout(state) ?? '';
+    const _currentLayout = getCurrentLayout() ?? '';
     let size: any = {};
     let _isMobilePortrait = false;
     const {

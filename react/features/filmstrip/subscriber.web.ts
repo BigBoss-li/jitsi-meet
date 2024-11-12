@@ -63,7 +63,7 @@ StateListenerRegistry.register(
         const { clientHeight, clientWidth } = state['features/base/responsive-ui'];
 
         return {
-            layout: getCurrentLayout(state),
+            layout: getCurrentLayout(),
             height: clientHeight,
             width: clientWidth
         };
@@ -186,7 +186,7 @@ StateListenerRegistry.register(
         };
     },
     /* listener */(_, store) => {
-        if (getCurrentLayout(store.getState()) === LAYOUTS.STAGE_FILMSTRIP_VIEW) {
+        if (getCurrentLayout() === LAYOUTS.STAGE_FILMSTRIP_VIEW) {
             store.dispatch(setStageFilmstripViewDimensions());
         }
     }, {

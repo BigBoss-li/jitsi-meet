@@ -64,7 +64,7 @@ export function shouldDisplayStageParticipantBadge(state: IReduxState) {
     const selectedId = largeVideoParticipant?.id;
     const nameToDisplay = getParticipantDisplayName(state, selectedId ?? '');
     const localId = getLocalParticipant(state)?.id;
-    const isTileView = isLayoutTileView(state);
+    const isTileView = isLayoutTileView();
     const toolboxVisible: boolean = isToolboxVisible(state);
     const showDisplayName = isDisplayNameVisible(state);
 

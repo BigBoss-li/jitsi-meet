@@ -105,17 +105,30 @@ class SharedVideo extends Component<IProps> {
      * @returns {Component}
      */
     getManager() {
+
         const { videoUrl } = this.props;
 
         if (!videoUrl) {
             return null;
         }
 
+        const videoUrls = videoUrl.split(',');
+
+        if (videoUrls.length > 1) {
+            return (
+                <ExtendedVideoManager
+                    videoId = { videoUrl } />)
+            ;
+        }
+
         if (videoUrl.match(/http/)) {
             const vUrl = new URL(videoUrl);
 
             if (vUrl.pathname.endsWith('.flv') || vUrl.pathname.endsWith('.m3u8')) {
-                return <ExtendedVideoManager videoId = { videoUrl } />;
+                return (
+                    <ExtendedVideoManager
+                        videoId = { videoUrl } />
+                );
             }
 
             return <VideoManager videoId = { videoUrl } />;
@@ -134,12 +147,11 @@ class SharedVideo extends Component<IProps> {
     render() {
         // console.log('SharedVideo render', this.props);
 
-        const { isEnabled, isOwner, isResizing } = this.props;
+        const { isEnabled, isResizing, isOwner } = this.props;
 
         if (!isEnabled) {
             return null;
         }
-
         const className = !isResizing && isOwner ? '' : 'disable-pointer';
 
         return (
@@ -148,6 +160,7 @@ class SharedVideo extends Component<IProps> {
                 id = 'sharedVideo'
                 style = { this.getDimensions() }>
                 {this.getManager()}
+
             </div>
         );
     }
@@ -172,7 +185,7 @@ function _mapStateToProps(state: IReduxState) {
         clientHeight,
         clientWidth,
         filmstripVisible: visible,
-        filmstripWidth: getVerticalViewMaxWidth(state),
+        filmstripWidth: getVerticalViewMaxWidth(),
         isEnabled: isSharedVideoEnabled(state),
         isOwner: ownerId === localParticipant?.id,
         isResizing,

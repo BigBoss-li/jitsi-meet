@@ -170,7 +170,7 @@ StateListenerRegistry.register(
             participantCount: visibleRemoteParticipants?.size || 0,
             reducedUI,
             screenSharingFilmstripHeight:
-                screenshareFilmstripParticipantId && getCurrentLayout(state) === LAYOUTS.STAGE_FILMSTRIP_VIEW
+                screenshareFilmstripParticipantId && getCurrentLayout() === LAYOUTS.STAGE_FILMSTRIP_VIEW
                     ? thumbnailSize?.height : undefined,
             stageFilmstripThumbnailHeight: state['features/filmstrip'].stageFilmstripDimensions?.thumbnailSize?.height,
             tileViewThumbnailHeight: tileViewThumbnailSize?.height,
@@ -462,7 +462,7 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
             });
         }
 
-        if (getCurrentLayout(state) === LAYOUTS.STAGE_FILMSTRIP_VIEW && activeParticipantsSources.length > 0) {
+        if (getCurrentLayout() === LAYOUTS.STAGE_FILMSTRIP_VIEW && activeParticipantsSources.length > 0) {
             const selectedSources: string[] = [];
             const onStageSources: string[] = [];
 

@@ -293,7 +293,7 @@ export function setStageFilmstripViewDimensions() {
             tileView = {}
         } = state['features/base/config'];
         const { visible, topPanelHeight } = state['features/filmstrip'];
-        const verticalWidth = visible ? getVerticalViewMaxWidth(state) : 0;
+        const verticalWidth = visible ? getVerticalViewMaxWidth() : 0;
         const { numberOfVisibleTiles = MAX_ACTIVE_PARTICIPANTS } = tileView;
         const numberOfParticipants = state['features/filmstrip'].activeParticipants.length;
         const availableWidth = clientWidth - verticalWidth;
@@ -545,7 +545,7 @@ export function setScreensharingTileDimensions() {
         const state = getState();
         const { clientHeight, clientWidth } = state['features/base/responsive-ui'];
         const { visible, topPanelHeight, topPanelVisible } = state['features/filmstrip'];
-        const verticalWidth = visible ? getVerticalViewMaxWidth(state) : 0;
+        const verticalWidth = visible ? getVerticalViewMaxWidth() : 0;
         const availableWidth = clientWidth - verticalWidth;
         const topPanel = isStageFilmstripTopPanel(state) && topPanelVisible;
         const availableHeight = clientHeight - (topPanel ? topPanelHeight?.current || TOP_FILMSTRIP_HEIGHT : 0);

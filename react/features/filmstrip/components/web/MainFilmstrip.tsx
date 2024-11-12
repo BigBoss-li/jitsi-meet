@@ -117,7 +117,7 @@ function _mapStateToProps(state: IReduxState, _ownProps: any) {
         hasScroll: tileViewHasScroll,
         thumbnailSize: tileViewThumbnailSize
     } = state['features/filmstrip'].tileViewDimensions ?? {};
-    const _currentLayout = getCurrentLayout(state);
+    const _currentLayout = getCurrentLayout();
     const _resizableFilmstrip = isFilmstripResizable(state);
     const _verticalViewGrid = showGridInVerticalView(state);
     let gridDimensions = dimensions;

@@ -625,7 +625,7 @@ export function getIndicatorsTooltipPosition(thumbnailType?: string) {
  */
 export function isFilmstripResizable(state: IReduxState) {
     const { filmstrip } = state['features/base/config'];
-    const _currentLayout = getCurrentLayout(state);
+    const _currentLayout = getCurrentLayout();
 
     return !filmstrip?.disableResizable && !isMobileBrowser()
         && (_currentLayout === LAYOUTS.VERTICAL_FILMSTRIP_VIEW || _currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW);
@@ -675,7 +675,7 @@ export function getVerticalViewMaxWidth(state: IReduxState) {
  * @returns {boolean} - True if the scroll is displayed and false otherwise.
  */
 export function isFilmstripScrollVisible(state: IReduxState) {
-    const _currentLayout = getCurrentLayout(state);
+    const _currentLayout = getCurrentLayout();
     let hasScroll = false;
 
     switch (_currentLayout) {
