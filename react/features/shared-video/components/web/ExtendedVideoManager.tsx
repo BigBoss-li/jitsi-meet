@@ -55,19 +55,6 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     }
 
     /**
-     * Add listenners.
-     *
-     * @inheritdoc
-     * @returns {void}
-     */
-    componentDidMount() {
-        this._onMessageListener = this._onMessageListener.bind(this);
-
-        window.addEventListener('message', this._onMessageListener);
-
-    }
-
-    /**
      * Removes all listeners.
      *
      * @inheritdoc
@@ -217,33 +204,6 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
             this.unMute();
         }
     };
-
-    /**
-     * Message listener.
-     *
-     * @param {any} e -received data.
-     * @returns {void}
-     */
-    _onMessageListener(e: any) {
-        const { layout } = this.state;
-
-        if (this.reactPlayersRef && this.reactPlayersRef.length > 0) {
-            this.reactPlayersRef.forEach(ref => {
-                if (ref !== null) {
-                    ref.getInternalPlayer('flv')?.destroy();
-                }
-            });
-        }
-
-        if (e.data.type === 'video_layout') {
-            const layoutHistory = layout === 'horizontal' ? 'vertical' : 'horizontal';
-
-            localStorage.setItem('video_layout', layoutHistory);
-            this.setState({
-                layout: layoutHistory
-            });
-        }
-    }
 
     getPlayerOptions = (videoId: string) => {
         const { showControls } = this.props;
