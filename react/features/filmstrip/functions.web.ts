@@ -650,7 +650,9 @@ export function showGridInVerticalView(state: IReduxState) {
  * @param {Object} state - Redux state.
  * @returns {number}
  */
-export function getVerticalViewMaxWidth() { // state: IReduxState
+export function getVerticalViewMaxWidth(state: IReduxState) {
+
+    const { visible } = state['features/filmstrip'];
 
     // const { width } = state['features/filmstrip'];
     // const _resizableFilmstrip = isFilmstripResizable(state);
@@ -663,8 +665,7 @@ export function getVerticalViewMaxWidth() { // state: IReduxState
     // On non-resizable filmstrip add 4px for the left margin and border.
     // Also adding 7px for the scrollbar. Also adding 9px for the drag handle.
     // maxWidth += (_verticalViewGrid ? 0 : 11) + (_resizableFilmstrip ? 9 : 4);
-
-    return DEFAULT_FILMSTRIP_WIDTH;
+    return visible ? DEFAULT_FILMSTRIP_WIDTH : 0;
 }
 
 /**
