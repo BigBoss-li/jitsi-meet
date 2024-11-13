@@ -42,10 +42,13 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     constructor(props: IProps) {
         super(props);
 
+        const layoutHistory = localStorage.getItem('video_layout');
+        const layout = layoutHistory ? layoutHistory : 'horizontal';
+
         this.state = {
             isPlaying: true,
             isMuted: false,
-            layout: 'horizontal'
+            layout
         };
 
         this.playerRef = React.createRef<HTMLDivElement>();
@@ -233,8 +236,11 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         }
 
         if (e.data.type === 'video_layout') {
+            const layoutHistory = layout === 'horizontal' ? 'vertical' : 'horizontal';
+
+            localStorage.setItem('video_layout', layoutHistory);
             this.setState({
-                layout: layout === 'horizontal' ? 'vertical' : 'horizontal'
+                layout: layoutHistory
             });
         }
     }
@@ -309,12 +315,17 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     renderVideoVertical(videoUrls: Array<string>) {
         return (
             <div className = 'shared-video__vertical'>
-                <div className = 'shared-video_large'>
+                <div className = 'shared-video__large'>
                     { this.renderVideoPlayers(videoUrls?.slice(0, 1)) }
                 </div>
-                <div className = 'shared-video__small'>
-                    { this.renderVideoPlayers(videoUrls?.slice(1, videoUrls.length), 1) }
-                </div>
+                {
+                    videoUrls?.slice(1, videoUrls.length).length > 0 ? (
+                        <div className = 'shared-video__small'>
+                            { this.renderVideoPlayers(videoUrls?.slice(1, videoUrls.length), 1) }
+                        </div>
+                    ) : ''
+                }
+
             </div>
         );
     }
