@@ -1,30 +1,34 @@
 .signalstrip-wrapper {
-    margin-bottom: 12px;
-    background-color: #1C2928;
-    border-radius: 8px;
-    padding: 16px;
-    .signalstrip__top {
-        line-height: 40px;
-        font-size: 18px;
-        .signalstrip-type {
-            color: #08CCBC;
-            margin-right: 12px;
+    height: calc(100% - 88px);
+    overflow-y: auto;
+    .signalstrip-card {
+        margin-bottom: 12px;
+        background-color: #1c2928;
+        border-radius: 8px;
+        padding: 16px;
+        .signalstrip__top {
+            line-height: 40px;
+            font-size: 18px;
+            .signalstrip-type {
+                color: #08ccbc;
+                margin-right: 12px;
+            }
+            .signalstrip-name {
+                color: #ffffff;
+                font-weight: bold;
+            }
         }
-        .signalstrip-name {
-            color: #ffffff;
-            font-weight: bold;
-        }
-    }
 
-    .signalstrip__footer {
-        display: flex;
-        justify-content: space-between;
-        height: 38px;
-        line-height: 38px;
-        margin-top: 10px;
-        .signalstrip-ip {
-            color: #999999;
-            font-size: 14px;
+        .signalstrip__footer {
+            display: flex;
+            justify-content: space-between;
+            height: 38px;
+            line-height: 38px;
+            margin-top: 10px;
+            .signalstrip-ip {
+                color: #999999;
+                font-size: 14px;
+            }
         }
     }
 }

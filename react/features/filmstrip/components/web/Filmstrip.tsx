@@ -543,27 +543,20 @@ class Filmstrip extends PureComponent<IProps, IState> {
         );
 
         const signalstrip = (
-            <>
-                <div
-                    className = { clsx(
+            <div
+                className = { clsx(
                         this.props._videosClassName,
                         !tileViewActive
                             && (filmstripType === FILMSTRIP_TYPE.MAIN
                                 || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
                             && 'filmstrip-hover'
-                    ) }
-                    id = 'remoteVideos'>
-                    {!_disableSelfView && (
-                        <div
-                            className = 'filmstrip__videos'
-                            id = 'filmstripLocalVideo'>
-                            {!tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
-                                && <div id = 'filmstripLocalVideoThumbnail'>{this._renderSignalItem()}</div>
-                            }
-                        </div>
-                    )}
-                </div>
-            </>
+                ) }
+                id = 'remoteVideos'>
+                {
+                    !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
+                    && this._renderSignalItem()
+                }
+            </div>
         );
 
         return (
@@ -714,24 +707,30 @@ class Filmstrip extends PureComponent<IProps, IState> {
     _renderSignalItem() {
         const { signalList } = this.state;
 
-        return signalList.map((signal: any) => (
-            <div
-                className = 'signalstrip-wrapper'
-                key = { signal.id }>
-                <div className = 'signalstrip__top'>
-                    <span className = 'signalstrip-type'>{signal.type}</span>
-                    <span className = 'signalstrip-name'>{signal.name}</span>
-                </div>
-                <div className = 'signalstrip__footer'>
-                    <div className = 'signalstrip-ip'>{signal.ip}</div>
-                    <SignalSwitch
-                        checked = { signal.isSelected }
-                        // eslint-disable-next-line react/jsx-no-bind
-                        onChange = { (e: React.ChangeEvent, value: boolean) =>
-                            this._onSwitchChange(e, value, signal.id) } />
-                </div>
+        return (
+            <div className = 'signalstrip-wrapper'>
+                {
+                    signalList.map((signal: any) => (
+                        <div
+                            className = 'signalstrip-card'
+                            key = { signal.id }>
+                            <div className = 'signalstrip__top'>
+                                <span className = 'signalstrip-type'>{signal.type}</span>
+                                <span className = 'signalstrip-name'>{signal.name}</span>
+                            </div>
+                            <div className = 'signalstrip__footer'>
+                                <div className = 'signalstrip-ip'>{signal.ip}</div>
+                                <SignalSwitch
+                                    checked = { signal.isSelected }
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    onChange = { (e: React.ChangeEvent, value: boolean) =>
+                                        this._onSwitchChange(e, value, signal.id) } />
+                            </div>
+                        </div>
+                    ))
+                }
             </div>
-        ));
+        );
     }
 
     /**

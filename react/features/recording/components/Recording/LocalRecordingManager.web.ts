@@ -1,6 +1,5 @@
 import i18next from 'i18next';
 import { v4 as uuidV4 } from 'uuid';
-import fixWebmDuration from 'webm-duration-fix';
 
 import { IStore } from '../../../app/types';
 import { getRoomName } from '../../../base/conference/functions';
@@ -37,7 +36,7 @@ interface ILocalRecordingManager {
 
 const getMimeType = (): string => {
     const possibleTypes = [
-        'video/mp4'
+        'video/mp4;'
     ];
 
     for (const type of possibleTypes) {
@@ -69,7 +68,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
 
     get mediaType() {
         if (this.selfRecording.on && !this.selfRecording.withVideo) {
-            return 'audio/webm;';
+            return 'audio/mp3;';
         }
         if (!preferredMediaType) {
             preferredMediaType = getMimeType();
@@ -138,7 +137,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
      * */
     async saveRecording(recordingData, filename) {
         // @ts-ignore
-        const blob = await fixWebmDuration(new Blob(recordingData, { type: this.mediaType }));
+        const blob = new Blob(recordingData, { type: this.mediaType });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
 
@@ -152,7 +151,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
 
     async sendBlobRecording(recordingData) {
         // @ts-ignore
-        const blob = await fixWebmDuration(new Blob(recordingData, { type: this.mediaType }));
+        const blob = new Blob(recordingData, { type: this.mediaType });
         const extension = this.mediaType.slice(this.mediaType.indexOf('/') + 1, this.mediaType.indexOf(';'));
 
         window.parent.postMessage({
@@ -179,6 +178,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
             setTimeout(() => {
                 if (this.recordingData.length > 0) {
                     // this.saveRecording(this.recordingData, this.getFilename());
+
                     this.sendBlobRecording(this.recordingData);
                 }
             }, 1000);
