@@ -665,6 +665,7 @@ export function getVerticalViewMaxWidth(state: IReduxState) {
     // On non-resizable filmstrip add 4px for the left margin and border.
     // Also adding 7px for the scrollbar. Also adding 9px for the drag handle.
     // maxWidth += (_verticalViewGrid ? 0 : 11) + (_resizableFilmstrip ? 9 : 4);
+
     return visible ? DEFAULT_FILMSTRIP_WIDTH : 0;
 }
 

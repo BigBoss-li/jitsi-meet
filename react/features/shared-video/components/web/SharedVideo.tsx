@@ -185,7 +185,7 @@ function _mapStateToProps(state: IReduxState) {
         clientHeight,
         clientWidth,
         filmstripVisible: visible,
-        filmstripWidth: getVerticalViewMaxWidth(),
+        filmstripWidth: getVerticalViewMaxWidth(state),
         isEnabled: isSharedVideoEnabled(state),
         isOwner: ownerId === localParticipant?.id,
         isResizing,

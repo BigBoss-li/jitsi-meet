@@ -1186,7 +1186,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _topPanelMaxHeight: topPanelHeight.current || TOP_FILMSTRIP_HEIGHT,
         _topPanelVisible,
         _verticalFilmstripWidth: verticalFilmstripWidth.current,
-        _verticalViewMaxWidth: getVerticalViewMaxWidth(),
+        _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
         _videosClassName: videosClassName
     };
 }
