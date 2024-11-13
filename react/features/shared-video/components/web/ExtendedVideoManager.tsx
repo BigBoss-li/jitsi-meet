@@ -60,7 +60,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     componentDidMount() {
         this._onMessageListener = this._onMessageListener.bind(this);
 
-        // window.addEventListener('message', this._onMessageListener);
+        window.addEventListener('message', this._onMessageListener);
 
     }
 
@@ -222,9 +222,19 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @returns {void}
      */
     _onMessageListener(e: any) {
+        const { layout } = this.state;
+
+        if (this.reactPlayersRef && this.reactPlayersRef.length > 0) {
+            this.reactPlayersRef.forEach(ref => {
+                if (ref !== null) {
+                    ref.getInternalPlayer('flv')?.destroy();
+                }
+            });
+        }
+
         if (e.data.type === 'video_layout') {
             this.setState({
-                layout: e.data.layout
+                layout: layout === 'horizontal' ? 'vertical' : 'horizontal'
             });
         }
     }
