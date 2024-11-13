@@ -254,12 +254,12 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     /**
      * Render video players.
      *
-     * @param { Array } videoUrls - Video urls.
+     * @param { Array<string> } videoUrls - Video urls.
      * @param {number} playerRefStartIdx - PlayerRef start idx.
      * @returns {React.DOMElement}
      */
-    renderVideoPlayers(videoUrls: Array, playerRefStartIdx = 0) {
-        return videoUrls.map((url, idx) => (
+    renderVideoPlayers(videoUrls: Array<string>, playerRefStartIdx = 0) {
+        return videoUrls.map((url: string, idx: number) => (
             <div
                 className = 'shared-video'
                 key = { idx }>
@@ -277,10 +277,10 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     /**
      * Render horizontal videos.
      *
-     * @param {Array} videoUrls - Video urls.
+     * @param {Array<string>} videoUrls - Video urls.
      * @returns {React.DOMElement}
      */
-    renderVideoHorizontal(videoUrls: Array) {
+    renderVideoHorizontal(videoUrls: Array<string>) {
         const videoClassName = `shared-video-size-${videoUrls?.length}`;
 
         return (
@@ -293,10 +293,10 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     /**
      * Render vertical videos.
      *
-     * @param {Array} videoUrls - Video urls.
+     * @param {Array<string>} videoUrls - Video urls.
      * @returns {React.DOMElement}
      */
-    renderVideoVertical(videoUrls: Array) {
+    renderVideoVertical(videoUrls: Array<string>) {
         return (
             <div className = 'shared-video__vertical'>
                 <div className = 'shared-video_large'>
