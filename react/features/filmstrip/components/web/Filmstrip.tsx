@@ -549,7 +549,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
                         !tileViewActive
                             && (filmstripType === FILMSTRIP_TYPE.MAIN
                                 || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
-                            && 'filmstrip-hover'
                 ) }
                 id = 'remoteVideos'>
                 {
