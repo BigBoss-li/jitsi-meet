@@ -705,10 +705,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
     /**
      * Call shared videos debounce.
      *
-     * @param {string} videoUrls - Signal list.
+     * @param {Array<string>} videoUrls - Signal list.
      * @returns {void}
      */
-    _callChangeSharedVideos(videoUrls: string) {
+    _callChangeSharedVideos(videoUrls: Array<string>) {
         APP.store.dispatch(playSharedVideos(videoUrls.join(',')));
     }
 
