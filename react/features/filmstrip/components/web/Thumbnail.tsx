@@ -1076,6 +1076,12 @@ class Thumbnail extends Component<IProps, IState> {
             style = { styles.video }
             videoTrack = { _videoTrack } />;
 
+        const spanStyle = {
+            ...styles.thumbnail,
+            top: 0,
+            position: 'relative'
+        };
+
         return (
             <span
                 className = { containerClassName }
@@ -1099,7 +1105,7 @@ class Thumbnail extends Component<IProps, IState> {
                     }
                 ) }
                 ref = { this.containerRef }
-                style = { styles.thumbnail }>
+                style = { spanStyle }>
                 {/* this "button" is invisible, only here so that
                 keyboard/screen reader users can pin/unpin */}
                 <Tooltip
