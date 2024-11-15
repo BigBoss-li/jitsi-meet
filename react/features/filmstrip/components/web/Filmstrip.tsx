@@ -2,7 +2,7 @@
 import { Switch, Tab, Tabs } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
-import { throttle } from 'lodash-es';
+import { debounce, throttle } from 'lodash-es';
 import React, { ChangeEvent, PureComponent } from 'react';
 import { WithTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
@@ -350,6 +350,7 @@ interface IState {
  */
 class Filmstrip extends PureComponent<IProps, IState> {
     _throttledResize: Function;
+    _debouncedSwitch: Function;
 
     /**
      * Initializes a new {@code Filmstrip} instance.
@@ -384,12 +385,15 @@ class Filmstrip extends PureComponent<IProps, IState> {
         this._onSwitchChange = this._onSwitchChange.bind(this);
         this._renderSignalItem = this._renderSignalItem.bind(this);
         this._onMessageListener = this._onMessageListener.bind(this);
+        this._callChangeSharedVideos = this._callChangeSharedVideos.bind(this);
         window.addEventListener('message', this._onMessageListener, false);
 
         this._throttledResize = throttle(this._onFilmstripResize, 50, {
             leading: true,
             trailing: false
         });
+
+        this._debouncedSwitch = debounce(this._callChangeSharedVideos, 1500);
     }
 
     /**
@@ -695,7 +699,17 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
         const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
 
-        APP.store.dispatch(playSharedVideos(urls.join(',')));
+        this._debouncedSwitch(urls);
+    }
+
+    /**
+     * Call shared videos debounce.
+     *
+     * @param {string} videoUrls - Signal list.
+     * @returns {void}
+     */
+    _callChangeSharedVideos(videoUrls: string) {
+        APP.store.dispatch(playSharedVideos(videoUrls.join(',')));
     }
 
     /**
