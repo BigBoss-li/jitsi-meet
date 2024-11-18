@@ -115,7 +115,7 @@ export default class ToolboxItem extends AbstractToolboxItem<IProps> {
         let children = (
             <Fragment>
                 { this._renderIcon() }
-                { showLabel && <span>
+                { <span>
                     { this.label }
                 </span> }
                 { elementAfter }
