@@ -30,6 +30,17 @@
             .shared-video {
                 width: 50%;
                 height: 100%;
+
+                &:first-child {
+                    video {
+                        object-position: right;
+                    }
+                }
+                &:last-child {
+                    video {
+                        object-position: left;
+                    }
+                }
             }
         }
 
@@ -38,6 +49,30 @@
             .shared-video {
                 width: 50%;
                 height: 50%;
+
+                &:nth-child(1) {
+                    video {
+                        object-position: bottom right;
+                    }
+                }
+
+                &:nth-child(2) {
+                    video {
+                        object-position: bottom left;
+                    }
+                }
+
+                &:nth-child(3) {
+                    video {
+                        object-position: top right;
+                    }
+                }
+
+                &:nth-child(4) {
+                    video {
+                        object-position: top left;
+                    }
+                }
             }
         }
     }
