@@ -640,6 +640,7 @@ function initCommands() {
          * No other params should be passed.
          *
          * @param { string } arg.mode - Recording mode, either `local`, `file` or `stream`.
+         * @param { Object } arg.recordingMode - Recording mode.
          * @param { string } arg.dropboxToken - Dropbox oauth2 token.
          * @param { boolean } arg.onlySelf - Whether to only record the local streams.
          * @param { string } arg.rtmpStreamKey - The RTMP stream key.
@@ -654,6 +655,7 @@ function initCommands() {
          */
         'start-recording': ({
             mode,
+            recordingMode,
             dropboxToken,
             onlySelf,
             shouldShare,
@@ -689,7 +691,7 @@ function initCommands() {
                 const { localRecording } = state['features/base/config'];
 
                 if (!localRecording?.disable && supportsLocalRecording()) {
-                    APP.store.dispatch(startLocalVideoRecording(onlySelf));
+                    APP.store.dispatch(startLocalVideoRecording(onlySelf, recordingMode));
                 } else {
                     logger.error('Failed starting recording: local recording is either disabled or not supported');
                 }

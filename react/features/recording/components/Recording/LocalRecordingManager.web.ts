@@ -17,18 +17,26 @@ interface ILocalRecordingManager {
     addAudioTrackToLocalRecording: (track: MediaStreamTrack) => void;
     audioContext: AudioContext | undefined;
     audioDestination: MediaStreamAudioDestinationNode | undefined;
+    binaryFileIndex: number;
+    durationLimit: number;
+    fileSizeLimit: number;
     getFilename: () => string;
+    headerRecorder: MediaRecorder | undefined;
     initializeAudioMixer: () => void;
     isRecordingLocally: () => boolean;
     mediaType: string;
     mixAudioStream: (stream: MediaStream) => void;
     recorder: MediaRecorder | undefined;
     recordingData: Blob[];
+    recordingDurationTimer: Object;
+    recordingMetaData: Blob;
+    recordingMode: Object;
+    recordingType: string;
     roomName: string;
     saveRecording: (recordingData: Blob[], filename: string) => void;
     selfRecording: ISelfRecording;
     sendBlobRecording: (recordingData: Blob[]) => void;
-    startLocalRecording: (store: IStore, onlySelf: boolean) => Promise<void>;
+    startLocalRecording: (store: IStore, onlySelf: boolean, startLocalRecording: string) => Promise<void>;
     stopLocalRecording: () => void;
     stream: MediaStream | undefined;
     totalSize: number;
@@ -49,13 +57,18 @@ const getMimeType = (): string => {
 
 const VIDEO_BIT_RATE = 2500000; // 2.5Mbps in bits
 const MAX_SIZE = 1073741824; // 1GB in bytes
+const DEF_FILE_SIZE = 104857600;
+const DEF_DURATION_LIMIT = 600000;
 
 // Lazily initialize.
 let preferredMediaType: string;
 
 const LocalRecordingManager: ILocalRecordingManager = {
+    binaryFileIndex: 0,
     recordingData: [],
+    recordingMetaData: undefined,
     recorder: undefined,
+    headerRecorder: undefined,
     stream: undefined,
     audioContext: undefined,
     audioDestination: undefined,
@@ -65,6 +78,9 @@ const LocalRecordingManager: ILocalRecordingManager = {
         on: false,
         withVideo: false
     },
+    recordingType: 'SINGLE',
+    fileSizeLimit: DEF_FILE_SIZE,
+    durationLimit: DEF_DURATION_LIMIT,
 
     get mediaType() {
         if (this.selfRecording.on && !this.selfRecording.withVideo) {
@@ -135,32 +151,56 @@ const LocalRecordingManager: ILocalRecordingManager = {
      * @param {string} filename - The name of the file.
      * @returns {void}
      * */
-    async saveRecording(recordingData, filename) {
+    async saveRecording(recordingData) {
         // @ts-ignore
-        const blob = new Blob(recordingData, { type: this.mediaType });
-        const url = URL.createObjectURL(blob);
+        const blob = new Blob(recordingData, { type: 'application/octet-stream' });
+
+        const file = new File([ blob ], 'test.001');
+        const url = URL.createObjectURL(file);
         const a = document.createElement('a');
 
-        const extension = this.mediaType.slice(this.mediaType.indexOf('/') + 1, this.mediaType.indexOf(';'));
+        // const extension = this.mediaType.slice(this.mediaType.indexOf('/') + 1, this.mediaType.indexOf(';'));
 
         a.style.display = 'none';
         a.href = url;
-        a.download = `${filename}.${extension}`;
+
+        // a.download = `${filename}.${extension}`;
+        a.download = 'test.001';
         a.click();
+        this.recordingData = [];
     },
 
     async sendBlobRecording(recordingData) {
         // @ts-ignore
-        const blob = new Blob(recordingData, { type: this.mediaType });
-        const extension = this.mediaType.slice(this.mediaType.indexOf('/') + 1, this.mediaType.indexOf(';'));
+        const blob = new Blob(recordingData, { type: 'application/octet-stream' });
+        const filename = `${this.binaryFileIndex}.bin`;
 
         window.parent.postMessage({
             type: 'recorder_full_data',
             data: {
                 blob,
-                extension
+                filename
             }
         }, '*');
+    },
+
+    async sendSplitRecording(recordingData) {
+        // @ts-ignore
+        const blob = new Blob(recordingData, { type: 'application/octet-stream' });
+
+        // const extension = this.mediaType.slice(this.mediaType.indexOf('/') + 1, this.mediaType.indexOf(';'));
+        const filename = `${this.binaryFileIndex}.bin`;
+
+        this.binaryFileIndex++;
+
+        window.parent.postMessage({
+            type: 'recorder_split_data',
+            data: {
+                blob,
+                filename
+            }
+        }, '*');
+        this.recordingData = [];
     },
 
     /**
@@ -178,7 +218,9 @@ const LocalRecordingManager: ILocalRecordingManager = {
             setTimeout(() => {
                 if (this.recordingData.length > 0) {
                     // this.saveRecording(this.recordingData, this.getFilename());
-
+                    if (this.recordingType === 'DURATION') {
+                        clearInterval(this.recordingDurationTimer);
+                    }
                     this.sendBlobRecording(this.recordingData);
                 }
             }, 1000);
@@ -190,10 +232,17 @@ const LocalRecordingManager: ILocalRecordingManager = {
      *
      * @param {IStore} store - The redux store.
      * @param {boolean} onlySelf - Whether to record only self streams.
+     * @param {Object} recordingMode - Record type.
      * @returns {void}
      */
-    async startLocalRecording(store, onlySelf) {
+    async startLocalRecording(store, onlySelf, recordingMode) {
         const { dispatch, getState } = store;
+
+        this.recordingMode = recordingMode;
+        this.recordingType = recordingMode.recordingType;
+        this.fileSizeLimit = recordingMode.fileSizeLimit;
+        this.durationLimit = recordingMode.durationLimit;
+        this.binaryFileIndex = 0;
 
         // @ts-ignore
         const supportsCaptureHandle = Boolean(navigator.mediaDevices.setCaptureHandleConfig) && !inIframe();
@@ -294,16 +343,42 @@ const LocalRecordingManager: ILocalRecordingManager = {
             ]);
         }
 
+        // this.headerRecorder = new MediaRecorder(this.stream, {
+        //     mimeType: this.mediaType,
+        //     videoBitsPerSecond: VIDEO_BIT_RATE
+        // });
         this.recorder = new MediaRecorder(this.stream, {
             mimeType: this.mediaType,
             videoBitsPerSecond: VIDEO_BIT_RATE
         });
+
+        // this.headerRecorder.addEventListener('dataavailable', e => {
+        //     console.log('=============', e);
+        //     if (e.data && e.data.size > 0) {
+        //         console.log('header metadata info', e.data);
+        //         if (!this.recordingMetaData) {
+        //             this.recordingMetaData = e.data;
+        //         }
+        //     }
+        // });
+
         this.recorder.addEventListener('dataavailable', e => {
             if (e.data && e.data.size > 0) {
+                console.log(e);
                 this.recordingData.push(e.data);
                 this.totalSize -= e.data.size;
                 if (this.totalSize <= 0) {
                     dispatch(stopLocalVideoRecording());
+                }
+                if (this.recordingType === 'SIZE') {
+                    this.fileSizeLimit -= e.data.size;
+                    console.log('fileSizeLimit', this.fileSizeLimit);
+                    console.log('fileSizeLimit', this.recordingMode.fileSizeLimit);
+                    if (this.fileSizeLimit <= 0) {
+                        this.fileSizeLimit = this.recordingMode.fileSizeLimit;
+                        console.log('reset', this.fileSizeLimit);
+                        this.sendSplitRecording(this.recordingData);
+                    }
                 }
             }
         });
@@ -324,6 +399,15 @@ const LocalRecordingManager: ILocalRecordingManager = {
         }
 
         this.recorder.start(5000);
+        if (this.recordingType === 'DURATION') {
+            this.recordingDurationTimer
+            = setInterval(() => {
+                    if (this.recordingData.length) {
+                        this.sendSplitRecording(this.recordingData);
+                    }
+                }, this.durationLimit);
+        }
+
         window.parent.postMessage({
             type: 'recorder_start',
             data: true

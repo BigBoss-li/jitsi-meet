@@ -61,9 +61,8 @@ import {
 
 import ThumbnailAudioIndicator from './ThumbnailAudioIndicator';
 import ThumbnailBottomIndicators from './ThumbnailBottomIndicators';
+import ThumbnailTopIndicators from './ThumbnailTopIndicators';
 import VirtualScreenshareParticipant from './VirtualScreenshareParticipant';
-
-// import ThumbnailTopIndicators from './ThumbnailTopIndicators';
 
 /**
  * The type of the React {@code Component} state of {@link Thumbnail}.
@@ -261,8 +260,7 @@ const defaultStyles = (theme: Theme) => {
     return {
         indicatorsContainer: {
             position: 'absolute' as const,
-
-            // padding: theme.spacing(1),
+            padding: theme.spacing(1),
             zIndex: 10,
             width: '100%',
             boxSizing: 'border-box' as const,
@@ -308,8 +306,6 @@ const defaultStyles = (theme: Theme) => {
             height: '100%',
             width: '100%',
             borderRadius: '8px'
-
-            // backgroundColor: theme.palette.ui02
         },
 
         borderIndicator: {
@@ -361,8 +357,6 @@ const defaultStyles = (theme: Theme) => {
             width: '100%',
             height: '100%',
             backgroundColor: '#1C2928',
-
-            // backgroundColor: `${theme.palette.uiBackground}`,
             opacity: 0.6
         },
 
@@ -665,8 +659,6 @@ class Thumbnail extends Component<IProps, IState> {
         const { canPlayEventReceived } = this.state;
         const {
             _disableTileEnlargement,
-
-            // _height,
             _isVirtualScreenshareParticipant,
             _isHidden,
             _isScreenSharing,
@@ -674,8 +666,6 @@ class Thumbnail extends Component<IProps, IState> {
             _thumbnailType,
             _videoObjectPosition,
             _videoTrack,
-
-            // _width,
             horizontalOffset,
             style
         } = this.props;
@@ -727,11 +717,6 @@ class Thumbnail extends Component<IProps, IState> {
                 left,
                 height: '196px',
                 width: '100%'
-
-                // height: `${_height}px`,
-                // minHeight: `${_height}px`,
-                // minWidth: `${_width}px`,
-                // width: `${_width}px`
             },
             avatar: {
                 height: `${avatarSize}px`,
@@ -1037,8 +1022,7 @@ class Thumbnail extends Component<IProps, IState> {
             _isScreenSharing,
             _localFlipX,
             _participant,
-
-            // _shouldDisplayTintBackground,
+            _shouldDisplayTintBackground,
             _thumbnailType,
             _videoTrack,
             filmstripType,
@@ -1046,8 +1030,7 @@ class Thumbnail extends Component<IProps, IState> {
         } = this.props;
         const classes = withStyles.getClasses(this.props);
         const { id, name, pinned } = _participant || {};
-
-        // const { isHovered, popoverVisible } = this.state;
+        const { isHovered, popoverVisible } = this.state;
         const styles = this._getStyles();
         let containerClassName = this._getContainerClassName();
         const videoTrackClassName
@@ -1076,12 +1059,6 @@ class Thumbnail extends Component<IProps, IState> {
             style = { styles.video }
             videoTrack = { _videoTrack } />;
 
-        const spanStyle = {
-            ...styles.thumbnail,
-            top: 0,
-            position: 'relative'
-        };
-
         return (
             <span
                 className = { containerClassName }
@@ -1105,7 +1082,7 @@ class Thumbnail extends Component<IProps, IState> {
                     }
                 ) }
                 ref = { this.containerRef }
-                style = { spanStyle }>
+                style = { styles.thumbnail }>
                 {/* this "button" is invisible, only here so that
                 keyboard/screen reader users can pin/unpin */}
                 <Tooltip
@@ -1135,11 +1112,10 @@ class Thumbnail extends Component<IProps, IState> {
                         showStatusIndicators = { !isWhiteboardParticipant(_participant) }
                         thumbnailType = { _thumbnailType } />
                 </div>
-                {/* <div
+                <div
                     className = { clsx(classes.indicatorsContainer,
                         classes.indicatorsTopContainer,
-                        _thumbnailType === THUMBNAIL_TYPE.TILE && 'tile-view-mode',
-                        'cssw_hacked_top_indicators'
+                        _thumbnailType === THUMBNAIL_TYPE.TILE && 'tile-view-mode'
                     ) }>
                     <ThumbnailTopIndicators
                         disableConnectionIndicator = { isWhiteboardParticipant(_participant) }
@@ -1151,9 +1127,8 @@ class Thumbnail extends Component<IProps, IState> {
                         popoverVisible = { popoverVisible }
                         showPopover = { this._showPopover }
                         thumbnailType = { _thumbnailType } />
-                </div> */}
-                <div className = { classes.tintBackground } />
-                {/* {_shouldDisplayTintBackground && <div className = { classes.tintBackground } />} */}
+                </div>
+                {_shouldDisplayTintBackground && <div className = { classes.tintBackground } />}
                 {!_gifSrc && this._renderAvatar(styles.avatar) }
                 { !local && (
                     <div className = 'presence-label-container'>
@@ -1209,9 +1184,7 @@ class Thumbnail extends Component<IProps, IState> {
             && !isWhiteboardParticipant(_participant)
             && !_isVirtualScreenshareParticipant
         ) {
-            return null;
-
-            // return this._renderFakeParticipant();
+            return this._renderFakeParticipant();
         }
 
         if (_isVirtualScreenshareParticipant) {
@@ -1265,7 +1238,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any): Object {
     const _audioTrack = isLocal
         ? getLocalAudioTrack(tracks)
         : getTrackByMediaTypeAndParticipant(tracks, MEDIA_TYPE.AUDIO, id);
-    const _currentLayout = getCurrentLayout() ?? '';
+    const _currentLayout = getCurrentLayout(state) ?? '';
     let size: any = {};
     let _isMobilePortrait = false;
     const {
