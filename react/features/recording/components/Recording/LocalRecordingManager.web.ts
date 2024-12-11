@@ -18,7 +18,6 @@ interface ILocalRecordingManager {
     audioContext: AudioContext | undefined;
     audioDestination: MediaStreamAudioDestinationNode | undefined;
     binaryFileIndex: number;
-    durationLimit: number;
     fileSizeLimit: number;
     getFilename: () => string;
     headerRecorder: MediaRecorder | undefined;
@@ -57,8 +56,7 @@ const getMimeType = (): string => {
 
 const VIDEO_BIT_RATE = 2500000; // 2.5Mbps in bits
 const MAX_SIZE = 1073741824; // 1GB in bytes
-const DEF_FILE_SIZE = 104857600;
-const DEF_DURATION_LIMIT = 600000;
+const DEF_FILE_SIZE = 104857600; // 100MB in bytes
 
 // Lazily initialize.
 let preferredMediaType: string;
@@ -80,7 +78,6 @@ const LocalRecordingManager: ILocalRecordingManager = {
     },
     recordingType: 'SINGLE',
     fileSizeLimit: DEF_FILE_SIZE,
-    durationLimit: DEF_DURATION_LIMIT,
 
     get mediaType() {
         if (this.selfRecording.on && !this.selfRecording.withVideo) {
@@ -218,9 +215,6 @@ const LocalRecordingManager: ILocalRecordingManager = {
             setTimeout(() => {
                 if (this.recordingData.length > 0) {
                     // this.saveRecording(this.recordingData, this.getFilename());
-                    if (this.recordingType === 'DURATION') {
-                        clearInterval(this.recordingDurationTimer);
-                    }
                     this.sendBlobRecording(this.recordingData);
                 }
             }, 1000);
@@ -239,9 +233,8 @@ const LocalRecordingManager: ILocalRecordingManager = {
         const { dispatch, getState } = store;
 
         this.recordingMode = recordingMode;
-        this.recordingType = recordingMode.recordingType;
-        this.fileSizeLimit = recordingMode.fileSizeLimit;
-        this.durationLimit = recordingMode.durationLimit;
+        this.fileSizeLimit = DEF_FILE_SIZE;
+
         this.binaryFileIndex = 0;
 
         // @ts-ignore
@@ -370,15 +363,12 @@ const LocalRecordingManager: ILocalRecordingManager = {
                 if (this.totalSize <= 0) {
                     dispatch(stopLocalVideoRecording());
                 }
-                if (this.recordingType === 'SIZE') {
-                    this.fileSizeLimit -= e.data.size;
-                    console.log('fileSizeLimit', this.fileSizeLimit);
-                    console.log('fileSizeLimit', this.recordingMode.fileSizeLimit);
-                    if (this.fileSizeLimit <= 0) {
-                        this.fileSizeLimit = this.recordingMode.fileSizeLimit;
-                        console.log('reset', this.fileSizeLimit);
-                        this.sendSplitRecording(this.recordingData);
-                    }
+                this.fileSizeLimit -= e.data.size;
+                console.log('fileSizeLimit', this.fileSizeLimit);
+                if (this.fileSizeLimit <= 0) {
+                    this.fileSizeLimit = DEF_FILE_SIZE;
+                    console.log('reset', this.fileSizeLimit);
+                    this.sendSplitRecording(this.recordingData);
                 }
             }
         });
@@ -399,14 +389,6 @@ const LocalRecordingManager: ILocalRecordingManager = {
         }
 
         this.recorder.start(5000);
-        if (this.recordingType === 'DURATION') {
-            this.recordingDurationTimer
-            = setInterval(() => {
-                    if (this.recordingData.length) {
-                        this.sendSplitRecording(this.recordingData);
-                    }
-                }, this.durationLimit);
-        }
 
         window.parent.postMessage({
             type: 'recorder_start',
