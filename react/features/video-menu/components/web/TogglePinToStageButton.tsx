@@ -33,7 +33,8 @@ const TogglePinToStageButton = ({
     notifyClick,
     notifyMode,
     onClick,
-    participantID
+    participantID,
+    withText = true
 }: IProps): JSX.Element => {
     const dispatch = useDispatch();
     const { t } = useTranslation();
@@ -57,9 +58,10 @@ const TogglePinToStageButton = ({
     return (
         <ContextMenuItem
             accessibilityLabel = { text }
+            className = 'mutelink cssw_hacked'
             icon = { noIcon ? null : icon }
             onClick = { _onClick }
-            text = { text }
+            text = { withText ? text : '' }
             textClassName = { className } />
     );
 };

@@ -76,50 +76,15 @@ const useStyles = makeStyles()(theme => {
         },
 
         signalWrap: {
-            padding: '0 20px',
+            padding: '20px 20px',
             display: 'flex',
-            gap: '10px'
+            gap: '20px'
         },
 
         icon: {
-            width: '80px',
-            height: '80px',
+            width: '24px',
+            height: '24px',
             cursor: 'pointer'
-        },
-
-        previewEntry: {
-            cursor: 'pointer',
-            height: '138px',
-            width: '244px',
-            position: 'relative',
-            margin: '0 7px',
-            marginBottom: theme.spacing(1),
-            borderRadius: theme.shape.borderRadius,
-            boxSizing: 'border-box',
-            overflow: 'hidden',
-
-            '&:last-child': {
-                marginBottom: 0
-            }
-        },
-
-        selectedEntry: {
-            border: `2px solid ${theme.palette.action01Hover}`
-        },
-
-        previewVideo: {
-            height: '100%',
-            width: '100%',
-            objectFit: 'cover'
-        },
-
-        error: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-            width: '100%',
-            position: 'absolute'
         },
 
         labelContainer: {

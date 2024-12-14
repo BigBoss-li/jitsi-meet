@@ -23,7 +23,8 @@ import { IButtonProps } from '../../types';
 const MuteButton = ({
     notifyClick,
     notifyMode,
-    participantID
+    participantID,
+    withText = true
 }: IButtonProps): JSX.Element | null => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
@@ -55,10 +56,10 @@ const MuteButton = ({
     return (
         <ContextMenuItem
             accessibilityLabel = { t('dialog.muteParticipantButton') }
-            className = 'mutelink'
+            className = 'mutelink cssw_hacked'
             icon = { IconMicSlash }
             onClick = { handleClick }
-            text = { t('dialog.muteParticipantButton') } />
+            text = { withText ? t('dialog.muteParticipantButton') : '' } />
     );
 };
 

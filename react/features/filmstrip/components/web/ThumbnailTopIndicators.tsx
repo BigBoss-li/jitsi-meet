@@ -42,6 +42,11 @@ interface IProps {
     local?: boolean;
 
     /**
+     * An object with information about the participant related to the thumbnail.
+     */
+    participant: IParticipant;
+
+    /**
      * Id of the participant for which the component is displayed.
      */
     participantId: string;
@@ -81,6 +86,7 @@ const ThumbnailTopIndicators = ({
     isHovered,
     local,
     participantId,
+    participant,
     popoverVisible,
     showPopover,
     thumbnailType
@@ -118,10 +124,10 @@ const ThumbnailTopIndicators = ({
 
     return (<>
         <div className = { styles.container }>
-            <PinnedIndicator
+            {/* <PinnedIndicator
                 iconSize = { _indicatorIconSize }
                 participantId = { participantId }
-                tooltipPosition = { tooltipPosition } />
+                tooltipPosition = { tooltipPosition } /> */}
             {!_connectionIndicatorDisabled
                 && <ConnectionIndicator
                     alwaysVisible = { showConnectionIndicator }
@@ -146,6 +152,7 @@ const ThumbnailTopIndicators = ({
             <VideoMenuTriggerButton
                 hidePopover = { hidePopover }
                 local = { local }
+                participant = { participant }
                 participantId = { participantId }
                 popoverVisible = { popoverVisible }
                 showPopover = { showPopover }

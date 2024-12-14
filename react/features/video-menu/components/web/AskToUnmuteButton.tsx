@@ -60,10 +60,10 @@ const AskToUnmuteButton = ({
     return (
         <ContextMenuItem
             accessibilityLabel = { text }
+            className = 'mutelink cssw_hacked'
             icon = { icon }
             onClick = { _onClick }
-            testId = { `unmute-${buttonType}-${participantID}` }
-            text = { text } />
+            testId = { `unmute-${buttonType}-${participantID}` } />
     );
 };
 

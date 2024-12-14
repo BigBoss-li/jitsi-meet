@@ -34,6 +34,15 @@
                 padding-top: 12px;
                 justify-content: flex-start;
             }
+
+            #remotevideomenu, #localvideomenu {
+                .mutelink.cssw_hacked {
+                    padding: 5px 8px;
+                    min-height: unset;
+                    border-radius: 4px;
+                    overflow: hidden;
+                }
+            }
         }
 
         /**

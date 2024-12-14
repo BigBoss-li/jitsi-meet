@@ -738,14 +738,14 @@ class Thumbnail extends Component<IProps, IState> {
      * @returns {void}
      */
     _onClick() {
-        const { _participant, dispatch, _stageFilmstripLayout } = this.props;
-        const { id, pinned } = _participant;
+        // const { _participant, dispatch, _stageFilmstripLayout } = this.props;
+        // const { id, pinned } = _participant;
 
-        if (_stageFilmstripLayout) {
-            dispatch(togglePinStageParticipant(id));
-        } else {
-            dispatch(pinParticipant(pinned ? null : id));
-        }
+        // if (_stageFilmstripLayout) {
+        //     dispatch(togglePinStageParticipant(id));
+        // } else {
+        //     dispatch(pinParticipant(pinned ? null : id));
+        // }
     }
 
     /**
@@ -1118,11 +1118,12 @@ class Thumbnail extends Component<IProps, IState> {
                         _thumbnailType === THUMBNAIL_TYPE.TILE && 'tile-view-mode'
                     ) }>
                     <ThumbnailTopIndicators
-                        disableConnectionIndicator = { isWhiteboardParticipant(_participant) }
+                        disableConnectionIndicator = { true }
                         hidePopover = { this._hidePopover }
                         indicatorsClassName = { classes.indicatorsBackground }
                         isHovered = { isHovered }
                         local = { local }
+                        participant = { _participant }
                         participantId = { id }
                         popoverVisible = { popoverVisible }
                         showPopover = { this._showPopover }
