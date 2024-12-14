@@ -9,7 +9,7 @@ import ConnectionIndicator from '../../../connection-indicator/components/web/Co
 import { STATS_POPOVER_POSITION, THUMBNAIL_TYPE } from '../../constants';
 import { getIndicatorsTooltipPosition } from '../../functions.web';
 
-import PinnedIndicator from './PinnedIndicator';
+// import PinnedIndicator from './PinnedIndicator';
 import RaisedHandIndicator from './RaisedHandIndicator';
 import StatusIndicators from './StatusIndicators';
 import VideoMenuTriggerButton from './VideoMenuTriggerButton';
