@@ -42,6 +42,7 @@ import { default as IconFaceSmile } from './face-smile.svg';
 import { default as IconFavoriteSolid } from './favorite-solid.svg';
 import { default as IconFavorite } from './favorite.svg';
 import { default as IconFeedback } from './feedback.svg';
+import { default as IconFourCol } from './four-col.svg';
 import { default as IconGear } from './gear.svg';
 import { default as IconGoogle } from './google.svg';
 import { default as IconHangup } from './hangup.svg';
@@ -62,6 +63,8 @@ import { default as IconConnectionInactive } from './ninja.svg';
 import { default as IconNoiseSuppressionOff } from './noise-suppression-off.svg';
 import { default as IconNoiseSuppressionOn } from './noise-suppression-on.svg';
 import { default as IconOffice365 } from './office365.svg';
+import { default as IconOneCol } from './one-col.svg';
+import { default as IconOneLargeCol } from './one-large-col.svg';
 import { default as IconRecordOpportunity } from './opportunity-record.svg';
 import { default as IconPerformance } from './performance.svg';
 import { default as IconPhoneRinging } from './phone-ringing.svg';
@@ -81,6 +84,7 @@ import { default as IconSend } from './send.svg';
 import { default as IconShareDoc } from './share-doc.svg';
 import { default as IconShare } from './share.svg';
 import { default as IconShortcuts } from './shortcuts.svg';
+import { default as IconSignal } from './signal.svg';
 import { default as IconSip } from './sip.svg';
 import { default as IconSites } from './sites.svg';
 import { default as IconRemoteControlStart } from './start-remote-control.svg';
@@ -89,6 +93,7 @@ import { default as IconStop } from './stop.svg';
 import { default as IconSubtitles } from './subtitles.svg';
 import { default as IconTileView } from './tile-view.svg';
 import { default as IconTrash } from './trash.svg';
+import { default as IconTwoCol } from './two-col.svg';
 import { default as IconUserDeleted } from './user-deleted.svg';
 import { default as IconUser } from './user.svg';
 import { default as IconUsers } from './users.svg';
@@ -209,6 +214,7 @@ export const DEFAULT_ICON: Record<string, any> = {
     IconUser,
     IconVideo,
     IconVideoOff,
+    IconSignal,
     IconVolumeOff,
     IconVolumeUp,
     IconWarning,
@@ -218,5 +224,9 @@ export const DEFAULT_ICON: Record<string, any> = {
     IconWifi1Bar,
     IconWifi2Bars,
     IconWifi3Bars,
-    IconYahoo
+    IconYahoo,
+    IconOneCol,
+    IconTwoCol,
+    IconFourCol,
+    IconOneLargeCol
 };

@@ -23,6 +23,8 @@ import virtualBackgroundLogger from '../virtual-background/logger';
 
 import {
     SET_AUDIO_SETTINGS_VISIBILITY,
+    SET_SIGNAL_LAYOUT,
+    SET_SIGNAL_SETTINGS_VISIBILITY,
     SET_VIDEO_SETTINGS_VISIBILITY
 } from './actionTypes';
 import LogoutDialog from './components/web/LogoutDialog';
@@ -114,8 +116,36 @@ function setAudioSettingsVisibility(value: boolean) {
  * @returns {Function}
  */
 function setVideoSettingsVisibility(value: boolean) {
+
     return {
         type: SET_VIDEO_SETTINGS_VISIBILITY,
+        value
+    };
+}
+
+/**
+ * Sets the visibility of the video settings.
+ *
+ * @param {boolean} value - The new value.
+ * @returns {Function}
+ */
+function setSignalSettingsVisibility(value: boolean) {
+    return {
+        type: SET_SIGNAL_SETTINGS_VISIBILITY,
+        value
+    };
+}
+
+/**
+ * Sets the visibility of the video settings.
+ *
+ * @param {string} value - The new value.
+ * @returns {Function}
+ */
+function setSignalSettingsLayout(value: string) {
+
+    return {
+        type: SET_SIGNAL_LAYOUT,
         value
     };
 }
@@ -275,6 +305,32 @@ export function toggleVideoSettings() {
         const value = getState()['features/settings'].videoSettingsVisible;
 
         dispatch(setVideoSettingsVisibility(!value));
+    };
+}
+
+/**
+ * Toggles the visibility of the video settings.
+ *
+ * @returns {void}
+ */
+export function toggleSignalSettings() {
+    return (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
+        const value = getState()['features/settings'].signalSettingsVisible;
+
+        dispatch(setSignalSettingsVisibility(!value));
+    };
+}
+
+/**
+ * Toggles the visibility of the video settings.
+ *
+ * @param {string} layout - The new settings.
+ * @returns {void}
+ */
+export function setSignalLayout(layout: string) {
+    return (dispatch: IStore['dispatch']) => {
+
+        dispatch(setSignalSettingsLayout(layout));
     };
 }
 

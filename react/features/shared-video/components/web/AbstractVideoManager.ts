@@ -84,6 +84,8 @@ export interface IProps {
      */
     _setSharedVideoStatus: Function;
 
+    _signalLayout?: string;
+
     /**
      * The shared video status.
      */
@@ -450,6 +452,7 @@ export function _mapStateToProps(state: IReduxState) {
     const { ownerId, status, time, videoUrl, muted } = state['features/shared-video'];
     const localParticipant = getLocalParticipant(state);
     const _isLocalAudioMuted = isLocalTrackMuted(state['features/base/tracks'], MEDIA_TYPE.AUDIO);
+    const { signalLayout } = state['features/settings'];
 
     return {
         _conference: getCurrentConference(state),
@@ -459,7 +462,8 @@ export function _mapStateToProps(state: IReduxState) {
         _ownerId: ownerId,
         _status: status,
         _time: time,
-        _videoUrl: videoUrl
+        _videoUrl: videoUrl,
+        _signalLayout: signalLayout
     };
 }
 

@@ -236,6 +236,8 @@ interface IProps extends WithTranslation {
      */
     _rows: number;
 
+    _signalLayout: string;
+
     /**
      * The height of the thumbnail.
      */
@@ -755,17 +757,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
             this.setState({
                 signalList: e.data.signalList
             });
-        } else if (e.data.type === 'video_layout') {
-            const layout = localStorage.getItem('video_layout');
-            const layoutHistory = layout === 'vertical' ? 'horizontal' : 'vertical';
-
-            localStorage.setItem('video_layout', layoutHistory);
-
-            const { signalList } = this.state;
-
-            const urls = signalList.filter(item => item.isSelected).map(item => item.url);
-
-            APP.store.dispatch(playSharedVideos(urls.join(',')));
         }
     }
 
@@ -1168,6 +1159,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
     const disableSelfView = getHideSelfView(state);
     const { clientWidth, clientHeight } = state['features/base/responsive-ui'];
     const filmstripDisabled = isFilmstripDisabled(state);
+    const { signalLayout } = state['features/settings'];
 
     const collapseTileView = reduceHeight && isMobileBrowser() && clientWidth <= ASPECT_RATIO_BREAKPOINT;
 
@@ -1211,7 +1203,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _topPanelVisible,
         _verticalFilmstripWidth: verticalFilmstripWidth.current,
         _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
-        _videosClassName: videosClassName
+        _videosClassName: videosClassName,
+        _signalLayout: signalLayout || 'FOUR'
     };
 }
 

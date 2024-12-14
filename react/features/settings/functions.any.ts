@@ -253,3 +253,13 @@ export function getAudioSettingsVisibility(state: IReduxState) {
 export function getVideoSettingsVisibility(state: IReduxState) {
     return state['features/settings'].videoSettingsVisible;
 }
+
+/**
+ * Returns the visibility state of the signal settings.
+ *
+ * @param {Object} state - The state of the application.
+ * @returns {boolean}
+ */
+export function getSignalSettingsVisibility(state: IReduxState) {
+    return state['features/settings'].signalSettingsVisible;
+}

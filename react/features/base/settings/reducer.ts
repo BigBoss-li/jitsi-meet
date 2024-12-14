@@ -67,6 +67,8 @@ export interface ISettingsState {
     maxStageParticipants?: number;
     micDeviceId?: string | boolean;
     serverURL?: string;
+    signalLayout?: string;
+    signalSettingsVisible?: boolean;
     soundsIncomingMessage?: boolean;
     soundsParticipantJoined?: boolean;
     soundsParticipantKnocking?: boolean;

@@ -1329,7 +1329,8 @@
         "videoSettings": "视频设置",
         "videomute": "关闭摄像头",
         "videomuteGUMPending": "连接你的摄像头",
-        "videounmute": "启动摄像头"
+        "videounmute": "启动摄像头",
+        "signalunmute": "信号源排列"
     },
     "transcribing": {
         "ccButtonTooltip": "开启/关闭字幕",

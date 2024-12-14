@@ -67,6 +67,7 @@ import FullscreenButton from './components/web/FullscreenButton';
 import LinkToSalesforceButton from './components/web/LinkToSalesforceButton';
 import ProfileButton from './components/web/ProfileButton';
 import ShareDesktopButton from './components/web/ShareDesktopButton';
+import SignalSettingsButton from './components/web/SignalSettingsButton';
 import ToggleCameraButton from './components/web/ToggleCameraButton';
 import VideoSettingsButton from './components/web/VideoSettingsButton';
 import { isButtonEnabled, isDesktopShareButtonDisabled } from './functions.web';
@@ -157,6 +158,12 @@ const noiseSuppression = {
 const settings = {
     key: 'settings',
     Content: SettingsButton,
+    group: 4
+};
+
+const signal = {
+    key: 'signal',
+    Content: SignalSettingsButton,
     group: 4
 };
 
@@ -320,6 +327,7 @@ export function useToolboxButtons(
         'select-background': virtualBackground,
         stats: speakerStats,
         settings,
+        signal,
         shortcuts,
         embedmeeting: embed,
         feedback,

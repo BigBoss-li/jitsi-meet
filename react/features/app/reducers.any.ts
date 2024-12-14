@@ -19,6 +19,7 @@ import '../base/participants/reducer';
 import '../base/responsive-ui/reducer';
 import '../base/settings/reducer';
 import '../base/sounds/reducer';
+import '../base/signal/reducer';
 import '../base/testing/reducer';
 import '../base/tracks/reducer';
 import '../base/user-interaction/reducer';

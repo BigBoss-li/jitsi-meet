@@ -1,5 +1,4 @@
 /* eslint-disable no-invalid-this */
-import clsx from 'clsx';
 import React from 'react';
 import ReactPlayer from 'react-player';
 import { connect } from 'react-redux';
@@ -52,6 +51,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         };
 
         this.playerRef = React.createRef<HTMLDivElement>();
+
     }
 
     /**
@@ -206,6 +206,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     };
 
     getPlayerOptions = (videoId: string) => {
+        console.log('videoId', videoId);
         const { showControls } = this.props;
         const { isPlaying } = this.state;
 
@@ -235,59 +236,20 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @returns {React.DOMElement}
      */
     renderVideoPlayers(videoUrls: Array<string>, playerRefStartIdx = 0) {
-        return videoUrls.map((url: string, idx: number) => (
-            <div
-                className = 'shared-video'
-                key = { idx }>
-                <ReactPlayer
+
+        return videoUrls.map((url: string, idx: number) => (<div
+            className = 'shared-video'
+            key = { idx }>
+            <ReactPlayer
+                // eslint-disable-next-line react/jsx-no-bind
+                ref = { refItem => {
                     // eslint-disable-next-line react/jsx-no-bind
-                    ref = { refItem => {
-                        // eslint-disable-next-line react/jsx-no-bind
+                    if (!this.reactPlayersRef[idx + playerRefStartIdx]) {
                         this.reactPlayersRef[idx + playerRefStartIdx] = refItem;
-                    } }
-                    { ...this.getPlayerOptions(url) } />
-            </div>
-        ));
-    }
-
-    /**
-     * Render horizontal videos.
-     *
-     * @param {Array<string>} videoUrls - Video urls.
-     * @returns {React.DOMElement}
-     */
-    renderVideoHorizontal(videoUrls: Array<string>) {
-        const videoClassName = `shared-video-size-${videoUrls?.length}`;
-
-        return (
-            <div className = { clsx('shared-video__horizontal', videoClassName) }>
-                { this.renderVideoPlayers(videoUrls) }
-            </div>
-        );
-    }
-
-    /**
-     * Render vertical videos.
-     *
-     * @param {Array<string>} videoUrls - Video urls.
-     * @returns {React.DOMElement}
-     */
-    renderVideoVertical(videoUrls: Array<string>) {
-        return (
-            <div className = 'shared-video__vertical'>
-                <div className = 'shared-video__large'>
-                    { this.renderVideoPlayers(videoUrls?.slice(0, 1)) }
-                </div>
-                {
-                    videoUrls?.slice(1, videoUrls.length).length > 0 ? (
-                        <div className = 'shared-video__small'>
-                            { this.renderVideoPlayers(videoUrls?.slice(1, videoUrls.length), 1) }
-                        </div>
-                    ) : ''
-                }
-
-            </div>
-        );
+                    }
+                } }
+                { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+        </div>));
     }
 
     /**
@@ -296,24 +258,142 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @inheritdoc
      */
     render() {
-        const { videoId } = this.props;
-        const { layout } = this.state;
+        const { videoId, _signalLayout } = this.props;
 
+        if (this.reactPlayersRef && this.reactPlayersRef.length > 0) {
+            this.reactPlayersRef.forEach(ref => {
+                if (ref !== null) {
+                    ref.getInternalPlayer('flv')?.destroy();
+                }
+            });
+        }
         const videoUrls = videoId?.split(',');
+
+        let ele2;
+
+        console.log('======render=====');
 
         if (videoUrls && videoUrls?.length > 0) {
             this.reactPlayersRef = new Array(videoUrls.length);
-        }
 
-        const ele = videoUrls && videoUrls?.length > 0
-            ? layout === 'horizontal' ? this.renderVideoHorizontal(videoUrls) : this.renderVideoVertical(videoUrls)
-            : '';
+            let maxSignals = -1;
+
+            let signalLayout = _signalLayout;
+
+            if (!signalLayout) {
+                if (videoUrls.length === 1) {
+                    signalLayout = 'ONE';
+                } else if (videoUrls.length === 2) {
+                    signalLayout = 'TWO';
+                } else if (videoUrls.length === 3 || videoUrls.length === 4) {
+                    signalLayout = 'FOUR';
+                }
+            }
+
+            if (signalLayout === 'ONE') {
+                maxSignals = 1;
+            } else if (signalLayout === 'TWO') {
+                maxSignals = 2;
+            } else {
+                maxSignals = 4;
+            }
+
+            if (signalLayout === 'ONE_LARGE') {
+                const smallItems = [];
+                const largeUrl = videoUrls[0];
+
+                for (let i = 1; i < maxSignals; i++) {
+                    const url = videoUrls[i];
+
+                    if (url) {
+                        smallItems.push(
+                            <div
+                                className = { 'react-player-box' }
+                                key = { i }>
+                                <ReactPlayer
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    ref = { refItem => {
+                                        // eslint-disable-next-line react/jsx-no-bind
+                                        if (!this.reactPlayersRef[i]) {
+                                            this.reactPlayersRef[i] = refItem;
+                                        }
+                                    } }
+                                    { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                            </div>
+                        );
+                    } else {
+                        smallItems.push(
+                            <div
+                                className = { 'react-player-box box-no-signal' }
+                                key = { i }>
+                                <div className = { 'no-signal' }>暂无信号</div>
+                            </div>
+                        );
+                    }
+                }
+
+                const leftItem = (<div className = 'shared-video__large'>
+                    <ReactPlayer
+                        // eslint-disable-next-line react/jsx-no-bind
+                        ref = { refItem => {
+                            // eslint-disable-next-line react/jsx-no-bind
+                            if (!this.reactPlayersRef[0]) {
+                                this.reactPlayersRef[0] = refItem;
+                            }
+                        } }
+                        { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />
+                </div>);
+                const rightItem = <div className = { 'shared-video__small' }>{ smallItems }</div>;
+
+                ele2 = (<div className = { `shared-video shared-video-${signalLayout}` }>
+                    {leftItem}
+                    {rightItem}
+                </div>);
+            } else {
+                const listItems = [];
+
+                for (let i = 0; i < maxSignals; i++) {
+                    const url = videoUrls[i];
+
+                    if (url) {
+                        listItems.push(
+                            <div
+                                className = { 'react-player-box' }
+                                key = { i }>
+                                <ReactPlayer
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    ref = { refItem => {
+                                        // eslint-disable-next-line react/jsx-no-bind
+                                        if (!this.reactPlayersRef[i]) {
+                                            this.reactPlayersRef[i] = refItem;
+                                        }
+                                    } }
+                                    { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                            </div>
+                        );
+                    } else {
+                        listItems.push(
+                            <div
+                                className = { 'react-player-box box-no-signal' }
+                                key = { i }>
+                                <div className = { 'no-signal' }>暂无信号</div>
+                            </div>
+                        );
+                    }
+
+                }
+
+                ele2 = (<div className = { `shared-video shared-video-${signalLayout}` }>
+                    { listItems }
+                </div>);
+            }
+        }
 
         return (
             <div
                 className = 'shared-video-wrapper'
                 ref = { this.playerRef }>
-                { ele }
+                { ele2 }
             </div>
 
         );
