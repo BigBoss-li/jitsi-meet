@@ -1327,10 +1327,11 @@
         "toggleCamera": "切换摄像头",
         "unmute": "取消静音",
         "videoSettings": "视频设置",
+        "signalSettings": "布局设置",
         "videomute": "关闭摄像头",
         "videomuteGUMPending": "连接你的摄像头",
         "videounmute": "启动摄像头",
-        "signalunmute": "信号源排列"
+        "signalunmute": "布局"
     },
     "transcribing": {
         "ccButtonTooltip": "开启/关闭字幕",
