@@ -30,7 +30,7 @@ export default class BaseSignalMuteButton<P extends IProps, S=any>
      * @returns {boolean}
      */
     _isToggled() {
-        return this._isVideoMuted();
+        return false;
     }
 
     /**

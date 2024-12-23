@@ -6,7 +6,6 @@ import { IProps as AbstractButtonProps } from '../../base/toolbox/components/Abs
 import BaseSignalMuteButton from '../../base/toolbox/components/BaseSignalMuteButton';
 import { isLocalTrackMuted } from '../../base/tracks/functions';
 import { setSignalLayout } from '../../settings/actions.web';
-import { isVideoMuteButtonDisabled } from '../functions';
 
 /**
  * The type of the React {@code Component} props of {@link AbstractSignalMuteButton}.
@@ -32,11 +31,11 @@ export interface IProps extends AbstractButtonProps {
  * @augments BaseSignalMuteButton
  */
 export default class AbstractSignalMuteButton<P extends IProps> extends BaseSignalMuteButton<P> {
-    accessibilityLabel = 'toolbar.accessibilityLabel.videomute';
-    toggledAccessibilityLabel = 'toolbar.accessibilityLabel.videounmute';
-    label = 'toolbar.videomute';
+    accessibilityLabel = 'toolbar.accessibilityLabel.signalunmute';
+    toggledAccessibilityLabel = 'toolbar.accessibilityLabel.signalunmute';
+    label = 'toolbar.signalunmute';
     toggledLabel = 'toolbar.signalunmute';
-    tooltip = 'toolbar.videomute';
+    tooltip = 'toolbar.signalunmute';
     toggledTooltip = 'toolbar.signalunmute';
 
     /**
@@ -47,7 +46,7 @@ export default class AbstractSignalMuteButton<P extends IProps> extends BaseSign
      * @returns {boolean}
      */
     _isDisabled() {
-        return this.props._videoDisabled;
+        return false;
     }
 
     /**
@@ -98,7 +97,6 @@ export function mapStateToProps(state: IReduxState) {
     const enabledFlag = getFeatureFlag(state, VIDEO_MUTE_BUTTON_ENABLED, true);
 
     return {
-        _videoDisabled: isVideoMuteButtonDisabled(state),
         layout: isLocalTrackMuted(tracks, MEDIA_TYPE.VIDEO),
         visible: enabledFlag
     };
