@@ -91,6 +91,10 @@
             .shared-video__large {
                 width: calc(100% - 400px);
                 height: 100%;
+                
+                video {
+                    object-position: right;
+                }
             }
     
             .shared-video__small {

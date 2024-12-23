@@ -20,7 +20,6 @@ interface ILocalRecordingManager {
     binaryFileIndex: number;
     fileSizeLimit: number;
     getFilename: () => string;
-    headerRecorder: MediaRecorder | undefined;
     initializeAudioMixer: () => void;
     isRecordingLocally: () => boolean;
     mediaType: string;
@@ -56,7 +55,8 @@ const getMimeType = (): string => {
 
 const VIDEO_BIT_RATE = 2500000; // 2.5Mbps in bits
 const MAX_SIZE = 1073741824; // 1GB in bytes
-const DEF_FILE_SIZE = 104857600; // 100MB in bytes
+const DEF_FILE_SIZE = 1048576; // 1MB in bytes
+// const DEF_FILE_SIZE = 104857600; // 100MB in bytes
 
 // Lazily initialize.
 let preferredMediaType: string;
@@ -66,7 +66,6 @@ const LocalRecordingManager: ILocalRecordingManager = {
     recordingData: [],
     recordingMetaData: undefined,
     recorder: undefined,
-    headerRecorder: undefined,
     stream: undefined,
     audioContext: undefined,
     audioDestination: undefined,
@@ -336,24 +335,10 @@ const LocalRecordingManager: ILocalRecordingManager = {
             ]);
         }
 
-        // this.headerRecorder = new MediaRecorder(this.stream, {
-        //     mimeType: this.mediaType,
-        //     videoBitsPerSecond: VIDEO_BIT_RATE
-        // });
         this.recorder = new MediaRecorder(this.stream, {
             mimeType: this.mediaType,
             videoBitsPerSecond: VIDEO_BIT_RATE
         });
-
-        // this.headerRecorder.addEventListener('dataavailable', e => {
-        //     console.log('=============', e);
-        //     if (e.data && e.data.size > 0) {
-        //         console.log('header metadata info', e.data);
-        //         if (!this.recordingMetaData) {
-        //             this.recordingMetaData = e.data;
-        //         }
-        //     }
-        // });
 
         this.recorder.addEventListener('dataavailable', e => {
             if (e.data && e.data.size > 0) {

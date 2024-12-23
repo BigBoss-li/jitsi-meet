@@ -114,7 +114,8 @@ class SharedVideo extends Component<IProps> {
 
         const videoUrls = videoUrl.split(',');
 
-        if (videoUrls.length > 1) {
+        // if (videoUrls.length > 1) {
+        if (videoUrls.length > 0) {
             return (
                 <ExtendedVideoManager
                     videoId = { videoUrl } />)

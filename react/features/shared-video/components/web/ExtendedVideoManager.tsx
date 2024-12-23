@@ -10,6 +10,7 @@ import AbstractVideoManager, {
     _mapDispatchToProps,
     _mapStateToProps
 } from './AbstractVideoManager';
+import WebRTCPlayer from './WebRTCPlayer';
 
 interface IState {
   isMuted: boolean;
@@ -306,19 +307,26 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     const url = videoUrls[i];
 
                     if (url) {
+                        let videoPlayer;
+
+                        if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
+                            videoPlayer = (<ReactPlayer
+                            // eslint-disable-next-line react/jsx-no-bind
+                                ref = { refItem => {
+                                // eslint-disable-next-line react/jsx-no-bind
+                                    if (!this.reactPlayersRef[i]) {
+                                        this.reactPlayersRef[i] = refItem;
+                                    }
+                                } }
+                                { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />);
+                        } else {
+                            videoPlayer = <WebRTCPlayer videoUrl = { url } />;
+                        }
                         smallItems.push(
                             <div
                                 className = { 'react-player-box' }
                                 key = { i }>
-                                <ReactPlayer
-                                    // eslint-disable-next-line react/jsx-no-bind
-                                    ref = { refItem => {
-                                        // eslint-disable-next-line react/jsx-no-bind
-                                        if (!this.reactPlayersRef[i]) {
-                                            this.reactPlayersRef[i] = refItem;
-                                        }
-                                    } }
-                                    { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                                { videoPlayer }
                             </div>
                         );
                     } else {
@@ -332,16 +340,24 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     }
                 }
 
-                const leftItem = (<div className = 'shared-video__large'>
-                    <ReactPlayer
-                        // eslint-disable-next-line react/jsx-no-bind
+                let videoPlayer2;
+
+                if (largeUrl.endsWith('.flv') || largeUrl.endsWith('.m3u8')) {
+                    videoPlayer2 = (<ReactPlayer
+                    // eslint-disable-next-line react/jsx-no-bind
                         ref = { refItem => {
-                            // eslint-disable-next-line react/jsx-no-bind
-                            if (!this.reactPlayersRef[0]) {
-                                this.reactPlayersRef[0] = refItem;
+                        // eslint-disable-next-line react/jsx-no-bind
+                            if (!this.reactPlayersRef[i]) {
+                                this.reactPlayersRef[i] = refItem;
                             }
                         } }
-                        { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />
+                        { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />);
+                } else {
+                    videoPlayer2 = <WebRTCPlayer videoUrl = { largeUrl } />;
+                }
+
+                const leftItem = (<div className = 'shared-video__large'>
+                    { videoPlayer2 }
                 </div>);
                 const rightItem = <div className = { 'shared-video__small' }>{ smallItems }</div>;
 
@@ -356,19 +372,26 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     const url = videoUrls[i];
 
                     if (url) {
+                        let videoPlayer;
+
+                        if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
+                            videoPlayer = (<ReactPlayer
+                            // eslint-disable-next-line react/jsx-no-bind
+                                ref = { refItem => {
+                                // eslint-disable-next-line react/jsx-no-bind
+                                    if (!this.reactPlayersRef[i]) {
+                                        this.reactPlayersRef[i] = refItem;
+                                    }
+                                } }
+                                { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />);
+                        } else {
+                            videoPlayer = <WebRTCPlayer videoUrl = { url } />;
+                        }
                         listItems.push(
                             <div
                                 className = { 'react-player-box' }
                                 key = { i }>
-                                <ReactPlayer
-                                    // eslint-disable-next-line react/jsx-no-bind
-                                    ref = { refItem => {
-                                        // eslint-disable-next-line react/jsx-no-bind
-                                        if (!this.reactPlayersRef[i]) {
-                                            this.reactPlayersRef[i] = refItem;
-                                        }
-                                    } }
-                                    { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                                { videoPlayer}
                             </div>
                         );
                     } else {
