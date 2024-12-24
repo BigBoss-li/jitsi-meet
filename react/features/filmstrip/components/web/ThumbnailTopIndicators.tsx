@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 import { IReduxState } from '../../../app/types';
 import { isMobileBrowser } from '../../../base/environment/utils';
 import { isScreenShareParticipantById } from '../../../base/participants/functions';
+import { IParticipant } from '../../../base/participants/types';
 import ConnectionIndicator from '../../../connection-indicator/components/web/ConnectionIndicator';
 import { STATS_POPOVER_POSITION, THUMBNAIL_TYPE } from '../../constants';
 import { getIndicatorsTooltipPosition } from '../../functions.web';

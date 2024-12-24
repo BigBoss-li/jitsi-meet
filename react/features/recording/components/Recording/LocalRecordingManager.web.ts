@@ -26,15 +26,13 @@ interface ILocalRecordingManager {
     mixAudioStream: (stream: MediaStream) => void;
     recorder: MediaRecorder | undefined;
     recordingData: Blob[];
-    recordingDurationTimer: Object;
-    recordingMetaData: Blob;
-    recordingMode: Object;
     recordingType: string;
     roomName: string;
     saveRecording: (recordingData: Blob[], filename: string) => void;
     selfRecording: ISelfRecording;
     sendBlobRecording: (recordingData: Blob[]) => void;
-    startLocalRecording: (store: IStore, onlySelf: boolean, startLocalRecording: string) => Promise<void>;
+    sendSplitRecording: (recordingData: Blob[]) => void;
+    startLocalRecording: (store: IStore, onlySelf: boolean) => Promise<void>;
     stopLocalRecording: () => void;
     stream: MediaStream | undefined;
     totalSize: number;
@@ -64,7 +62,6 @@ let preferredMediaType: string;
 const LocalRecordingManager: ILocalRecordingManager = {
     binaryFileIndex: 0,
     recordingData: [],
-    recordingMetaData: undefined,
     recorder: undefined,
     stream: undefined,
     audioContext: undefined,
@@ -166,7 +163,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
         this.recordingData = [];
     },
 
-    async sendBlobRecording(recordingData) {
+    async sendBlobRecording(recordingData: any) {
         // @ts-ignore
         const blob = new Blob(recordingData, { type: 'application/octet-stream' });
         const filename = `${this.binaryFileIndex}.bin`;
@@ -180,7 +177,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
         }, '*');
     },
 
-    async sendSplitRecording(recordingData) {
+    async sendSplitRecording(recordingData: any) {
         // @ts-ignore
         const blob = new Blob(recordingData, { type: 'application/octet-stream' });
 
@@ -225,13 +222,11 @@ const LocalRecordingManager: ILocalRecordingManager = {
      *
      * @param {IStore} store - The redux store.
      * @param {boolean} onlySelf - Whether to record only self streams.
-     * @param {Object} recordingMode - Record type.
      * @returns {void}
      */
-    async startLocalRecording(store, onlySelf, recordingMode) {
+    async startLocalRecording(store, onlySelf) {
         const { dispatch, getState } = store;
 
-        this.recordingMode = recordingMode;
         this.fileSizeLimit = DEF_FILE_SIZE;
 
         this.binaryFileIndex = 0;

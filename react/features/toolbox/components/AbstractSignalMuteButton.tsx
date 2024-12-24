@@ -1,29 +1,14 @@
 import { IReduxState } from '../../app/types';
 import { VIDEO_MUTE_BUTTON_ENABLED } from '../../base/flags/constants';
 import { getFeatureFlag } from '../../base/flags/functions';
-import { MEDIA_TYPE } from '../../base/media/constants';
 import { IProps as AbstractButtonProps } from '../../base/toolbox/components/AbstractButton';
 import BaseSignalMuteButton from '../../base/toolbox/components/BaseSignalMuteButton';
-import { isLocalTrackMuted } from '../../base/tracks/functions';
 import { setSignalLayout } from '../../settings/actions.web';
 
 /**
  * The type of the React {@code Component} props of {@link AbstractSignalMuteButton}.
  */
-export interface IProps extends AbstractButtonProps {
-
-    /**
-     * Whether video button is disabled or not.
-     */
-    _videoDisabled: boolean;
-
-    /**
-     * Whether video is currently muted or not.
-     */
-    _videoMuted: boolean;
-
-    layout: string;
-}
+export type IProps = AbstractButtonProps;
 
 /**
  * Component that renders a toolbar button for toggling video mute.
@@ -47,17 +32,6 @@ export default class AbstractSignalMuteButton<P extends IProps> extends BaseSign
      */
     _isDisabled() {
         return false;
-    }
-
-    /**
-     * Indicates if video is currently muted or not.
-     *
-     * @override
-     * @protected
-     * @returns {boolean}
-     */
-    _isVideoMuted() {
-        return this.props.layout;
     }
 
     /**
@@ -88,16 +62,14 @@ export default class AbstractSignalMuteButton<P extends IProps> extends BaseSign
  * @param {Object} state - The Redux state.
  * @private
  * @returns {{
- *     _videoMuted: boolean
+ *     visible: boolean
  * }}
  */
 export function mapStateToProps(state: IReduxState) {
-    const tracks = state['features/base/tracks'];
 
     const enabledFlag = getFeatureFlag(state, VIDEO_MUTE_BUTTON_ENABLED, true);
 
     return {
-        layout: isLocalTrackMuted(tracks, MEDIA_TYPE.VIDEO),
         visible: enabledFlag
     };
 }

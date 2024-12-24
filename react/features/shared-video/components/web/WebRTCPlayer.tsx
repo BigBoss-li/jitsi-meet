@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 
 import 'adapterjs';
+
+// @ts-ignore
 import { SrsRtcWhipWhepAsync } from './srs.sdk.js';
 
 interface IProps {
@@ -15,6 +17,7 @@ interface IProps {
  */
 class WebRTCPlayer extends Component<IProps> {
     videoRef: React.RefObject<HTMLVideoElement>;
+    player: SrsRtcWhipWhepAsync | null;
 
     /**
      * Initializes a new VideoManager instance.
@@ -27,43 +30,58 @@ class WebRTCPlayer extends Component<IProps> {
         super(props);
 
         this.videoRef = React.createRef();
-
-        const { videoUrl } = this.props;
-        const playWebRTC = async () => {
-            const player = new SrsRtcWhipWhepAsync();
-
-            try {
-                // 替换为你的 WebRTC 播放 URL
-                await player.play(videoUrl);
-                this.videoRef.current.srcObject = player.stream;
-                console.log('WebRTC Stream Playing...');
-            } catch (error) {
-                console.error('Failed to play WebRTC stream:', error);
-                player.close();
-            }
-        };
-
-        playWebRTC();
+        this.player = null;
     }
 
     /**
-     * Removes all listeners.
+     * 在组件挂载后初始化 WebRTC 播放.
      *
-     * @inheritdoc
+     * @returns {void}
+     */
+    async componentDidMount() {
+        const { videoUrl } = this.props;
+
+        if (!videoUrl) {
+            return;
+        }
+
+        try {
+            this.player = new SrsRtcWhipWhepAsync();
+            await this.player.play(videoUrl);
+
+            if (this.videoRef.current) {
+                this.videoRef.current.srcObject = this.player.stream;
+            }
+            console.log('WebRTC Stream Playing...');
+        } catch (error) {
+            console.error('Failed to play WebRTC stream:', error);
+
+            if (this.player) {
+                this.player.close();
+                this.player = null;
+            }
+        }
+    }
+
+    /**
+     * 释放资源.
+     *
      * @returns {void}
      */
     componentWillUnmount() {
-        // TODO destroy
+        if (this.player) {
+            this.player.close();
+            this.player = null;
+        }
     }
 
     /**
-     * Implements React's {@link Component#render()}.
+     * 渲染视频元素和错误信息。 {@link Component#render()}.
      *
      * @inheritdoc
      * @returns {React$Element}
      */
     render() {
-
         return (
             <video
                 autoPlay = { true }

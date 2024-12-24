@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { WithTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 
-import { IReduxState } from '../../../app/types';
 import { translate } from '../../../base/i18n/functions';
 import { IconArrowUp } from '../../../base/icons/svg';
 import ToolboxButtonWithIcon from '../../../base/toolbox/components/web/ToolboxButtonWithIcon';
@@ -118,6 +117,7 @@ class SignalSettingsButton extends Component<IProps> {
                     ariaLabel = { this.props.t('toolbar.videoSettings') }
                     buttonKey = { buttonKey }
                     icon = { IconArrowUp }
+                    iconDisabled = { false }
                     iconId = 'signal-settings-button'
                     iconTooltip = { t('toolbar.signalSettings') }
                     notifyMode = { notifyMode }
@@ -135,14 +135,11 @@ class SignalSettingsButton extends Component<IProps> {
 /**
  * Function that maps parts of Redux state tree into component props.
  *
- * @param {Object} state - Redux state.
  * @returns {Object}
  */
-function mapStateToProps(state: IReduxState) {
-    const { layout = 'horizontal' } = state['features/base/settings'];
+function mapStateToProps() {
 
     return {
-        layout,
         isDisabled: false,
         isOpen: false
     };

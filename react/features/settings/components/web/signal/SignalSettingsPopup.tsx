@@ -39,11 +39,6 @@ interface IProps {
      * The popup placement enum value.
      */
     popupPlacement: string;
-
-    /**
-     * All the camera device ids currently connected.
-     */
-    videoDeviceIds: string[];
 }
 
 const useStyles = makeStyles()(() => {

@@ -25,6 +25,11 @@ interface IProps extends IButtonProps {
      * Click handler executed aside from the main action.
      */
     onClick?: Function;
+
+    /**
+     * Whether with text.
+     */
+    withText?: boolean;
 }
 
 const TogglePinToStageButton = ({

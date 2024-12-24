@@ -15,4 +15,9 @@ export interface IButtonProps {
      * The ID of the participant that's linked to the button.
      */
     participantID: string;
+
+    /**
+     * Wether with text.
+     */
+    withText?: boolean;
 }

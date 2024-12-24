@@ -1,47 +1,15 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
-import { IReduxState, IStore } from '../../../../app/types';
 import { IconFourCol, IconOneCol, IconOneLargeCol, IconTwoCol } from '../../../../base/icons/svg';
-import { updateSettings } from '../../../../base/settings/actions';
 import { withPixelLineHeight } from '../../../../base/styles/functions.web';
 import ContextMenu from '../../../../base/ui/components/web/ContextMenu';
 import ContextMenuItemGroup from '../../../../base/ui/components/web/ContextMenuItemGroup';
-import { openSettingsDialog } from '../../../actions';
-import { SETTINGS_TABS } from '../../../constants';
 
 /**
  * The type of the React {@code Component} props of {@link SignalSettingsContent}.
  */
 export interface IProps {
-
-    /**
-     * Callback to change the flip state.
-     */
-    changeFlip: (flip: boolean) => void;
-
-    /**
-     * The deviceId of the camera device currently being used.
-     */
-    currentCameraDeviceId: string;
-
-    /**
-     * Whether the local video flip is disabled.
-     */
-    disableLocalVideoFlip: boolean | undefined;
-
-    layout: string;
-
-    /**
-     * Whether or not the local video is flipped.
-     */
-    localFlipX: boolean;
-
-    /**
-     * Open virtual background dialog.
-     */
-    selectBackground: () => void;
 
     /**
      * Callback invoked to change current camera.
@@ -52,16 +20,6 @@ export interface IProps {
      * Callback invoked to toggle the settings popup visibility.
      */
     toggleSignalSettings: Function;
-
-    /**
-     * All the camera device ids currently connected.
-     */
-    videoDeviceIds: string[];
-
-    /**
-    * Whether or not the virtual background is visible.
-    */
-    visibleVirtualBackground: boolean;
 }
 
 const useStyles = makeStyles()(theme => {
@@ -152,7 +110,7 @@ const SignalSettingsContent = ({
             icon: <IconOneLargeCol />
         }
     ];
-    const _rednerLayoutIcon = (data: { icon: ReactDOM; key: string; }) => {
+    const _rednerLayoutIcon = (data: { icon: any; key: string; }) => {
         const { icon, key } = data;
 
         const layoutItemProps: any = {
@@ -186,23 +144,4 @@ const SignalSettingsContent = ({
     );
 };
 
-const mapStateToProps = (state: IReduxState) => {
-    const { signalLayout } = state['features/settings'];
-
-    return {
-        layout: signalLayout
-    };
-};
-
-const mapDispatchToProps = (dispatch: IStore['dispatch']) => {
-    return {
-        selectBackground: () => dispatch(openSettingsDialog(SETTINGS_TABS.VIRTUAL_BACKGROUND)),
-        changeFlip: (flip: boolean) => {
-            dispatch(updateSettings({
-                localFlipX: flip
-            }));
-        }
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignalSettingsContent);
+export default SignalSettingsContent;

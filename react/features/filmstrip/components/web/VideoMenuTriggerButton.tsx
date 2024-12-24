@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
+
 import { isSupported as isAvModerationSupported } from '../../../../features/av-moderation/functions';
 import { MEDIA_TYPE } from '../../../../features/base/media/constants';
 import { PARTICIPANT_ROLE } from '../../../../features/base/participants/constants';
@@ -14,6 +15,9 @@ import AskToUnmuteButton from '../../../../features/video-menu/components/web/As
 import MuteButton from '../../../../features/video-menu/components/web/MuteButton';
 import TogglePinToStageButton from '../../../../features/video-menu/components/web/TogglePinToStageButton';
 import { PARTICIPANT_MENU_BUTTONS as BUTTONS } from '../../../../features/video-menu/constants';
+import { IReduxState } from '../../../app/types';
+import { IParticipant } from '../../../base/participants/types';
+import { NOTIFY_CLICK_MODE } from '../../../toolbox/types';
 
 interface IProps {
 

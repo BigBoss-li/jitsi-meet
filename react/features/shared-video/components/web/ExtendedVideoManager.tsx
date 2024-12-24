@@ -347,8 +347,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     // eslint-disable-next-line react/jsx-no-bind
                         ref = { refItem => {
                         // eslint-disable-next-line react/jsx-no-bind
-                            if (!this.reactPlayersRef[i]) {
-                                this.reactPlayersRef[i] = refItem;
+                            if (!this.reactPlayersRef[0]) {
+                                this.reactPlayersRef[0] = refItem;
                             }
                         } }
                         { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />);
