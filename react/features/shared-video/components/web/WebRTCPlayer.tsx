@@ -85,7 +85,7 @@ class WebRTCPlayer extends Component<IProps> {
         return (
             <video
                 autoPlay = { true }
-                controls = { true }
+                controls = { false }
                 playsInline = { true }
                 ref = { this.videoRef } />
         );
