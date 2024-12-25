@@ -4,12 +4,9 @@ import { makeStyles } from 'tss-react/mui';
 
 import { IReduxState, IStore } from '../../../app/types';
 import {
-    IconBell,
     IconCalendar,
-    IconGear,
     IconImage,
     IconModerator,
-    IconShortcuts,
     IconUser,
     IconVideo,
     IconVolumeUp
@@ -27,29 +24,19 @@ import { checkBlurSupport, checkVirtualBackgroundEnabled } from '../../../virtua
 import { iAmVisitor } from '../../../visitors/functions';
 import {
     submitModeratorTab,
-    submitMoreTab,
-    submitNotificationsTab,
     submitProfileTab,
-    submitShortcutsTab,
     submitVirtualBackgroundTab
 } from '../../actions';
 import { SETTINGS_TABS } from '../../constants';
 import {
     getModeratorTabProps,
-    getMoreTabProps,
-    getNotificationsMap,
-    getNotificationsTabProps,
     getProfileTabProps,
-    getShortcutsTabProps,
     getVirtualBackgroundTabProps
 } from '../../functions';
 
 import CalendarTab from './CalendarTab';
 import ModeratorTab from './ModeratorTab';
-import MoreTab from './MoreTab';
-import NotificationsTab from './NotificationsTab';
 import ProfileTab from './ProfileTab';
-import ShortcutsTab from './ShortcutsTab';
 import VirtualBackgroundTab from './VirtualBackgroundTab';
 
 /**
@@ -129,17 +116,12 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
 
     // The settings sections to display.
     const showDeviceSettings = configuredTabs.includes('devices');
-    const moreTabProps = getMoreTabProps(state);
     const moderatorTabProps = getModeratorTabProps(state);
     const { showModeratorSettings } = moderatorTabProps;
-    const showMoreTab = configuredTabs.includes('more');
     const showProfileSettings
         = configuredTabs.includes('profile') && !state['features/base/config'].disableProfile;
     const showCalendarSettings
         = configuredTabs.includes('calendar') && isCalendarEnabled(state);
-    const showSoundsSettings = configuredTabs.includes('sounds');
-    const enabledNotifications = getNotificationsMap(state);
-    const showNotificationsSettings = Object.keys(enabledNotifications).length > 0;
     const virtualBackgroundSupported = checkBlurSupport();
     const enableVirtualBackground = checkVirtualBackgroundEnabled(state);
     const tabs: IDialogTab<any>[] = [];
@@ -218,29 +200,6 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         });
     }
 
-    if ((showSoundsSettings || showNotificationsSettings) && !_iAmVisitor) {
-        tabs.push({
-            name: SETTINGS_TABS.NOTIFICATIONS,
-            component: NotificationsTab,
-            labelKey: 'settings.notifications',
-            propsUpdateFunction: (tabState: any, newProps: ReturnType<typeof getNotificationsTabProps>) => {
-                return {
-                    ...newProps,
-                    enabledNotifications: tabState?.enabledNotifications || {},
-                    soundsIncomingMessage: tabState?.soundsIncomingMessage,
-                    soundsParticipantJoined: tabState?.soundsParticipantJoined,
-                    soundsParticipantKnocking: tabState?.soundsParticipantKnocking,
-                    soundsParticipantLeft: tabState?.soundsParticipantLeft,
-                    soundsReactions: tabState?.soundsReactions,
-                    soundsTalkWhileMuted: tabState?.soundsTalkWhileMuted
-                };
-            },
-            props: getNotificationsTabProps(state, showSoundsSettings),
-            submit: submitNotificationsTab,
-            icon: IconBell
-        });
-    }
-
     if (showModeratorSettings && !_iAmVisitor) {
         tabs.push({
             name: SETTINGS_TABS.MODERATOR,
@@ -281,45 +240,6 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
             component: CalendarTab,
             labelKey: 'settings.calendar.title',
             icon: IconCalendar
-        });
-    }
-
-    !_iAmVisitor && tabs.push({
-        name: SETTINGS_TABS.SHORTCUTS,
-        component: ShortcutsTab,
-        labelKey: 'settings.shortcuts',
-        props: getShortcutsTabProps(state, isDisplayedOnWelcomePage),
-        propsUpdateFunction: (tabState: any, newProps: ReturnType<typeof getShortcutsTabProps>) => {
-            // Updates tab props, keeping users selection
-
-            return {
-                ...newProps,
-                keyboardShortcutsEnabled: tabState?.keyboardShortcutsEnabled
-            };
-        },
-        submit: submitShortcutsTab,
-        icon: IconShortcuts
-    });
-
-    if (showMoreTab && !_iAmVisitor) {
-        tabs.push({
-            name: SETTINGS_TABS.MORE,
-            component: MoreTab,
-            labelKey: 'settings.more',
-            props: moreTabProps,
-            propsUpdateFunction: (tabState: any, newProps: typeof moreTabProps) => {
-                // Updates tab props, keeping users selection
-
-                return {
-                    ...newProps,
-                    currentLanguage: tabState?.currentLanguage,
-                    hideSelfView: tabState?.hideSelfView,
-                    showPrejoinPage: tabState?.showPrejoinPage,
-                    maxStageParticipants: tabState?.maxStageParticipants
-                };
-            },
-            submit: submitMoreTab,
-            icon: IconGear
         });
     }
 
