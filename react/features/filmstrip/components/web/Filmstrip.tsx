@@ -321,6 +321,12 @@ interface IState {
      */
     dragFilmstripWidth?: number | null;
 
+    informationList: Array<{
+        id: string;
+        name: string;
+        type: string;
+    }>;
+
     /**
      * Whether or not the mouse is pressed.
      */
@@ -368,7 +374,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
             mousePosition: null,
             dragFilmstripWidth: null,
             titleTabIndex: 0,
-            signalList: []
+            signalList: [],
+            informationList: []
         };
 
         // Bind event handlers so they are only bound once for every instance.
@@ -386,6 +393,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
         this._onTitleTabChange = this._onTitleTabChange.bind(this);
         this._onSwitchChange = this._onSwitchChange.bind(this);
         this._renderSignalItem = this._renderSignalItem.bind(this);
+        this._renderInformationItem = this._renderInformationItem.bind(this);
         this._onMessageListener = this._onMessageListener.bind(this);
         this._callChangeSharedVideos = this._callChangeSharedVideos.bind(this);
         window.addEventListener('message', this._onMessageListener, false);
@@ -548,7 +556,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             </>
         );
 
-        const signalstrip = (
+        const signal = (
             <div
                 className = { clsx(
                         this.props._videosClassName,
@@ -560,6 +568,22 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 {
                     !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
                     && this._renderSignalItem()
+                }
+            </div>
+        );
+
+        const information = (
+            <div
+                className = { clsx(
+                    this.props._videosClassName,
+                    !tileViewActive
+                        && (filmstripType === FILMSTRIP_TYPE.MAIN
+                            || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+                ) }
+                id = 'remoteVideos'>
+                {
+                    !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
+                && this._renderInformationItem()
                 }
             </div>
         );
@@ -588,30 +612,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
                         value = { titleTabIndex }>
                         <FilmstripTitleTab label = '成员' />
                         <FilmstripTitleTab label = '信号源' />
+                        <FilmstripTitleTab label = '资料' />
                     </FilmstripTitleTabs>
                 </div>
                 {
-
-                    /* {
-                    _resizableFilmstrip
-                        ? <div
-                            className = { clsx('resizable-filmstrip', classes.resizableFilmstripContainer,
-                                _topPanelFilmstrip && 'top-panel-filmstrip') }>
-                            <div
-                                className = { clsx('dragHandleContainer',
-                                    classes.dragHandleContainer,
-                                    isMouseDown && 'visible',
-                                    _topPanelFilmstrip && 'top-panel')
-                                }
-                                onMouseDown = { this._onDragHandleMouseDown }>
-                                <div className = { clsx(classes.dragHandle, 'dragHandle') } />
-                            </div>
-                            {filmstrip}
-                        </div>
-                        : filmstrip
-                } */
-                    // filmstrip
-                    titleTabIndex === 0 ? filmstrip : signalstrip
+                    titleTabIndex === 0 ? filmstrip : titleTabIndex === 1 ? signal : information
                 }
                 <AudioTracksContainer />
             </div>
@@ -722,18 +727,18 @@ class Filmstrip extends PureComponent<IProps, IState> {
     _renderSignalItem() {
         const { signalList } = this.state;
 
-        return (<div className = 'signalstrip__list'>
+        return (<div className = 'signal__list'>
             {
                 signalList.map((signal: any) => (
                     <div
-                        className = 'signalstrip-wrapper'
+                        className = 'signal-wrapper'
                         key = { signal.id }>
-                        <div className = 'signalstrip__top'>
-                            <span className = 'signalstrip-type'>{signal.type}</span>
-                            <span className = 'signalstrip-name'>{signal.name}</span>
+                        <div className = 'signal__top'>
+                            <span className = 'signal-type'>{signal.type}</span>
+                            <span className = 'signal-name'>{signal.name}</span>
                         </div>
-                        <div className = 'signalstrip__footer'>
-                            <div className = 'signalstrip-ip'>{signal.ip}</div>
+                        <div className = 'signal__footer'>
+                            <div className = 'signal-ip'>{signal.ip}</div>
                             <SignalSwitch
                                 checked = { signal.isSelected }
                                 // eslint-disable-next-line react/jsx-no-bind
@@ -747,15 +752,63 @@ class Filmstrip extends PureComponent<IProps, IState> {
     }
 
     /**
+     * Render information.
+     *
+     * @returns {React.DOMElement}
+     */
+    _renderInformationItem() {
+        const { informationList } = this.state;
+
+        return (
+            <div className = 'information-list'>
+                {
+                    informationList.map((information: any) => {
+                        const { id, name, type } = information;
+                        let imageUrl;
+
+                        if (type === 'PDF') {
+                            imageUrl = 'images/information-pdf.png';
+                        } else if (type === 'JPG') {
+                            imageUrl = 'images/information-image.png';
+                        } else if (type === 'MP4') {
+                            imageUrl = 'images/information-video.png';
+                        }
+                        const image = (<img
+                            className = 'information-image'
+                            src = { imageUrl } />);
+
+                        return (
+                            <div
+                                className = 'information-item'
+                                key = { id }>
+                                { image }
+                                <div className = 'information-name'>
+                                    { name }
+                                </div>
+                            </div>
+                        );
+                    })
+                }
+            </div>
+        );
+    }
+
+    /**
      * Message listener.
      *
      * @param {any} e -received data.
      * @returns {void}
      */
     _onMessageListener(e: any) {
-        if (e.data.type === 'signal_list') {
+        const { type, data } = e.data;
+
+        if (type === 'signal_list') {
             this.setState({
-                signalList: e.data.signalList
+                signalList: data
+            });
+        } else if (type === 'information_list') {
+            this.setState({
+                informationList: data
             });
         }
     }
