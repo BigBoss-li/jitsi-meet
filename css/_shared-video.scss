@@ -26,7 +26,6 @@
 
                 opacity: 0.5;
             }
-
         }
 
         &-ONE {
@@ -89,29 +88,34 @@
             flex-direction: column;
 
             .shared-video__large {
-                width: calc(100% - 400px);
+                width: 75%;
                 height: 100%;
-                
+
                 video {
                     object-position: right;
                 }
             }
-    
+
             .shared-video__small {
-                width: 400px;
+                width: 25%;
                 height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
 
                 .react-player-box {
-                    width: 400px;
-                    height: 33.33%;
+                    width: 100%;
+                    padding-bottom: calc(100% * 9 / 16);
+                    position: relative;
+
+                    > div {
+                        position: absolute;
+                        left: 0;
+                    }
                 }
             }
         }
     }
-
-
-
-
 
     .shared-video__horizontal {
         width: 100%;
