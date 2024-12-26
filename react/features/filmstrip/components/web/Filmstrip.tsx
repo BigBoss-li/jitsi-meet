@@ -368,6 +368,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     constructor(props: IProps) {
         super(props);
+        this.fileInputRef = React.createRef();
 
         this.state = {
             isMouseDown: false,
@@ -396,6 +397,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
         this._renderInformationItem = this._renderInformationItem.bind(this);
         this._onMessageListener = this._onMessageListener.bind(this);
         this._callChangeSharedVideos = this._callChangeSharedVideos.bind(this);
+        this._onFileChange = this._onFileChange.bind(this);
+        this._onButtonClick = this._onButtonClick.bind(this);
         window.addEventListener('message', this._onMessageListener, false);
 
         this._throttledResize = throttle(this._onFilmstripResize, 50, {
@@ -585,6 +588,21 @@ class Filmstrip extends PureComponent<IProps, IState> {
                     !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
                 && this._renderInformationItem()
                 }
+
+                <div className = 'information-footer' >
+                    <input
+                        onChange = { this._onFileChange }
+                        ref = { this.fileInputRef }
+                        type = 'file' />
+                    <button
+                        className = 'information-button'
+                        onClick = { this._onButtonClick }>
+                        <img
+                            className = 'button-icon'
+                            src = 'images/upload.png' />
+                        上传
+                    </button>
+                </div>
             </div>
         );
 
@@ -811,6 +829,25 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 informationList: data
             });
         }
+    }
+
+    /**
+     * Upload file change.
+     *
+     * @param {ChangeEvent} e - The input change event.
+     * @returns {void}
+     */
+    _onFileChange(e: React.ChangeEvent) {
+        console.log(e);
+    }
+
+    /**
+     * Upload button click.
+     *
+     * @returns {void}
+     */
+    _onButtonClick() {
+        this.fileInputRef.current.click();
     }
 
     /**
