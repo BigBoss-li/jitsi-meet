@@ -180,6 +180,7 @@ export default [
     'iceTransportPolicy',
     'ignoreStartMuted',
     'inviteAppName',
+    'isMini',
     'liveStreaming',
     'liveStreamingEnabled',
     'lobby',

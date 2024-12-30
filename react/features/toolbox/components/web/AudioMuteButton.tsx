@@ -36,6 +36,8 @@ interface IProps extends AbstractAudioMuteButtonProps {
    */
   _gumPending: IGUMPendingState;
 
+  _isMini: boolean;
+
   /**
    * An object containing the CSS classes.
    */
@@ -116,7 +118,11 @@ class AudioMuteButton extends AbstractAudioMuteButton<IProps> {
      * @returns {string}
      */
     _getLabel() {
-        const { _gumPending } = this.props;
+        const { _gumPending, _isMini } = this.props;
+
+        if (_isMini) {
+            return;
+        }
 
         if (_gumPending === IGUMPendingState.NONE) {
             return super._getLabel();
@@ -195,10 +201,12 @@ class AudioMuteButton extends AbstractAudioMuteButton<IProps> {
  */
 function _mapStateToProps(state: IReduxState) {
     const { gumPending } = state['features/base/media'].audio;
+    const { isMini } = state['features/base/config'];
 
     return {
         ...abstractMapStateToProps(state),
-        _gumPending: gumPending
+        _gumPending: gumPending,
+        _isMini: isMini
     };
 }
 

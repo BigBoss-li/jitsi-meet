@@ -36,6 +36,8 @@ export interface IProps extends AbstractVideoMuteButtonProps {
      */
     _gumPending: IGUMPendingState;
 
+    _isMini: boolean;
+
     /**
      * An object containing the CSS classes.
      */
@@ -48,7 +50,6 @@ export interface IProps extends AbstractVideoMuteButtonProps {
  * @augments AbstractVideoMuteButton
  */
 class VideoMuteButton extends AbstractVideoMuteButton<IProps> {
-
     /**
      * Initializes a new {@code VideoMuteButton} instance.
      *
@@ -70,11 +71,13 @@ class VideoMuteButton extends AbstractVideoMuteButton<IProps> {
      * @returns {void}
      */
     componentDidMount() {
-        this.props.dispatch(registerShortcut({
-            character: 'V',
-            helpDescription: 'keyboardShortcuts.videoMute',
-            handler: this._onKeyboardShortcut
-        }));
+        this.props.dispatch(
+            registerShortcut({
+                character: 'V',
+                helpDescription: 'keyboardShortcuts.videoMute',
+                handler: this._onKeyboardShortcut
+            })
+        );
     }
 
     /**
@@ -115,13 +118,17 @@ class VideoMuteButton extends AbstractVideoMuteButton<IProps> {
      * @returns {string}
      */
     _getLabel() {
-        const { _gumPending } = this.props;
+        const { _gumPending, _isMini } = this.props;
 
+        if (_isMini) {
+            return '';
+        }
         if (_gumPending === IGUMPendingState.NONE) {
             return super._getLabel();
         }
 
         return 'toolbar.videomuteGUMPending';
+
     }
 
     /**
@@ -148,14 +155,13 @@ class VideoMuteButton extends AbstractVideoMuteButton<IProps> {
         const { _gumPending } = this.props;
         const classes = withStyles.getClasses(this.props);
 
-        return _gumPending === IGUMPendingState.NONE ? null
-            : (
-                <div className = { classes.pendingContainer }>
-                    <Spinner
-                        color = { SPINNER_COLOR }
-                        size = 'small' />
-                </div>
-            );
+        return _gumPending === IGUMPendingState.NONE ? null : (
+            <div className = { classes.pendingContainer }>
+                <Spinner
+                    color = { SPINNER_COLOR }
+                    size = 'small' />
+            </div>
+        );
     }
 
     /**
@@ -171,11 +177,7 @@ class VideoMuteButton extends AbstractVideoMuteButton<IProps> {
             return;
         }
 
-        sendAnalytics(
-            createShortcutEvent(
-                VIDEO_MUTE,
-                ACTION_SHORTCUT_TRIGGERED,
-                { enable: !this._isVideoMuted() }));
+        sendAnalytics(createShortcutEvent(VIDEO_MUTE, ACTION_SHORTCUT_TRIGGERED, { enable: !this._isVideoMuted() }));
 
         AbstractButton.prototype._onClick.call(this);
     }
@@ -193,10 +195,12 @@ class VideoMuteButton extends AbstractVideoMuteButton<IProps> {
  */
 function _mapStateToProps(state: IReduxState) {
     const { gumPending } = state['features/base/media'].video;
+    const { isMini } = state['features/base/config'];
 
     return {
         ...abstractMapStateToProps(state),
-        _gumPending: gumPending
+        _gumPending: gumPending,
+        _isMini: isMini
     };
 }
 

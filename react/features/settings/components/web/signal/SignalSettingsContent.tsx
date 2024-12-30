@@ -1,8 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
 import { IconFourCol, IconOneCol, IconOneLargeCol, IconTwoCol } from '../../../../base/icons/svg';
-import { withPixelLineHeight } from '../../../../base/styles/functions.web';
 import ContextMenu from '../../../../base/ui/components/web/ContextMenu';
 import ContextMenuItemGroup from '../../../../base/ui/components/web/ContextMenuItemGroup';
 
@@ -15,6 +15,11 @@ export interface IProps {
      * Callback invoked to change current camera.
      */
     setSignalLayout: Function;
+
+    /**
+     * Signal layout.
+     */
+    signalLayout: string;
 
     /**
      * Callback invoked to toggle the settings popup visibility.
@@ -34,15 +39,29 @@ const useStyles = makeStyles()(theme => {
         },
 
         signalWrap: {
-            padding: '20px 20px',
+            padding: '10px 10px',
             display: 'flex',
-            gap: '20px'
+            flexDirection: 'column'
         },
 
-        icon: {
-            width: '24px',
+        signalItem: {
+            padding: '10px 20px',
             height: '24px',
-            cursor: 'pointer'
+            lineHeight: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            columnGap: '10px'
+        },
+
+        signalItemActive: {
+            backgroundColor: '#1f2928',
+            borderRadius: '6px'
+        },
+
+        signalIcon: {
+            width: '20px',
+            height: '20px'
         },
 
         labelContainer: {
@@ -56,16 +75,7 @@ const useStyles = makeStyles()(theme => {
         },
 
         label: {
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            borderRadius: '4px',
-            padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
-            color: theme.palette.text01,
-            ...withPixelLineHeight(theme.typography.labelBold),
-            width: 'fit-content',
-            maxwidth: `calc(100% - ${theme.spacing(2)} - ${theme.spacing(2)})`,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
+
         },
 
         checkboxContainer: {
@@ -75,13 +85,15 @@ const useStyles = makeStyles()(theme => {
 });
 
 const SignalSettingsContent = ({
+    signalLayout,
     setSignalLayout,
     toggleSignalSettings
 }: IProps) => {
+    console.log(signalLayout);
 
     // const { t } = useTranslation();
 
-    const { classes } = useStyles();
+    const { classes, cx } = useStyles();
 
     const _onEntryClick = (layoutType: string) => () => {
         setSignalLayout(layoutType);
@@ -95,42 +107,56 @@ const SignalSettingsContent = ({
     const layoutList = [
         {
             key: 'ONE',
-            icon: <IconOneCol />
+            icon: <IconOneCol />,
+            label: '单分屏'
         },
         {
             key: 'TWO',
-            icon: <IconTwoCol />
+            icon: <IconTwoCol />,
+            label: '二分屏'
         },
         {
             key: 'FOUR',
-            icon: <IconFourCol />
+            icon: <IconFourCol />,
+            label: '四分屏'
         },
         {
             key: 'ONE_LARGE',
-            icon: <IconOneLargeCol />
+            icon: <IconOneLargeCol />,
+            label: '一拖三屏'
         }
     ];
-    const _rednerLayoutIcon = (data: { icon: any; key: string; }) => {
-        const { icon, key } = data;
+
+    const _rednerLayoutIcon = (data: { icon: any; key: string; label: string; }) => {
+        const { icon, key, label } = data;
+
+        const _getLayoutItemClassName = () => {
+            if (signalLayout && signalLayout === key) {
+                return cx(classes.signalItem, classes.signalItemActive);
+            }
+
+            return classes.signalItem;
+        };
 
         const layoutItemProps: any = {
-            className: classes.icon,
+            className: _getLayoutItemClassName(),
             key,
             onClick: _onEntryClick(key)
         };
 
         return (<div { ...layoutItemProps }>
-            { icon }
+            <div className = { classes.signalIcon }>{ icon }</div>
+            <div className = { classes.label }>{ label }</div>
         </div>);
     };
 
     return (
         <ContextMenu
             activateFocusTrap = { true }
-            aria-labelledby = 'video-settings-button'
+            aria-labelledby = 'signal-settings-button'
             className = { classes.container }
             hidden = { false }
-            id = 'video-settings-dialog'
+            id = 'signal-settings-dialog'
             role = 'radiogroup'
             tabIndex = { -1 }>
             <ContextMenuItemGroup>
@@ -144,4 +170,13 @@ const SignalSettingsContent = ({
     );
 };
 
-export default SignalSettingsContent;
+const mapStateToProps = (state: IReduxState) => {
+    const { signalLayout } = state['features/settings'];
+
+    return {
+        signalLayout
+    };
+};
+
+
+export default connect(mapStateToProps)(SignalSettingsContent);

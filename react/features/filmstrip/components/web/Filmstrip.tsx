@@ -186,6 +186,8 @@ interface IProps extends WithTranslation {
      */
     _isFilmstripButtonEnabled: boolean;
 
+    _isMini: boolean;
+
     /**
      * Whether or not the toolbox is displayed.
      */
@@ -465,8 +467,13 @@ class Filmstrip extends PureComponent<IProps, IState> {
             _verticalViewGrid,
             _verticalViewMaxWidth,
             filmstripType,
+            _isMini,
             t
         } = this.props;
+
+        console.log('----------');
+        console.log('_isMini', _isMini);
+
         const classes = withStyles.getClasses(this.props);
         const { titleTabIndex } = this.state; // { isMouseDown, titleTabIndex }
         const tileViewActive = _currentLayout === LAYOUTS.TILE_VIEW;
@@ -1240,7 +1247,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
 function _mapStateToProps(state: IReduxState, ownProps: any) {
     const { _hasScroll = false, filmstripType, _topPanelFilmstrip, _remoteParticipants } = ownProps;
     const { toolbarButtons } = state['features/toolbox'];
-    const { iAmRecorder } = state['features/base/config'];
+    const { iAmRecorder, isMini } = state['features/base/config'];
     const { topPanelHeight, topPanelVisible, visible, width: verticalFilmstripWidth } = state['features/filmstrip'];
     const { localScreenShare } = state['features/base/participants'];
     const reduceHeight = state['features/toolbox'].visible && toolbarButtons?.length;
@@ -1294,7 +1301,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _verticalFilmstripWidth: verticalFilmstripWidth.current,
         _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
         _videosClassName: videosClassName,
-        _signalLayout: signalLayout || 'FOUR'
+        _signalLayout: signalLayout || 'FOUR',
+        _isMini: isMini
     };
 }
 
