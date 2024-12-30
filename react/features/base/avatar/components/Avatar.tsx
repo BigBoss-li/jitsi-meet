@@ -69,6 +69,8 @@ export interface IProps {
      */
     id?: string;
 
+    isMini?: boolean;
+
     /**
      * The ID of the participant to render an avatar for (if it's a participant avatar).
      */
@@ -182,6 +184,7 @@ class Avatar<P extends IProps> extends PureComponent<P, IState> {
             dynamicColor,
             id,
             size,
+            isMini,
             status,
             testId,
             url
@@ -203,7 +206,7 @@ class Avatar<P extends IProps> extends PureComponent<P, IState> {
             initials: undefined,
             onAvatarLoadError: undefined,
             onAvatarLoadErrorParams: undefined,
-            size,
+            size: isMini === true ? 100 : size,
             status,
             testId,
             url: undefined,
@@ -280,7 +283,7 @@ export function _mapStateToProps(state: IReduxState, ownProps: IProps) {
     const { colorBase, displayName, participantId } = ownProps;
     const _participant: IParticipant | undefined = participantId ? getParticipantById(state, participantId) : undefined;
     const _initialsBase = _participant?.name ?? displayName;
-    const { corsAvatarURLs } = state['features/base/config'];
+    const { corsAvatarURLs, isMini } = state['features/base/config'];
 
     return {
         _customAvatarBackgrounds: state['features/dynamic-branding'].avatarBackgrounds,
@@ -288,7 +291,8 @@ export function _mapStateToProps(state: IReduxState, ownProps: IProps) {
         _initialsBase,
         _loadableAvatarUrl: _participant?.loadableAvatarUrl,
         _loadableAvatarUrlUseCORS: _participant?.loadableAvatarUrlUseCORS,
-        colorBase
+        colorBase,
+        isMini
     };
 }
 

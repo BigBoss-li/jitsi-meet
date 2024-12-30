@@ -127,6 +127,9 @@ export function validateJwt(jwt: string) {
         const header = jwtDecode(jwt, { header: true });
         const payload = jwtDecode(jwt);
 
+        console.log('===========');
+        console.log('payload', payload);
+
         if (!header) {
             errors.push({ key: JWT_VALIDATION_ERRORS.HEADER_NOT_FOUND });
 

@@ -17,6 +17,10 @@
                 align-items: center;
                 box-shadow: none;
                 column-gap: 10px;
+
+                @media screen and (max-width: 800px) and (max-height: 400px) {
+                    height: 60px;
+                }
                 .toolbox-button {
                     line-height: unset;
                     > div {

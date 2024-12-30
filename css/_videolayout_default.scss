@@ -217,12 +217,23 @@
     position: relative;
     top: 50%;
     transform: translateY(-50%);
+
+    @media screen and (max-width: 800px) and (max-height: 400px) {
+        width: 100px;
+        height: 100px;
+        top: 40%;
+    }
 }
 
 #dominantSpeakerAvatarContainer,
 .dynamic-shadow {
     width: 200px;
     height: 200px;
+
+    @media screen and (max-width: 800px) and (max-height: 400px) {
+        width: 100px;
+        height: 100px;
+    }
 }
 
 #dominantSpeakerAvatarContainer {
@@ -231,6 +242,10 @@
     position: relative;
     overflow: hidden;
     visibility: inherit;
+
+    @media screen and (max-width: 800px) and (max-height: 400px) {
+        top: 0;
+    }
 }
 
 .dynamic-shadow {
@@ -240,6 +255,11 @@
     left: 50%;
     margin: -100px 0 0 -100px;
     transition: box-shadow 0.3s ease;
+
+    @media screen and (max-width: 800px) and (max-height: 400px) {
+        top: 100%;
+        left: 100%;
+    }
 }
 
 .avatar-container {

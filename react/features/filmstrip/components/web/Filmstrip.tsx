@@ -471,9 +471,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
             t
         } = this.props;
 
-        console.log('----------');
-        console.log('_isMini', _isMini);
-
         const classes = withStyles.getClasses(this.props);
         const { titleTabIndex } = this.state; // { isMouseDown, titleTabIndex }
         const tileViewActive = _currentLayout === LAYOUTS.TILE_VIEW;
@@ -613,7 +610,19 @@ class Filmstrip extends PureComponent<IProps, IState> {
             </div>
         );
 
-        return (
+        const filmstripTabs = (
+            <div className = 'cssw_hacked_title_tabs'>
+                <FilmstripTitleTabs
+                    onChange = { this._onTitleTabChange }
+                    value = { titleTabIndex }>
+                    <FilmstripTitleTab label = '成员' />
+                    <FilmstripTitleTab label = '信号源' />
+                    <FilmstripTitleTab label = '资料' />
+                </FilmstripTitleTabs>
+            </div>
+        );
+
+        return _isMini === false ? (
             <div
                 className = { clsx(
                     'filmstrip',
@@ -631,21 +640,15 @@ class Filmstrip extends PureComponent<IProps, IState> {
                     {t('filmstrip.accessibilityLabel.heading')}
                 </span>
                 { toolbar }
-                <div className = 'cssw_hacked_title_tabs'>
-                    <FilmstripTitleTabs
-                        onChange = { this._onTitleTabChange }
-                        value = { titleTabIndex }>
-                        <FilmstripTitleTab label = '成员' />
-                        <FilmstripTitleTab label = '信号源' />
-                        <FilmstripTitleTab label = '资料' />
-                    </FilmstripTitleTabs>
-                </div>
+                {
+                    filmstripTabs
+                }
                 {
                     titleTabIndex === 0 ? filmstrip : titleTabIndex === 1 ? signal : information
                 }
                 <AudioTracksContainer />
             </div>
-        );
+        ) : <AudioTracksContainer />;
     }
 
     /**
@@ -787,11 +790,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
         return (
             <div className = 'information-list'>
                 {
-                    informationList.map((information: any) => {
-                        const { id, name, type } = information;
+                    informationList?.map((information: any) => {
+                        const { id, fileName: name, fileType: type } = information;
                         let imageUrl;
 
-                        if (type === 'PDF') {
+                        if (type === '.pdf') {
                             imageUrl = 'images/information-pdf.png';
                         } else if (type === 'JPG') {
                             imageUrl = 'images/information-image.png';
@@ -846,6 +849,32 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _onFileChange(e: React.ChangeEvent) {
         console.log(e);
+
+        const file = e.target.files[0];
+
+        const reader = new FileReader();
+
+        reader.addEventListener(
+            'load',
+            () => {
+                const buffer = reader.result;
+
+                console.log('buffer before postMessage', buffer.byteLength);
+                window.parent.postMessage({
+                    type: 'upload_file',
+                    data: {
+                        fileType: file.type,
+                        fileName: file.name,
+                        buffer
+                    }
+                }, '*', [ buffer ]);
+
+
+            },
+            false
+        );
+
+        reader.readAsArrayBuffer(file);
     }
 
     /**
