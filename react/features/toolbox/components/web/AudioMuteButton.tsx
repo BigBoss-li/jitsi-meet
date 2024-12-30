@@ -36,7 +36,7 @@ interface IProps extends AbstractAudioMuteButtonProps {
    */
   _gumPending: IGUMPendingState;
 
-  _isMini: boolean;
+  _isMini?: boolean;
 
   /**
    * An object containing the CSS classes.
@@ -121,7 +121,7 @@ class AudioMuteButton extends AbstractAudioMuteButton<IProps> {
         const { _gumPending, _isMini } = this.props;
 
         if (_isMini) {
-            return;
+            return '';
         }
 
         if (_gumPending === IGUMPendingState.NONE) {

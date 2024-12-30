@@ -36,7 +36,7 @@ export interface IProps extends AbstractVideoMuteButtonProps {
      */
     _gumPending: IGUMPendingState;
 
-    _isMini: boolean;
+    _isMini?: boolean;
 
     /**
      * An object containing the CSS classes.

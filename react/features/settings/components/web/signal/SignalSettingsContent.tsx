@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
+import { IReduxState } from '../../../../app/types';
 import { IconFourCol, IconOneCol, IconOneLargeCol, IconTwoCol } from '../../../../base/icons/svg';
 import ContextMenu from '../../../../base/ui/components/web/ContextMenu';
 import ContextMenuItemGroup from '../../../../base/ui/components/web/ContextMenuItemGroup';
@@ -14,17 +15,17 @@ export interface IProps {
     /**
      * Callback invoked to change current camera.
      */
-    setSignalLayout: Function;
+    setSignalLayout?: Function;
 
     /**
      * Signal layout.
      */
-    signalLayout: string;
+    signalLayout?: string;
 
     /**
      * Callback invoked to toggle the settings popup visibility.
      */
-    toggleSignalSettings: Function;
+    toggleSignalSettings?: Function;
 }
 
 const useStyles = makeStyles()(theme => {
@@ -96,8 +97,8 @@ const SignalSettingsContent = ({
     const { classes, cx } = useStyles();
 
     const _onEntryClick = (layoutType: string) => () => {
-        setSignalLayout(layoutType);
-        toggleSignalSettings();
+        setSignalLayout?.(layoutType);
+        toggleSignalSettings?.();
     };
 
 

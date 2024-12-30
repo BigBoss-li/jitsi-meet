@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Switch, Tab, Tabs } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
@@ -186,7 +186,7 @@ interface IProps extends WithTranslation {
      */
     _isFilmstripButtonEnabled: boolean;
 
-    _isMini: boolean;
+    _isMini?: boolean;
 
     /**
      * Whether or not the toolbox is displayed.
@@ -361,6 +361,7 @@ interface IState {
 class Filmstrip extends PureComponent<IProps, IState> {
     _throttledResize: Function;
     _debouncedSwitch: Function;
+    fileInputRef: React.RefObject<HTMLInputElement>;
 
     /**
      * Initializes a new {@code Filmstrip} instance.
@@ -844,31 +845,31 @@ class Filmstrip extends PureComponent<IProps, IState> {
     /**
      * Upload file change.
      *
-     * @param {ChangeEvent} e - The input change event.
+     * @param {any} e - The input change event.
      * @returns {void}
      */
-    _onFileChange(e: React.ChangeEvent) {
-        console.log(e);
+    _onFileChange(e: any) {
 
-        const file = e.target.files[0];
+        // @ts-ignore
+        const file = e?.target?.files?.[0];
 
         const reader = new FileReader();
 
         reader.addEventListener(
             'load',
             () => {
-                const buffer = reader.result;
+                const buffer = reader.result as ArrayBuffer | null;
 
-                console.log('buffer before postMessage', buffer.byteLength);
-                window.parent.postMessage({
-                    type: 'upload_file',
-                    data: {
-                        fileType: file.type,
-                        fileName: file.name,
-                        buffer
-                    }
-                }, '*', [ buffer ]);
-
+                if (buffer) {
+                    window.parent.postMessage({
+                        type: 'upload_file',
+                        data: {
+                            fileType: file.type,
+                            fileName: file.name,
+                            buffer
+                        }
+                    }, '*', [ buffer ]);
+                }
 
             },
             false
@@ -883,7 +884,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {void}
      */
     _onButtonClick() {
-        this.fileInputRef.current.click();
+        this.fileInputRef?.current?.click();
     }
 
     /**
