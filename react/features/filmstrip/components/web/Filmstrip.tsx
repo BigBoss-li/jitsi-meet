@@ -324,9 +324,10 @@ interface IState {
     dragFilmstripWidth?: number | null;
 
     informationList: Array<{
+        fileName: string;
+        filePath: string;
+        fileType: string;
         id: string;
-        name: string;
-        type: string;
     }>;
 
     /**
@@ -396,6 +397,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
         this._onFilmstripResize = this._onFilmstripResize.bind(this);
         this._onTitleTabChange = this._onTitleTabChange.bind(this);
         this._onSwitchChange = this._onSwitchChange.bind(this);
+        this._onFileDownload = this._onFileDownload.bind(this);
         this._renderSignalItem = this._renderSignalItem.bind(this);
         this._renderInformationItem = this._renderInformationItem.bind(this);
         this._onMessageListener = this._onMessageListener.bind(this);
@@ -739,6 +741,23 @@ class Filmstrip extends PureComponent<IProps, IState> {
     }
 
     /**
+     * Switch change.
+     *
+     * @param {string} url - The new value.
+     * @param {string} filename - The new value.
+     * @returns {void}
+     */
+    async _onFileDownload(url: string, filename: string) {
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    /**
      * Call shared videos debounce.
      *
      * @param {Array<string>} videoUrls - Signal list.
@@ -792,7 +811,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             <div className = 'information-list'>
                 {
                     informationList?.map((information: any) => {
-                        const { id, fileName: name, fileType: type } = information;
+                        const { id, fileName: name, fileType: type, filePath } = information;
                         let imageUrl;
 
                         if (type === '.pdf') {
@@ -801,6 +820,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
                             imageUrl = 'images/information-image.png';
                         } else if (type === 'MP4') {
                             imageUrl = 'images/information-video.png';
+                        } else {
+                            imageUrl = 'images/information-file.png';
                         }
                         const image = (<img
                             className = 'information-image'
@@ -809,7 +830,9 @@ class Filmstrip extends PureComponent<IProps, IState> {
                         return (
                             <div
                                 className = 'information-item'
-                                key = { id }>
+                                key = { id }
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick = { () => this._onFileDownload(filePath, name) }>
                                 { image }
                                 <div className = 'information-name'>
                                     { name }
