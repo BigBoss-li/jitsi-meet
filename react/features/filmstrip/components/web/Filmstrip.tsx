@@ -748,17 +748,12 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * Switch change.
      *
      * @param {string} url - The new value.
-     * @param {string} filename - The new value.
      * @returns {void}
      */
-    async _onFileDownload(url: string, filename: string) {
-        const link = document.createElement('a');
-
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    async _onFileDownload(url: string) {
+        window.open(url, '_blank',
+            `channelmode=yes,directories=no,
+            location=no,toolbar=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no`);
     }
 
     /**
@@ -841,7 +836,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                                 className = 'information-item'
                                 key = { id }
                                 // eslint-disable-next-line react/jsx-no-bind
-                                onClick = { () => this._onFileDownload(filePath, name) }>
+                                onClick = { () => this._onFileDownload(filePath) }>
                                 { image }
                                 <div className = 'information-name'>
                                     { name }
