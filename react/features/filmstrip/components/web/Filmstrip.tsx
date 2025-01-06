@@ -16,6 +16,8 @@ import { isMobileBrowser } from '../../../base/environment/utils';
 import { translate } from '../../../base/i18n/functions';
 import Icon from '../../../base/icons/components/Icon';
 import { IconArrowDown, IconArrowUp } from '../../../base/icons/svg';
+import { PARTICIPANT_ROLE } from '../../../base/participants/constants';
+import { getLocalParticipant } from '../../../base/participants/functions';
 import { getHideSelfView } from '../../../base/settings/functions.any';
 import { registerShortcut, unregisterShortcut } from '../../../keyboard-shortcuts/actions';
 import { playSharedVideos } from '../../../shared-video/actions.any';
@@ -187,6 +189,8 @@ interface IProps extends WithTranslation {
     _isFilmstripButtonEnabled: boolean;
 
     _isMini?: boolean;
+
+    _isModerator: boolean;
 
     /**
      * Whether or not the toolbox is displayed.
@@ -708,6 +712,13 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {void}
      */
     async _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
+        const {
+            _isModerator
+        } = this.props;
+
+        if (_isModerator !== true) {
+            return;
+        }
         const { signalList } = this.state;
         const MAX_SHARED_VIDEO_LENGTH = 4;
 
@@ -853,17 +864,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _onMessageListener(e: any) {
         const { type, data } = e.data;
-        const { signalList } = this.state;
 
         if (type === 'signal_list') {
             this.setState({
-                signalList: signalList.concat(data)
-            });
-        } else if (type === 'remove_signal_list') {
-            const removeIds = signalList.map(item => item.id);
-
-            this.setState({
-                signalList: signalList.filter(item => !removeIds.includes(item.id))
+                signalList: data
             });
         } else if (type === 'information_list') {
             this.setState({
@@ -1317,6 +1321,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
     const { clientWidth, clientHeight } = state['features/base/responsive-ui'];
     const filmstripDisabled = isFilmstripDisabled(state);
     const { signalLayout } = state['features/settings'];
+    const localParticipant = getLocalParticipant(state);
+    const _isModerator = Boolean(localParticipant?.role === PARTICIPANT_ROLE.MODERATOR);
 
     const collapseTileView = reduceHeight && isMobileBrowser() && clientWidth <= ASPECT_RATIO_BREAKPOINT;
 
@@ -1362,7 +1368,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
         _videosClassName: videosClassName,
         _signalLayout: signalLayout || 'FOUR',
-        _isMini: isMini
+        _isMini: isMini,
+        _isModerator
     };
 }
 
