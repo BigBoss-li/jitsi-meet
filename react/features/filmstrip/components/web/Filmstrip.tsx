@@ -712,13 +712,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {void}
      */
     async _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
-        const {
-            _isModerator
-        } = this.props;
-
-        if (_isModerator !== true) {
-            return;
-        }
         const { signalList } = this.state;
         const MAX_SHARED_VIDEO_LENGTH = 4;
 
@@ -785,6 +778,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _renderSignalItem() {
         const { signalList } = this.state;
+        const { _isModerator } = this.props;
 
         return (<div className = 'signal__list'>
             {
@@ -798,11 +792,15 @@ class Filmstrip extends PureComponent<IProps, IState> {
                         </div>
                         <div className = 'signal__footer'>
                             <div className = 'signal-ip'>{signal.ip}</div>
-                            <SignalSwitch
-                                checked = { signal.isSelected }
-                                // eslint-disable-next-line react/jsx-no-bind
-                                onChange = { (e: React.ChangeEvent, value: boolean) =>
-                                    this._onSwitchChange(e, value, signal.id) } />
+
+                            {
+                                _isModerator && <SignalSwitch
+                                    checked = { signal.isSelected }
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    onChange = { (e: React.ChangeEvent, value: boolean) =>
+                                        this._onSwitchChange(e, value, signal.id) } />
+                            }
+
                         </div>
                     </div>
                 ))
