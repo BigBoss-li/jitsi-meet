@@ -118,7 +118,7 @@ export function commonUserLeftHandling(
         { dispatch }: { dispatch: IStore['dispatch']; },
         conference: IJitsiConference,
         user: any) {
-    const id = user.getId();
+    const id = user.getIdentity()?.user?.id;
 
     if (!user.isHidden()) {
         const isReplaced = user.isReplaced?.();
