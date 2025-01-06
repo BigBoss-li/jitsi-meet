@@ -80,6 +80,8 @@ export default [
     'brandingRoomAlias',
     'debug',
     'debugAudioLevels',
+    'defaultLanguage',
+    'defaultLogoUrl',
     'deeplinking.disabled',
     'deeplinking.desktop.enabled',
     'defaultLocalDisplayName',

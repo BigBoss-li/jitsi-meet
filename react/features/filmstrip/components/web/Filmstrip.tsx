@@ -814,11 +814,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
                         const { id, fileName: name, fileType: type, filePath } = information;
                         let imageUrl;
 
-                        if (type === '.pdf') {
+                        if (type === 'pdf') {
                             imageUrl = 'images/information-pdf.png';
-                        } else if (type === 'JPG') {
+                        } else if (type === 'jpg') {
                             imageUrl = 'images/information-image.png';
-                        } else if (type === 'MP4') {
+                        } else if (type === 'mp4') {
                             imageUrl = 'images/information-video.png';
                         } else {
                             imageUrl = 'images/information-file.png';
@@ -853,10 +853,17 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _onMessageListener(e: any) {
         const { type, data } = e.data;
+        const { signalList } = this.state;
 
         if (type === 'signal_list') {
             this.setState({
-                signalList: data
+                signalList: signalList.concat(data)
+            });
+        } else if (type === 'remove_signal_list') {
+            const removeIds = signalList.map(item => item.id);
+
+            this.setState({
+                signalList: signalList.filter(item => !removeIds.includes(item.id))
             });
         } else if (type === 'information_list') {
             this.setState({

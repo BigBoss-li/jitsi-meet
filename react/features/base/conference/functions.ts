@@ -80,7 +80,9 @@ export function commonUserJoinedHandling(
         { dispatch }: { dispatch: IStore['dispatch']; },
         conference: IJitsiConference,
         user: any) {
-    const id = user.getId();
+
+    // const id = user.getId();
+    const id = user.getIdentity()?.user?.id;
     const displayName = user.getDisplayName();
 
     if (!user.isHidden()) {
