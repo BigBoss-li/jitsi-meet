@@ -40,6 +40,7 @@ export interface IParticipant {
     role?: string;
     sources?: Map<string, Map<string, ISourceInfo>>;
     supportsRemoteControl?: boolean;
+    userDetail?: any;
 }
 
 export interface ILocalParticipant extends IParticipant {
