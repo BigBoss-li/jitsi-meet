@@ -464,7 +464,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
             _currentLayout,
             _disableSelfView,
             _filmstripDisabled,
-            _localScreenShareId,
+
+            // _localScreenShareId,
             _mainFilmstripVisible,
             _resizableFilmstrip,
             _topPanelFilmstrip,
@@ -552,7 +553,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                             )}
                         </div>
                     )}
-                    {_localScreenShareId && !_disableSelfView && !_verticalViewGrid && (
+                    {/* {_localScreenShareId && !_disableSelfView && !_verticalViewGrid && (
                         <div
                             className = 'filmstrip__videos'
                             id = 'filmstripLocalScreenShare'>
@@ -564,7 +565,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                                 }
                             </div>
                         </div>
-                    )}
+                    )} */}
                     {this._renderRemoteParticipants()}
                 </div>
             </>
