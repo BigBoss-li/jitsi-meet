@@ -313,6 +313,13 @@ interface IProps extends WithTranslation {
      * The type of filmstrip to be displayed.
      */
     filmstripType: string;
+
+    /**
+     * Is the video shared by the local user.
+     */
+    isOwner: boolean;
+
+    ownerId: string;
 }
 
 interface IState {
@@ -774,7 +781,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _renderSignalItem() {
         const { signalList } = this.state;
-        const { _isModerator } = this.props;
+        const { _isModerator, isOwner, ownerId } = this.props;
 
         return (<div className = 'signal__list'>
             {
@@ -792,6 +799,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                             {
                                 _isModerator && <SignalSwitch
                                     checked = { signal.isSelected }
+                                    disabled = { ownerId && !isOwner }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onChange = { (e: React.ChangeEvent, value: boolean) =>
                                         this._onSwitchChange(e, value, signal.id) } />
@@ -1304,6 +1312,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
  */
 function _mapStateToProps(state: IReduxState, ownProps: any) {
     const { _hasScroll = false, filmstripType, _topPanelFilmstrip, _remoteParticipants } = ownProps;
+    const { ownerId } = state['features/shared-video'];
     const { toolbarButtons } = state['features/toolbox'];
     const { iAmRecorder, isMini } = state['features/base/config'];
     const { topPanelHeight, topPanelVisible, visible, width: verticalFilmstripWidth } = state['features/filmstrip'];
@@ -1363,7 +1372,9 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _videosClassName: videosClassName,
         _signalLayout: signalLayout || 'FOUR',
         _isMini: isMini,
-        _isModerator
+        _isModerator,
+        ownerId,
+        isOwner: ownerId === localParticipant?.id
     };
 }
 
