@@ -866,11 +866,23 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _onMessageListener(e: any) {
         const { type, data } = e.data;
+        const { signalList } = this.state;
 
         if (type === 'signal_list') {
-            this.setState({
-                signalList: data
+            const newSignalList = data.map((s: any) => {
+                return {
+                    ...s,
+                    isSelected: signalList.some((l: any) => l.id === s.id && l.isSelected)
+                };
             });
+
+            this.setState({
+                signalList: newSignalList
+            });
+
+            const urls = newSignalList.filter((item: any) => item.isSelected).map((item: any) => item.url);
+
+            this._debouncedSwitch(urls);
         } else if (type === 'information_list') {
             this.setState({
                 informationList: data
@@ -1356,6 +1368,12 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         }
     }
 
+
+    const filterRemoteParticipants = _remoteParticipants.filter((participant: any) =>
+        typeof participant !== 'string' || (!participant.startsWith('http://') && !participant.startsWith('https://')));
+
+    // TODO
+
     return {
         _className: className,
         _chatOpen: state['features/chat'].isOpen,
@@ -1371,7 +1389,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _mainFilmstripVisible: notDisabled,
         _maxFilmstripWidth: clientWidth - MIN_STAGE_VIEW_WIDTH,
         _maxTopPanelHeight: clientHeight - MIN_STAGE_VIEW_HEIGHT,
-        _remoteParticipantsLength: _remoteParticipants?.length ?? 0,
+        _remoteParticipants: filterRemoteParticipants,
+        _remoteParticipantsLength: filterRemoteParticipants?.length ?? 0,
         _topPanelHeight: topPanelHeight.current,
         _topPanelMaxHeight: topPanelHeight.current || TOP_FILMSTRIP_HEIGHT,
         _topPanelVisible,

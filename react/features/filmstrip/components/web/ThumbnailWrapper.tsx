@@ -160,7 +160,12 @@ function _mapStateToProps(state: IReduxState, ownProps: { columnIndex: number;
     const stageFilmstrip = filmstripType === FILMSTRIP_TYPE.STAGE;
     const sortedActiveParticipants = activeParticipants.sort();
     const remoteParticipants = stageFilmstrip ? sortedActiveParticipants : remote;
-    const remoteParticipantsLength = remoteParticipants.length;
+
+    const filterRemoteParticipants = remoteParticipants.filter((participant: any) =>
+        typeof participant !== 'string' || (!participant.startsWith('http://') && !participant.startsWith('https://')));
+
+
+    const remoteParticipantsLength = filterRemoteParticipants.length;
     const localId = getLocalParticipant(state)?.id;
 
     if (_currentLayout === LAYOUTS.TILE_VIEW || _verticalViewGrid || stageFilmstrip) {
@@ -233,7 +238,7 @@ function _mapStateToProps(state: IReduxState, ownProps: { columnIndex: number;
             return {
                 _disableSelfView: disableSelfView,
                 _filmstripType: filmstripType,
-                _participantID: remoteParticipants[index] === localId ? 'local' : remoteParticipants[index],
+                _participantID: filterRemoteParticipants[index] === localId ? 'local' : filterRemoteParticipants[index],
                 _horizontalOffset: horizontalOffset,
                 _thumbnailWidth: thumbnailWidth
             };
@@ -271,7 +276,7 @@ function _mapStateToProps(state: IReduxState, ownProps: { columnIndex: number;
 
         return {
             _filmstripType: filmstripType,
-            _participantID: remoteParticipants[remoteIndex],
+            _participantID: filterRemoteParticipants[remoteIndex],
             _horizontalOffset: horizontalOffset,
             _thumbnailWidth: thumbnailWidth
         };
@@ -299,7 +304,7 @@ function _mapStateToProps(state: IReduxState, ownProps: { columnIndex: number;
     }
 
     return {
-        _participantID: remoteParticipants[index]
+        _participantID: filterRemoteParticipants[index]
     };
 }
 
