@@ -104,6 +104,7 @@ const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (<Tab
 
 interface IFilmstripSignalSwitchProps {
     checked: boolean;
+    disabled: boolean;
     onChange: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void;
 }
 
@@ -245,6 +246,11 @@ interface IProps extends WithTranslation {
     _signalLayout: string;
 
     /**
+     * Is the video shared by the local user.
+     */
+    _switchDisabled?: boolean;
+
+    /**
      * The height of the thumbnail.
      */
     _thumbnailHeight: number;
@@ -314,12 +320,6 @@ interface IProps extends WithTranslation {
      */
     filmstripType: string;
 
-    /**
-     * Is the video shared by the local user.
-     */
-    isOwner: boolean;
-
-    ownerId: string;
 }
 
 interface IState {
@@ -471,8 +471,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             _currentLayout,
             _disableSelfView,
             _filmstripDisabled,
-
-            // _localScreenShareId,
+            _localScreenShareId,
             _mainFilmstripVisible,
             _resizableFilmstrip,
             _topPanelFilmstrip,
@@ -560,7 +559,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                             )}
                         </div>
                     )}
-                    {/* {_localScreenShareId && !_disableSelfView && !_verticalViewGrid && (
+                    {_localScreenShareId && !_disableSelfView && !_verticalViewGrid && (
                         <div
                             className = 'filmstrip__videos'
                             id = 'filmstripLocalScreenShare'>
@@ -572,7 +571,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                                 }
                             </div>
                         </div>
-                    )} */}
+                    )}
                     {this._renderRemoteParticipants()}
                 </div>
             </>
@@ -781,7 +780,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _renderSignalItem() {
         const { signalList } = this.state;
-        const { _isModerator, isOwner, ownerId } = this.props;
+        const { _isModerator, _switchDisabled } = this.props;
+
 
         return (<div className = 'signal__list'>
             {
@@ -799,7 +799,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                             {
                                 _isModerator && <SignalSwitch
                                     checked = { signal.isSelected }
-                                    disabled = { ownerId && !isOwner }
+                                    disabled = { _switchDisabled || false }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onChange = { (e: React.ChangeEvent, value: boolean) =>
                                         this._onSwitchChange(e, value, signal.id) } />
@@ -1348,6 +1348,14 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         = _currentLayout === LAYOUTS.VERTICAL_FILMSTRIP_VIEW
         || (filmstripType === FILMSTRIP_TYPE.MAIN && _currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW);
 
+    let _switchDisabled = false;
+
+    if (ownerId !== undefined) {
+        if (ownerId !== localParticipant?.id) {
+            _switchDisabled = true;
+        }
+    }
+
     return {
         _className: className,
         _chatOpen: state['features/chat'].isOpen,
@@ -1373,8 +1381,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _signalLayout: signalLayout || 'FOUR',
         _isMini: isMini,
         _isModerator,
-        ownerId,
-        isOwner: ownerId === localParticipant?.id
+        _switchDisabled
     };
 }
 
