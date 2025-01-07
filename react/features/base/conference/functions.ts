@@ -81,8 +81,9 @@ export function commonUserJoinedHandling(
         conference: IJitsiConference,
         user: any) {
 
-    // const id = user.getId();
-    const id = user.getIdentity()?.user?.id;
+    const id = user.getId();
+
+    const identity = user.getIdentity()?.user;
     const displayName = user.getDisplayName();
 
     if (!user.isHidden()) {
@@ -98,6 +99,7 @@ export function commonUserJoinedHandling(
             presence: user.getStatus(),
             role: user.getRole(),
             isReplacing,
+            userDetail: identity,
             sources: user.getSources()
         }));
     }
@@ -118,7 +120,7 @@ export function commonUserLeftHandling(
         { dispatch }: { dispatch: IStore['dispatch']; },
         conference: IJitsiConference,
         user: any) {
-    const id = user.getIdentity()?.user?.id;
+    const id = user.getId();
 
     if (!user.isHidden()) {
         const isReplaced = user.isReplaced?.();
