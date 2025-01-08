@@ -422,7 +422,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
             trailing: false
         });
 
-        this._debouncedSwitch = debounce(this._callChangeSharedVideos, 1500);
+        this._debouncedSwitch = debounce(this._callChangeSharedVideos, 1500, {
+            leading: true,
+            trailing: true
+        });
     }
 
     /**

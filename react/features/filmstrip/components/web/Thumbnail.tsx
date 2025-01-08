@@ -1119,7 +1119,7 @@ class Thumbnail extends Component<IProps, IState> {
                         _thumbnailType === THUMBNAIL_TYPE.TILE && 'tile-view-mode'
                     ) }>
                     <ThumbnailTopIndicators
-                        disableConnectionIndicator = { true }
+                        disableConnectionIndicator = { isWhiteboardParticipant(_participant) }
                         hidePopover = { this._hidePopover }
                         indicatorsClassName = { classes.indicatorsBackground }
                         isHovered = { isHovered }
