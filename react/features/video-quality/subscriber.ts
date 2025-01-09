@@ -512,7 +512,7 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
         }
     }
 
-    const forcedConstraints = {};
+    const forcedConstraints: any = {};
 
     Object.keys(receiverConstraints.constraints).forEach(id => {
         forcedConstraints[id] = {
