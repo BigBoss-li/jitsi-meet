@@ -34,7 +34,6 @@ import {
     setMaxReceiverVideoQualityForTileView,
     setMaxReceiverVideoQualityForVerticalFilmstrip
 } from './actions';
-
 import { MAX_VIDEO_QUALITY, VIDEO_QUALITY_LEVELS, VIDEO_QUALITY_UNLIMITED } from './constants';
 import { getReceiverVideoQualityLevel } from './functions';
 import logger from './logger';
@@ -382,18 +381,22 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
     }
     const { lastN } = state['features/base/lastn'];
     const {
-        maxReceiverVideoQualityForTileView,
-        maxReceiverVideoQualityForStageFilmstrip,
-        maxReceiverVideoQualityForVerticalFilmstrip,
+        // maxReceiverVideoQualityForTileView,
+        // maxReceiverVideoQualityForStageFilmstrip,
+
+        // maxReceiverVideoQualityForVerticalFilmstrip,
         maxReceiverVideoQualityForLargeVideo,
         maxReceiverVideoQualityForScreenSharingFilmstrip,
         preferredVideoQuality
     } = state['features/video-quality'];
     const { participantId: largeVideoParticipantId = '' } = state['features/large-video'];
-    const maxFrameHeightForTileView = Math.min(maxReceiverVideoQualityForTileView, preferredVideoQuality);
-    const maxFrameHeightForStageFilmstrip = Math.min(maxReceiverVideoQualityForStageFilmstrip, preferredVideoQuality);
-    const maxFrameHeightForVerticalFilmstrip
-        = Math.min(maxReceiverVideoQualityForVerticalFilmstrip, preferredVideoQuality);
+
+    // const maxFrameHeightForTileView = Math.min(maxReceiverVideoQualityForTileView, preferredVideoQuality);
+    // const maxFrameHeightForStageFilmstrip =
+    // Math.min(maxReceiverVideoQualityForStageFilmstrip, preferredVideoQuality);
+
+    // const maxFrameHeightForVerticalFilmstrip
+    //     = Math.min(maxReceiverVideoQualityForVerticalFilmstrip, preferredVideoQuality);
     const maxFrameHeightForLargeVideo
         = Math.min(maxReceiverVideoQualityForLargeVideo, preferredVideoQuality);
     const maxFrameHeightForScreenSharingFilmstrip
@@ -477,10 +480,10 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
             }
 
             activeParticipantsSources.forEach(sourceName => {
-                const isScreenSharing = remoteScreenShares.includes(sourceName);
-                const quality
-                    = isScreenSharing && preferredVideoQuality >= MAX_VIDEO_QUALITY
-                        ? VIDEO_QUALITY_UNLIMITED : maxFrameHeightForStageFilmstrip;
+                // const isScreenSharing = remoteScreenShares.includes(sourceName);
+                // const quality
+                //     = isScreenSharing && preferredVideoQuality >= MAX_VIDEO_QUALITY
+                //         ? VIDEO_QUALITY_UNLIMITED : maxFrameHeightForStageFilmstrip;
 
                 receiverConstraints.constraints[sourceName] = { 'maxHeight': 720 };
             });
@@ -508,17 +511,18 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
             receiverConstraints.onStageSources = [ largeVideoSourceName ];
         }
     }
-    
-    const forcedConstraints = {}
+
+    const forcedConstraints = {};
+
     Object.keys(receiverConstraints.constraints).forEach(id => {
         forcedConstraints[id] = {
             ...receiverConstraints.constraints[id],
             maxHeight: 720
-        }
-    })
-    receiverConstraints.constraints = forcedConstraints
+        };
+    });
+    receiverConstraints.constraints = forcedConstraints;
 
-    console.log("receiverConstraints", receiverConstraints);
+    console.log('receiverConstraints', receiverConstraints);
     try {
         conference.setReceiverConstraints(receiverConstraints);
     } catch (error: any) {
