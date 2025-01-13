@@ -446,7 +446,7 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
         }
 
         visibleRemoteTrackSourceNames.forEach(sourceName => {
-            receiverConstraints.constraints[sourceName] = { 'maxHeight': 720 };
+            receiverConstraints.constraints[sourceName] = { 'maxHeight': 1080 };
         });
 
         // Prioritize screenshare in tile view.
@@ -462,7 +462,7 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
 
         if (visibleRemoteTrackSourceNames?.length) {
             visibleRemoteTrackSourceNames.forEach(sourceName => {
-                receiverConstraints.constraints[sourceName] = { 'maxHeight': 720 };
+                receiverConstraints.constraints[sourceName] = { 'maxHeight': 1080 };
             });
         }
 
@@ -485,7 +485,7 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
                 //     = isScreenSharing && preferredVideoQuality >= MAX_VIDEO_QUALITY
                 //         ? VIDEO_QUALITY_UNLIMITED : maxFrameHeightForStageFilmstrip;
 
-                receiverConstraints.constraints[sourceName] = { 'maxHeight': 720 };
+                receiverConstraints.constraints[sourceName] = { 'maxHeight': 1080 };
             });
 
             if (screenshareFilmstripParticipantId) {
@@ -517,7 +517,7 @@ function _updateReceiverVideoConstraints({ getState }: IStore) {
     Object.keys(receiverConstraints.constraints).forEach(id => {
         forcedConstraints[id] = {
             ...receiverConstraints.constraints[id],
-            maxHeight: 720
+            maxHeight: 1080
         };
     });
     receiverConstraints.constraints = forcedConstraints;
