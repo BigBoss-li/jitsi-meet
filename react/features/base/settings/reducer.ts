@@ -69,6 +69,7 @@ export interface ISettingsState {
     serverURL?: string;
     signalLayout?: string;
     signalSettingsVisible?: boolean;
+    signalVideoLarge?: string;
     soundsIncomingMessage?: boolean;
     soundsParticipantJoined?: boolean;
     soundsParticipantKnocking?: boolean;

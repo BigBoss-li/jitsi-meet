@@ -12,6 +12,7 @@ import AbstractVideoManager, {
 } from './AbstractVideoManager';
 import WebRTCPlayer from './WebRTCPlayer';
 
+
 interface IState {
   isMuted: boolean;
   isPlaying: boolean;
@@ -207,7 +208,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     };
 
     getPlayerOptions = (videoId: string) => {
-        console.log('videoId', videoId);
+
         const { showControls } = this.props;
         const { isPlaying } = this.state;
 
@@ -254,6 +255,18 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     }
 
     /**
+     * 视频放大点击事件.
+     *
+     * @param {string} url - 视频Url.
+     * @returns {void}
+     */
+    _onLargeVideoClick(url: string) {
+        if (this.props._isOwner) {
+            this.props._setSignalVideoLarge(url);
+        }
+    }
+
+    /**
      * Implements React Component's render.
      *
      * @inheritdoc
@@ -268,11 +281,19 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                 }
             });
         }
+
         const videoUrls = videoId?.split(',');
 
-        let ele2;
+        // if (_signalVideoLarge) {
+        //     const idx = videoUrls.indexOf(_signalVideoLarge);
 
-        console.log('======render=====');
+        //     if (idx !== -1) {
+        //         videoUrls.splice(idx, 1);
+        //         videoUrls.unshift(_signalVideoLarge);
+        //     }
+        // }
+
+        let ele2;
 
         if (videoUrls && videoUrls?.length > 0) {
             this.reactPlayersRef = new Array(videoUrls.length);
@@ -325,7 +346,9 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                         smallItems.push(
                             <div
                                 className = { 'react-player-box' }
-                                key = { i }>
+                                key = { i }
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick = { () => this._onLargeVideoClick(url) }>
                                 { videoPlayer }
                             </div>
                         );

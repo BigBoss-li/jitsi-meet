@@ -162,7 +162,7 @@ function _mapStateToProps(state: IReduxState, ownProps: { columnIndex: number;
     const remoteParticipants = stageFilmstrip ? sortedActiveParticipants : remote;
 
     const filterRemoteParticipants = remoteParticipants.filter((participant: any) =>
-        typeof participant !== 'string' || (!participant.startsWith('http://') && !participant.startsWith('https://')));
+        typeof participant !== 'string' || !(participant.startsWith('{') && participant.endsWith('}')));
 
 
     const remoteParticipantsLength = filterRemoteParticipants.length;

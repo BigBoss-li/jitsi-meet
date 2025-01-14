@@ -13,6 +13,7 @@ import { getLocalParticipant } from '../../../base/participants/functions';
 import { isLocalTrackMuted } from '../../../base/tracks/functions';
 import { showWarningNotification } from '../../../notifications/actions';
 import { NOTIFICATION_TIMEOUT_TYPE } from '../../../notifications/constants';
+import { setSignalVideoLargeValue } from '../../../settings/actions.web';
 import { dockToolbox } from '../../../toolbox/actions';
 import { muteLocal } from '../../../video-menu/actions.any';
 import { setSharedVideoStatus, stopSharedVideo } from '../../actions.any';
@@ -83,6 +84,8 @@ export interface IProps {
      * Updates the shared video status.
      */
     _setSharedVideoStatus: Function;
+
+    _setSignalVideoLarge: Function;
 
     _signalLayout?: string;
 
@@ -452,7 +455,6 @@ export function _mapStateToProps(state: IReduxState) {
     const { ownerId, status, time, videoUrl, muted } = state['features/shared-video'];
     const localParticipant = getLocalParticipant(state);
     const _isLocalAudioMuted = isLocalTrackMuted(state['features/base/tracks'], MEDIA_TYPE.AUDIO);
-    const { signalLayout } = state['features/settings'];
 
     return {
         _conference: getCurrentConference(state),
@@ -462,8 +464,7 @@ export function _mapStateToProps(state: IReduxState) {
         _ownerId: ownerId,
         _status: status,
         _time: time,
-        _videoUrl: videoUrl,
-        _signalLayout: signalLayout
+        _videoUrl: videoUrl
     };
 }
 
@@ -497,6 +498,9 @@ export function _mapDispatchToProps(dispatch: IStore['dispatch']) {
                 ownerId,
                 muted
             }));
+        },
+        _setSignalVideoLarge: (value: string) => {
+            dispatch(setSignalVideoLargeValue(value));
         }
     };
 }

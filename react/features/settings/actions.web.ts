@@ -25,6 +25,7 @@ import {
     SET_AUDIO_SETTINGS_VISIBILITY,
     SET_SIGNAL_LAYOUT,
     SET_SIGNAL_SETTINGS_VISIBILITY,
+    SET_SIGNAL_VIDEO_LARGE,
     SET_VIDEO_SETTINGS_VISIBILITY
 } from './actionTypes';
 import LogoutDialog from './components/web/LogoutDialog';
@@ -142,10 +143,24 @@ function setSignalSettingsVisibility(value: boolean) {
  * @param {string} value - The new value.
  * @returns {Function}
  */
-function setSignalSettingsLayout(value: string) {
+export function setSignalSettingsLayout(value: string) {
 
     return {
         type: SET_SIGNAL_LAYOUT,
+        value
+    };
+}
+
+/**
+ * Sets the visibility of the video settings.
+ *
+ * @param {string} value - The new value.
+ * @returns {Function}
+ */
+export function setSignalVideoLargeValue(value: string) {
+
+    return {
+        type: SET_SIGNAL_VIDEO_LARGE,
         value
     };
 }
@@ -331,6 +346,20 @@ export function setSignalLayout(layout: string) {
     return (dispatch: IStore['dispatch']) => {
 
         dispatch(setSignalSettingsLayout(layout));
+    };
+}
+
+/**
+ * Toggles the visibility of the video settings.
+ *
+ * @param {string} value - The new settings.
+ * @returns {void}
+ */
+export function setSignalVideoLarge(value: string) {
+
+    return (dispatch: IStore['dispatch']) => {
+
+        dispatch(setSignalVideoLargeValue(value));
     };
 }
 

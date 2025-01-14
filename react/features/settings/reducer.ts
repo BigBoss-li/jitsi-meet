@@ -4,6 +4,7 @@ import {
     SET_AUDIO_SETTINGS_VISIBILITY,
     SET_SIGNAL_LAYOUT,
     SET_SIGNAL_SETTINGS_VISIBILITY,
+    SET_SIGNAL_VIDEO_LARGE,
     SET_VIDEO_SETTINGS_VISIBILITY
 } from './actionTypes';
 
@@ -11,6 +12,7 @@ export interface ISettingsState {
     audioSettingsVisible?: boolean;
     signalLayout?: string;
     signalSettingsVisible?: boolean;
+    signalVideoLarge?: string;
     videoSettingsVisible?: boolean;
 }
 
@@ -36,6 +38,12 @@ ReducerRegistry.register('features/settings', (state: ISettingsState = {}, actio
         return {
             ...state,
             signalLayout: action.value
+        };
+    case SET_SIGNAL_VIDEO_LARGE:
+
+        return {
+            ...state,
+            signalVideoLarge: action.value
         };
     }
 

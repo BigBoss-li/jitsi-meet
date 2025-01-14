@@ -20,7 +20,8 @@ import { PARTICIPANT_ROLE } from '../../../base/participants/constants';
 import { getLocalParticipant } from '../../../base/participants/functions';
 import { getHideSelfView } from '../../../base/settings/functions.any';
 import { registerShortcut, unregisterShortcut } from '../../../keyboard-shortcuts/actions';
-import { playSharedVideos } from '../../../shared-video/actions.any';
+import { setSignalLayout } from '../../../settings/actions.web';
+import { playSharedVideosDef } from '../../../shared-video/actions.any';
 import { showToolbox } from '../../../toolbox/actions.web';
 import { isButtonEnabled, isToolboxVisible } from '../../../toolbox/functions.web';
 import { LAYOUTS } from '../../../video-layout/constants';
@@ -243,7 +244,9 @@ interface IProps extends WithTranslation {
      */
     _rows: number;
 
-    _signalLayout: string;
+    _signalLayout?: string;
+
+    _signalVideoLarge?: string;
 
     /**
      * Is the video shared by the local user.
@@ -319,6 +322,11 @@ interface IProps extends WithTranslation {
      * The type of filmstrip to be displayed.
      */
     filmstripType: string;
+
+    /**
+     * Callback invoked to change current camera.
+     */
+    onLayoutSelect: Function;
 
 }
 
@@ -426,6 +434,53 @@ class Filmstrip extends PureComponent<IProps, IState> {
             leading: true,
             trailing: true
         });
+    }
+
+    /**
+     * Implements React's {@link Component#componentDidUpdate}.
+     *
+     * @inheritdoc
+     */
+    componentDidUpdate(prevProps: IProps) {
+        if (this.props._signalVideoLarge !== undefined
+            && prevProps._signalVideoLarge !== this.props._signalVideoLarge) {
+
+            const { _signalVideoLarge } = this.props;
+            const { signalList } = this.state;
+
+            const urls = signalList.filter(item => item.isSelected).map(item => item.url);
+
+            if (_signalVideoLarge) {
+                const idx = urls.indexOf(_signalVideoLarge);
+
+                if (idx !== -1) {
+                    urls.splice(idx, 1);
+                    urls.unshift(_signalVideoLarge);
+                }
+            }
+
+            this._debouncedSwitch(urls);
+        }
+
+        if (this.props._signalLayout !== undefined && this.props._signalLayout !== prevProps._signalLayout) {
+            const { _signalVideoLarge } = this.props;
+
+            const { signalList } = this.state;
+
+            const urls = signalList.filter(item => item.isSelected).map(item => item.url);
+
+            if (_signalVideoLarge) {
+                const idx = urls.indexOf(_signalVideoLarge);
+
+                if (idx !== -1) {
+                    urls.splice(idx, 1);
+                    urls.unshift(_signalVideoLarge);
+                }
+            }
+
+            this._debouncedSwitch(urls);
+
+        }
     }
 
     /**
@@ -723,6 +778,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     async _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
         const { signalList } = this.state;
+        const { _signalLayout, _signalVideoLarge } = this.props;
         const MAX_SHARED_VIDEO_LENGTH = 4;
 
         const selected = signalList.filter((signal: any) => signal.isSelected);
@@ -751,6 +807,15 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
         const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
 
+        if (_signalLayout === 'ONE_LARGE' && _signalVideoLarge) {
+            const idx = urls.indexOf(_signalVideoLarge);
+
+            if (idx !== -1) {
+                urls.splice(idx, 1);
+                urls.unshift(_signalVideoLarge);
+            }
+        }
+
         this._debouncedSwitch(urls);
     }
 
@@ -773,7 +838,18 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {void}
      */
     _callChangeSharedVideos(videoUrls: Array<string>) {
-        APP.store.dispatch(playSharedVideos(videoUrls.join(',')));
+        const { _signalLayout } = this.props;
+
+        const videoUrlMap = {
+            signalLayout: _signalLayout,
+            videoUrls: videoUrls.join(',')
+        };
+
+        const urls = JSON.stringify(videoUrlMap);
+
+        APP.store.dispatch(playSharedVideosDef(urls));
+
+        // APP.store.dispatch(playSharedVideos(videoUrls.join(',')));
     }
 
     /**
@@ -784,7 +860,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
     _renderSignalItem() {
         const { signalList } = this.state;
         const { _isModerator, _switchDisabled } = this.props;
-
 
         return (<div className = 'signal__list'>
             {
@@ -1338,7 +1413,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
     const disableSelfView = getHideSelfView(state);
     const { clientWidth, clientHeight } = state['features/base/responsive-ui'];
     const filmstripDisabled = isFilmstripDisabled(state);
-    const { signalLayout } = state['features/settings'];
+    const { signalLayout, signalVideoLarge } = state['features/settings'];
     const localParticipant = getLocalParticipant(state);
     const _isModerator = Boolean(localParticipant?.role === PARTICIPANT_ROLE.MODERATOR);
 
@@ -1373,7 +1448,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
 
 
     const filterRemoteParticipants = _remoteParticipants.filter((participant: any) =>
-        typeof participant !== 'string' || (!participant.startsWith('http://') && !participant.startsWith('https://')));
+        typeof participant !== 'string' || !(participant.startsWith('{') && participant.startsWith('}')));
 
     // TODO
 
@@ -1400,11 +1475,16 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _verticalFilmstripWidth: verticalFilmstripWidth.current,
         _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
         _videosClassName: videosClassName,
-        _signalLayout: signalLayout || 'FOUR',
-        _isMini: isMini,
+        _signalLayout: signalLayout,
+        _signalVideoLarge: signalVideoLarge,
+        _isMini: isMini || false,
         _isModerator,
         _switchDisabled
     };
 }
 
-export default withStyles(translate(connect(_mapStateToProps)(Filmstrip)), styles);
+const mapDispatchToProps = {
+    onLayoutSelect: setSignalLayout
+};
+
+export default withStyles(translate(connect(_mapStateToProps, mapDispatchToProps)(Filmstrip)), styles);
