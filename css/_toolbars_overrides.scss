@@ -19,7 +19,7 @@
                 column-gap: 10px;
 
                 @media screen and (max-width: 800px) and (max-height: 400px) {
-                    height: 60px;
+                    height: 40px;
                 }
                 .toolbox-button {
                     line-height: unset;
@@ -32,6 +32,17 @@
                     .toolbox-icon {
                         height: 36px;
                         width: 36px;
+                        @media screen and (max-width: 800px) and (max-height: 400px) {
+                            height: 30px;
+                            width: 30px;
+
+                            .jitsi-icon-default {
+                                svg, img {
+                                    width: 20px;
+                                    height: 20px;
+                                }
+                            }
+                        }
                         &:hover {
                             background-color: #2a3d3c;
                         }
