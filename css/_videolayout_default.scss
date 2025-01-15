@@ -237,7 +237,7 @@
 }
 
 #dominantSpeakerAvatarContainer {
-    top: 50px;
+    // top: 50px;
     margin: auto;
     position: relative;
     overflow: hidden;
@@ -253,12 +253,13 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    margin: -100px 0 0 -100px;
+    margin: -150px 0 0 -100px;
     transition: box-shadow 0.3s ease;
 
     @media screen and (max-width: 800px) and (max-height: 400px) {
         top: 100%;
         left: 100%;
+        margin: -100px 0 0 -100px;
     }
 }
 
