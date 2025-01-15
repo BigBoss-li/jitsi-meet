@@ -13,7 +13,7 @@ import { getLocalParticipant } from '../../../base/participants/functions';
 import { isLocalTrackMuted } from '../../../base/tracks/functions';
 import { showWarningNotification } from '../../../notifications/actions';
 import { NOTIFICATION_TIMEOUT_TYPE } from '../../../notifications/constants';
-import { setSignalVideoLargeValue } from '../../../settings/actions.web';
+import { updateSignalVideoOrder } from '../../../settings/actions.web';
 import { dockToolbox } from '../../../toolbox/actions';
 import { muteLocal } from '../../../video-menu/actions.any';
 import { setSharedVideoStatus, stopSharedVideo } from '../../actions.any';
@@ -85,8 +85,6 @@ export interface IProps {
      */
     _setSharedVideoStatus: Function;
 
-    _setSignalVideoLarge: Function;
-
     _signalLayout?: string;
 
     /**
@@ -104,6 +102,8 @@ export interface IProps {
      *
      */
     _time?: number;
+
+    _updateSignalVideoOrder: Function;
 
     /**
      * The video url.
@@ -499,8 +499,8 @@ export function _mapDispatchToProps(dispatch: IStore['dispatch']) {
                 muted
             }));
         },
-        _setSignalVideoLarge: (value: string) => {
-            dispatch(setSignalVideoLargeValue(value));
+        _updateSignalVideoOrder: (urls: Array<string>) => {
+            dispatch(updateSignalVideoOrder(urls));
         }
     };
 }

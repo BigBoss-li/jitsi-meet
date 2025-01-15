@@ -25,8 +25,8 @@ import {
     SET_AUDIO_SETTINGS_VISIBILITY,
     SET_SIGNAL_LAYOUT,
     SET_SIGNAL_SETTINGS_VISIBILITY,
-    SET_SIGNAL_VIDEO_LARGE,
-    SET_VIDEO_SETTINGS_VISIBILITY
+    SET_VIDEO_SETTINGS_VISIBILITY,
+    UPDATE_SIGNAL_VIDEO_ORDER
 } from './actionTypes';
 import LogoutDialog from './components/web/LogoutDialog';
 import SettingsDialog from './components/web/SettingsDialog';
@@ -154,14 +154,14 @@ export function setSignalSettingsLayout(value: string) {
 /**
  * Sets the visibility of the video settings.
  *
- * @param {string} value - The new value.
+ * @param {Array<string>} urls - The new value.
  * @returns {Function}
  */
-export function setSignalVideoLargeValue(value: string) {
+export function updateSignalVideoOrder(urls: Array<string>) {
 
     return {
-        type: SET_SIGNAL_VIDEO_LARGE,
-        value
+        type: UPDATE_SIGNAL_VIDEO_ORDER,
+        value: urls
     };
 }
 
@@ -346,20 +346,6 @@ export function setSignalLayout(layout: string) {
     return (dispatch: IStore['dispatch']) => {
 
         dispatch(setSignalSettingsLayout(layout));
-    };
-}
-
-/**
- * Toggles the visibility of the video settings.
- *
- * @param {string} value - The new settings.
- * @returns {void}
- */
-export function setSignalVideoLarge(value: string) {
-
-    return (dispatch: IStore['dispatch']) => {
-
-        dispatch(setSignalVideoLargeValue(value));
     };
 }
 

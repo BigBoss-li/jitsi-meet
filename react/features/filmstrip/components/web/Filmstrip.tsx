@@ -106,6 +106,7 @@ const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (<Tab
 interface IFilmstripSignalSwitchProps {
     checked: boolean;
     disabled: boolean;
+    inputProps: any;
     onChange: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void;
 }
 
@@ -224,6 +225,8 @@ interface IProps extends WithTranslation {
      */
     _maxTopPanelHeight: number;
 
+    _orderedSignalUrls?: Array<string>;
+
     /**
      * The participants in the call.
      */
@@ -245,8 +248,6 @@ interface IProps extends WithTranslation {
     _rows: number;
 
     _signalLayout?: string;
-
-    _signalVideoLarge?: string;
 
     /**
      * Is the video shared by the local user.
@@ -442,40 +443,20 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @inheritdoc
      */
     componentDidUpdate(prevProps: IProps) {
-        if (this.props._signalVideoLarge !== undefined
-            && prevProps._signalVideoLarge !== this.props._signalVideoLarge) {
-
-            const { _signalVideoLarge } = this.props;
-            const { signalList } = this.state;
-
-            const urls = signalList.filter(item => item.isSelected).map(item => item.url);
-
-            if (_signalVideoLarge) {
-                const idx = urls.indexOf(_signalVideoLarge);
-
-                if (idx !== -1) {
-                    urls.splice(idx, 1);
-                    urls.unshift(_signalVideoLarge);
-                }
-            }
-
-            this._debouncedSwitch(urls);
+        if (this.props._orderedSignalUrls !== undefined
+            && this.props._orderedSignalUrls !== prevProps._orderedSignalUrls) {
+            this._debouncedSwitch(this.props._orderedSignalUrls);
         }
 
         if (this.props._signalLayout !== undefined && this.props._signalLayout !== prevProps._signalLayout) {
-            const { _signalVideoLarge } = this.props;
 
             const { signalList } = this.state;
+            const { _orderedSignalUrls } = this.props;
 
             const urls = signalList.filter(item => item.isSelected).map(item => item.url);
 
-            if (_signalVideoLarge) {
-                const idx = urls.indexOf(_signalVideoLarge);
-
-                if (idx !== -1) {
-                    urls.splice(idx, 1);
-                    urls.unshift(_signalVideoLarge);
-                }
+            if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
+                urls.sort((a, b) => _orderedSignalUrls.indexOf(a) - _orderedSignalUrls.indexOf(b));
             }
 
             this._debouncedSwitch(urls);
@@ -771,14 +752,14 @@ class Filmstrip extends PureComponent<IProps, IState> {
     /**
      * Switch change.
      *
-     * @param {React.ChangeEvent} e - React event.
+     * @param {React.ChangeEvent<HTMLDivElement>} e - React event.
      * @param {boolean} value - The new value.
-     * @param {number} id - The signal id.
      * @returns {void}
      */
-    async _onSwitchChange(e: React.ChangeEvent, value: boolean, id: string) {
+    async _onSwitchChange(e: React.ChangeEvent<HTMLDivElement>, value: boolean) {
+        const id = e.target?.dataset.id;
         const { signalList } = this.state;
-        const { _signalLayout, _signalVideoLarge } = this.props;
+        const { _orderedSignalUrls } = this.props;
         const MAX_SHARED_VIDEO_LENGTH = 4;
 
         const selected = signalList.filter((signal: any) => signal.isSelected);
@@ -807,12 +788,13 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
         const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
 
-        if (_signalLayout === 'ONE_LARGE' && _signalVideoLarge) {
-            const idx = urls.indexOf(_signalVideoLarge);
+        if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
+            urls.sort((a, b) => _orderedSignalUrls.indexOf(a) - _orderedSignalUrls.indexOf(b));
+        }
 
-            if (idx !== -1) {
-                urls.splice(idx, 1);
-                urls.unshift(_signalVideoLarge);
+        if (urls.length > 0 && urls.length < 4) {
+            for (let i = urls.length; i < 4; i++) {
+                urls.push('#');
             }
         }
 
@@ -878,9 +860,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
                                 _isModerator && <SignalSwitch
                                     checked = { signal.isSelected }
                                     disabled = { _switchDisabled || false }
-                                    // eslint-disable-next-line react/jsx-no-bind
-                                    onChange = { (e: React.ChangeEvent, value: boolean) =>
-                                        this._onSwitchChange(e, value, signal.id) } />
+                                    inputProps = {{ 'data-id': signal.id }}
+                                    onChange = { this._onSwitchChange } />
                             }
 
                         </div>
@@ -1413,7 +1394,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
     const disableSelfView = getHideSelfView(state);
     const { clientWidth, clientHeight } = state['features/base/responsive-ui'];
     const filmstripDisabled = isFilmstripDisabled(state);
-    const { signalLayout, signalVideoLarge } = state['features/settings'];
+    const { signalLayout, orderedSignalUrls } = state['features/settings'];
     const localParticipant = getLocalParticipant(state);
     const _isModerator = Boolean(localParticipant?.role === PARTICIPANT_ROLE.MODERATOR);
 
@@ -1476,7 +1457,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
         _videosClassName: videosClassName,
         _signalLayout: signalLayout,
-        _signalVideoLarge: signalVideoLarge,
+        _orderedSignalUrls: orderedSignalUrls,
         _isMini: isMini || false,
         _isModerator,
         _switchDisabled

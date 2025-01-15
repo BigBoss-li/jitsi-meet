@@ -66,10 +66,10 @@ export interface ISettingsState {
     localFlipX?: boolean;
     maxStageParticipants?: number;
     micDeviceId?: string | boolean;
+    orderedSignalUrls?: string[];
     serverURL?: string;
     signalLayout?: string;
     signalSettingsVisible?: boolean;
-    signalVideoLarge?: string;
     soundsIncomingMessage?: boolean;
     soundsParticipantJoined?: boolean;
     soundsParticipantKnocking?: boolean;

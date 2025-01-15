@@ -13,6 +13,10 @@
         height: 100%;
         display: flex;
         flex-wrap: wrap;
+        
+        .react-player-box {
+            cursor: grab;
+        }
 
         .box-no-signal {
             position: relative;
@@ -26,6 +30,10 @@
 
                 opacity: 0.5;
             }
+        }
+
+        .drag-over {
+            opacity: 0.5;
         }
 
         &-ONE {
@@ -90,6 +98,20 @@
             .shared-video__large {
                 width: 75%;
                 height: 100%;
+                position: relative;
+
+                .box-no-signal {
+                    position: absolute;
+                    width: 100%;
+                    text-align: center;
+                    top: 50%;
+                    transform: translateY(-50%);
+        
+                    .no-signal {
+        
+                        opacity: 0.5;
+                    }
+                }
 
                 video {
                     object-position: right;
