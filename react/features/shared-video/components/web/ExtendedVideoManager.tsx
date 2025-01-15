@@ -271,7 +271,6 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         dragImage.style.display = 'flex';
         dragImage.style.justifyContent = 'center';
         dragImage.style.alignItems = 'center';
-        dragImage.style.borderRadius = '8px';
         dragImage.style.fontSize = '12px';
         dragImage.style.pointerEvents = 'none';
         dragImage.style.cursor = 'grabbing';
