@@ -137,6 +137,52 @@
                 }
             }
         }
+
+        &-ONE_LARGE_TWO {
+            flex-direction: column;
+
+            .shared-video__large {
+                width: 66.66%;
+                height: 100%;
+                position: relative;
+
+                .box-no-signal {
+                    position: absolute;
+                    width: 100%;
+                    text-align: center;
+                    top: 50%;
+                    transform: translateY(-50%);
+        
+                    .no-signal {
+        
+                        opacity: 0.5;
+                    }
+                }
+
+                video {
+                    object-position: right;
+                }
+            }
+
+            .shared-video__small {
+                width: 33.33%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+
+                .react-player-box {
+                    width: 100%;
+                    padding-bottom: calc(100% * 9 / 16);
+                    position: relative;
+
+                    > div {
+                        position: absolute;
+                        left: 0;
+                    }
+                }
+            }
+        }
     }
 
     .shared-video__horizontal {

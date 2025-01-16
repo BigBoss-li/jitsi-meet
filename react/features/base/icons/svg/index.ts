@@ -115,7 +115,8 @@ const {
     IconOneCol,
     IconTwoCol,
     IconFourCol,
-    IconOneLargeCol
+    IconOneLargeCol,
+    IconOneLargeThreeCol
 } = Object.keys(DEFAULT_ICON).reduce((exportedIcons: Record<string, any>, key) => {
     return {
         ...exportedIcons,
@@ -239,5 +240,6 @@ export {
     IconOneCol,
     IconTwoCol,
     IconFourCol,
-    IconOneLargeCol
+    IconOneLargeCol,
+    IconOneLargeThreeCol
 };

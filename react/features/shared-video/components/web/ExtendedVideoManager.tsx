@@ -387,11 +387,13 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                 maxSignals = 1;
             } else if (signalLayout === 'TWO') {
                 maxSignals = 2;
+            } else if (signalLayout === 'ONE_LARGE_TWO') {
+                maxSignals = 3;
             } else {
                 maxSignals = 4;
             }
 
-            if (signalLayout === 'ONE_LARGE') {
+            if (signalLayout === 'ONE_LARGE_TWO' || signalLayout === 'ONE_LARGE') {
                 const smallItems = [];
                 const largeUrl = videoUrls[0];
 
