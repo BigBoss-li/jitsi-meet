@@ -1,5 +1,5 @@
-jitsi-meet-web (1.0.9999-cssw) unstable; urgency=low
+jitsi-meet-web (1.0.8187-1) unstable; urgency=low
 
-  * Initial release. (Closes: #760485)
+  * CSSW hacked. (Closes: #760485)
 
- -- Damian Minkov <damencho@jitsi.org>  Wed, 22 Oct 2014 10:30:00 +0200
+ -- trueorfalse.yuan<trueorfalse.yuan@gmail.com>  Jan, 1 Oct 2025 00:00:00 +0800
