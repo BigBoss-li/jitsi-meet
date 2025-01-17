@@ -516,15 +516,24 @@ export default class LargeVideoManager {
      * Updates the src of the dominant speaker avatar
      */
     updateAvatar() {
-        ReactDOM.render(
-            <Provider store = { APP.store }>
-                <Avatar
-                    id = "dominantSpeakerAvatar"
-                    participantId = { this.id }
-                    size = { 200 } />
-            </Provider>,
-            this._dominantSpeakerAvatarContainer
-        );
+        if (this.id.startsWith('{') && this.id.endsWith('}') && typeof JSON.parse(this.id) === 'object') {
+            ReactDOM.render(
+                <div className = 'signal-loading'></div>,
+                this._dominantSpeakerAvatarContainer
+            );
+
+        } else {
+            ReactDOM.render(
+                <Provider store = { APP.store }>
+                    <Avatar
+                        id = "dominantSpeakerAvatar"
+                        participantId = { this.id }
+                        size = { 200 } />
+                </Provider>,
+                this._dominantSpeakerAvatarContainer
+            );
+        }
+
     }
 
     /**

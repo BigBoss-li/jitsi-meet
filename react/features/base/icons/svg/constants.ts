@@ -65,6 +65,7 @@ import { default as IconNoiseSuppressionOn } from './noise-suppression-on.svg';
 import { default as IconOffice365 } from './office365.svg';
 import { default as IconOneCol } from './one-col.svg';
 import { default as IconOneLargeCol } from './one-large-col.svg';
+import { default as IconOneLargeThreeCol } from './one-large-three.svg';
 import { default as IconRecordOpportunity } from './opportunity-record.svg';
 import { default as IconPerformance } from './performance.svg';
 import { default as IconPhoneRinging } from './phone-ringing.svg';
@@ -228,5 +229,6 @@ export const DEFAULT_ICON: Record<string, any> = {
     IconOneCol,
     IconTwoCol,
     IconFourCol,
-    IconOneLargeCol
+    IconOneLargeCol,
+    IconOneLargeThreeCol
 };

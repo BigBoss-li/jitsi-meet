@@ -178,6 +178,48 @@ export function playSharedVideos(videoUrl: string) {
 
 /**
  *
+ * Plays a shared video.
+ *
+ * @param {string} sharedParams - The video url to be played.
+ *
+ * @returns {Function}
+ */
+export function playSharedVideosDef(sharedParams: string) {
+    return (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
+        const state = getState();
+        const { ownerId } = state['features/shared-video'];
+        const localParticipant = getLocalParticipant(state);
+
+        if (ownerId === localParticipant?.id) {
+            sendAnalytics(createApiEvent('share.video.stop'));
+            dispatch(resetSharedVideoStatus());
+        }
+
+        if (!isSharedVideoEnabled(getState())) {
+            return;
+        }
+        const conference = getCurrentConference(getState());
+
+        const sharedParamsJSON = JSON.parse(sharedParams);
+        const { videoUrls } = sharedParamsJSON;
+
+        if (conference && videoUrls && videoUrls !== '') {
+
+            // we will send the command and will create local video fake participant
+            // and start playing once we receive ourselves the command
+            sendShareVideoCommand({
+                conference,
+                id: sharedParams,
+                localParticipantId: localParticipant?.id,
+                status: PLAYBACK_START,
+                time: 0
+            });
+        }
+    };
+}
+
+/**
+ *
  * Stops playing a shared video.
  *
  * @returns {Function}

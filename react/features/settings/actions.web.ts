@@ -25,7 +25,8 @@ import {
     SET_AUDIO_SETTINGS_VISIBILITY,
     SET_SIGNAL_LAYOUT,
     SET_SIGNAL_SETTINGS_VISIBILITY,
-    SET_VIDEO_SETTINGS_VISIBILITY
+    SET_VIDEO_SETTINGS_VISIBILITY,
+    UPDATE_SIGNAL_VIDEO_ORDER
 } from './actionTypes';
 import LogoutDialog from './components/web/LogoutDialog';
 import SettingsDialog from './components/web/SettingsDialog';
@@ -142,11 +143,25 @@ function setSignalSettingsVisibility(value: boolean) {
  * @param {string} value - The new value.
  * @returns {Function}
  */
-function setSignalSettingsLayout(value: string) {
+export function setSignalSettingsLayout(value: string) {
 
     return {
         type: SET_SIGNAL_LAYOUT,
         value
+    };
+}
+
+/**
+ * Sets the visibility of the video settings.
+ *
+ * @param {Array<string>} urls - The new value.
+ * @returns {Function}
+ */
+export function updateSignalVideoOrder(urls: Array<string>) {
+
+    return {
+        type: UPDATE_SIGNAL_VIDEO_ORDER,
+        value: urls
     };
 }
 

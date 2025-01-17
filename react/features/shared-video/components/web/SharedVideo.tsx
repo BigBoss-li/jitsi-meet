@@ -15,6 +15,8 @@ import YoutubeVideoManager from './YoutubeVideoManager';
 
 interface IProps {
 
+    _signalLayout?: string;
+
     /**
      * The available client width.
      */
@@ -106,9 +108,27 @@ class SharedVideo extends Component<IProps> {
      */
     getManager() {
 
-        const { videoUrl } = this.props;
+        const { videoUrl: videoParams, _signalLayout } = this.props;
 
-        if (!videoUrl) {
+        // const { videoUrl } = this.props;
+
+        if (videoParams === undefined) {
+            return null;
+        }
+
+        let videoUrl;
+        let _signalLayouts = _signalLayout;
+
+        if (videoParams !== undefined) {
+            const videoUrlMap = JSON.parse(videoParams);
+            const { signalLayout, videoUrls: url } = videoUrlMap;
+
+            videoUrl = url;
+            _signalLayouts = signalLayout;
+        }
+
+
+        if (!videoUrl || videoUrl === '') {
             return null;
         }
 
@@ -118,6 +138,7 @@ class SharedVideo extends Component<IProps> {
         if (videoUrls.length > 0) {
             return (
                 <ExtendedVideoManager
+                    _signalLayout = { _signalLayouts }
                     videoId = { videoUrl } />)
             ;
         }
@@ -179,6 +200,7 @@ function _mapStateToProps(state: IReduxState) {
     const { ownerId, videoUrl } = state['features/shared-video'];
     const { clientHeight, clientWidth } = state['features/base/responsive-ui'];
     const { visible, isResizing } = state['features/filmstrip'];
+    const { signalLayout } = state['features/settings'];
 
     const localParticipant = getLocalParticipant(state);
 
@@ -190,7 +212,8 @@ function _mapStateToProps(state: IReduxState) {
         isEnabled: isSharedVideoEnabled(state),
         isOwner: ownerId === localParticipant?.id,
         isResizing,
-        videoUrl
+        videoUrl,
+        _signalLayout: signalLayout
     };
 }
 

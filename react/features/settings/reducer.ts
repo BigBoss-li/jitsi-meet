@@ -4,7 +4,8 @@ import {
     SET_AUDIO_SETTINGS_VISIBILITY,
     SET_SIGNAL_LAYOUT,
     SET_SIGNAL_SETTINGS_VISIBILITY,
-    SET_VIDEO_SETTINGS_VISIBILITY
+    SET_VIDEO_SETTINGS_VISIBILITY,
+    UPDATE_SIGNAL_VIDEO_ORDER
 } from './actionTypes';
 
 export interface ISettingsState {
@@ -36,6 +37,11 @@ ReducerRegistry.register('features/settings', (state: ISettingsState = {}, actio
         return {
             ...state,
             signalLayout: action.value
+        };
+    case UPDATE_SIGNAL_VIDEO_ORDER:
+        return {
+            ...state,
+            orderedSignalUrls: action.value
         };
     }
 

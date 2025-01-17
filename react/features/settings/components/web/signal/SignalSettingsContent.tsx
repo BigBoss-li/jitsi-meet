@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
 import { IReduxState } from '../../../../app/types';
-import { IconFourCol, IconOneCol, IconOneLargeCol, IconTwoCol } from '../../../../base/icons/svg';
+import { IconFourCol, IconOneCol, IconOneLargeCol, IconOneLargeThreeCol, IconTwoCol } from '../../../../base/icons/svg';
 import ContextMenu from '../../../../base/ui/components/web/ContextMenu';
 import ContextMenuItemGroup from '../../../../base/ui/components/web/ContextMenuItemGroup';
 
@@ -122,8 +122,13 @@ const SignalSettingsContent = ({
             label: '四分屏'
         },
         {
-            key: 'ONE_LARGE',
+            key: 'ONE_LARGE_TWO',
             icon: <IconOneLargeCol />,
+            label: '一拖二屏'
+        },
+        {
+            key: 'ONE_LARGE',
+            icon: <IconOneLargeThreeCol />,
             label: '一拖三屏'
         }
     ];
