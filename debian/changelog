@@ -1,4 +1,4 @@
-jitsi-meet-web (1.0.8187-1) unstable; urgency=low
+jitsi-meet-web (1.0.8187-1-CSSW) unstable; urgency=low
 
   * CSSW hacked. (Closes: #760485)
 
