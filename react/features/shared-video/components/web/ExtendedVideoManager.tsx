@@ -224,31 +224,6 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     };
 
     /**
-     * Render video players.
-     *
-     * @param { Array<string> } videoUrls - Video urls.
-     * @param {number} playerRefStartIdx - PlayerRef start idx.
-     * @returns {React.DOMElement}
-     */
-    renderVideoPlayers(videoUrls: Array<string>, playerRefStartIdx = 0) {
-        return videoUrls.map((url: string, idx: number) => (
-            <div
-                className = 'shared-video'
-                key = { idx }>
-                <ReactPlayer
-                    // eslint-disable-next-line react/jsx-no-bind
-                    ref = { refItem => {
-                        // eslint-disable-next-line react/jsx-no-bind
-                        if (!this.reactPlayersRef[idx + playerRefStartIdx]) {
-                            this.reactPlayersRef[idx + playerRefStartIdx] = refItem;
-                        }
-                    } }
-                    { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
-            </div>
-        ));
-    }
-
-    /**
      * 视频放大点击事件.
      *
      * @param {React.DragEvent<HTMLDivElement>} e - 拖动event.
@@ -320,16 +295,16 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         const { videoId } = this.props;
 
         if (videoId !== undefined) {
-            const videoUrls = videoId?.split(',');
+            const signalList = JSON.parse(videoId);
 
-            const fromUrl = videoUrls[from];
-            const toUrl = videoUrls[to];
+            const fromUrl = signalList[from];
+            const toUrl = signalList[to];
 
-            videoUrls[from] = toUrl;
-            videoUrls[to] = fromUrl;
+            signalList[from] = toUrl;
+            signalList[to] = fromUrl;
 
             if (this.props._isOwner) {
-                this.props._updateSignalVideoOrder(videoUrls);
+                this.props._updateSignalVideoOrder(signalList);
             }
         }
 
@@ -353,6 +328,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     render() {
         const { videoId, _signalLayout } = this.props;
 
+        console.log('-3-3-3--3-3-3-3-3-3-3-3-3-3-3', videoId, _signalLayout);
+
         if (this.reactPlayersRef && this.reactPlayersRef.length > 0) {
             this.reactPlayersRef.forEach(ref => {
                 if (ref !== null) {
@@ -361,24 +338,21 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
             });
         }
 
-        const videoUrls = videoId?.split(',');
-
+        const signalList = JSON.parse(videoId);
         let ele2;
 
-        if (videoUrls && videoUrls?.length > 0) {
-            this.reactPlayersRef = new Array(videoUrls.length);
+        if (signalList && signalList?.length > 0) {
+            this.reactPlayersRef = new Array(signalList.length);
 
             let maxSignals = -1;
-
             let signalLayout = _signalLayout;
-            const filterEmpty = videoUrls.filter(url => url !== '#');
 
             if (!signalLayout) {
-                if (filterEmpty.length === 1) {
+                if (signalList.length === 1) {
                     signalLayout = 'ONE';
-                } else if (filterEmpty.length === 2) {
+                } else if (signalList.length === 2) {
                     signalLayout = 'TWO';
-                } else if (filterEmpty.length === 3 || filterEmpty.length === 4) {
+                } else if (signalList.length === 3 || signalList.length === 4) {
                     signalLayout = 'FOUR';
                 }
             }
@@ -395,13 +369,14 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
             if (signalLayout === 'ONE_LARGE_TWO' || signalLayout === 'ONE_LARGE') {
                 const smallItems = [];
-                const largeUrl = videoUrls[0];
+                const largeUrl = signalList[0].url;
 
                 for (let i = 1; i < maxSignals; i++) {
-                    const url = videoUrls[i];
+                    const signal = signalList[i];
 
-                    if (url && url !== '#') {
+                    if (signal) {
                         let videoPlayer;
+                        const url = signalList[i].url;
 
                         if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
                             videoPlayer = (
@@ -501,10 +476,12 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                 const listItems = [];
 
                 for (let i = 0; i < maxSignals; i++) {
-                    const url = videoUrls[i];
 
-                    if (url && url !== '#') {
+                    const signal = signalList[i];
+
+                    if (signal) {
                         let videoPlayer;
+                        const url = signalList[i].url;
 
                         if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
                             videoPlayer = (

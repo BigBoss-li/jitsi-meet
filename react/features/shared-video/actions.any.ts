@@ -201,9 +201,9 @@ export function playSharedVideosDef(sharedParams: string) {
         const conference = getCurrentConference(getState());
 
         const sharedParamsJSON = JSON.parse(sharedParams);
-        const { videoUrls } = sharedParamsJSON;
+        const { signals } = sharedParamsJSON;
 
-        if (conference && videoUrls && videoUrls !== '') {
+        if (conference && signals && signals.length > 0) {
 
             // we will send the command and will create local video fake participant
             // and start playing once we receive ourselves the command

@@ -10,8 +10,9 @@ import { getToolboxHeight } from '../../../toolbox/functions.web';
 import { isSharedVideoEnabled } from '../../functions';
 
 import ExtendedVideoManager from './ExtendedVideoManager';
-import VideoManager from './VideoManager';
-import YoutubeVideoManager from './YoutubeVideoManager';
+
+// import VideoManager from './VideoManager';
+// import YoutubeVideoManager from './YoutubeVideoManager';
 
 interface IProps {
 
@@ -108,56 +109,51 @@ class SharedVideo extends Component<IProps> {
      */
     getManager() {
 
-        const { videoUrl: videoParams, _signalLayout } = this.props;
+        const { videoUrl: signalParams, _signalLayout: layout } = this.props;
 
-        // const { videoUrl } = this.props;
+        console.log('SharedVideo getManager', signalParams);
 
-        if (videoParams === undefined) {
+        if (signalParams === undefined) {
             return null;
         }
 
         let videoUrl;
-        let _signalLayouts = _signalLayout;
+        let _signalLayout = layout;
 
-        if (videoParams !== undefined) {
-            const videoUrlMap = JSON.parse(videoParams);
-            const { signalLayout, videoUrls: url } = videoUrlMap;
+        if (signalParams !== undefined) {
+            const signalObj = JSON.parse(signalParams);
+            const { signalLayout, signals } = signalObj;
 
-            videoUrl = url;
-            _signalLayouts = signalLayout;
+            videoUrl = JSON.stringify(signals);
+            _signalLayout = signalLayout;
         }
 
-
+        console.log('**************************', videoUrl);
         if (!videoUrl || videoUrl === '') {
             return null;
         }
 
-        const videoUrls = videoUrl.split(',');
+        return (
+            <ExtendedVideoManager
+                _signalLayout = { _signalLayout }
+                videoId = { videoUrl } />)
+        ;
 
-        // if (videoUrls.length > 1) {
-        if (videoUrls.length > 0) {
-            return (
-                <ExtendedVideoManager
-                    _signalLayout = { _signalLayouts }
-                    videoId = { videoUrl } />)
-            ;
-        }
+        // if (videoUrl.match(/http/)) {
+        //     const vUrl = new URL(videoUrl);
 
-        if (videoUrl.match(/http/)) {
-            const vUrl = new URL(videoUrl);
+        //     if (vUrl.pathname.endsWith('.flv') || vUrl.pathname.endsWith('.m3u8')) {
+        //         return (
+        //             <ExtendedVideoManager
+        //                 videoId = { videoUrl } />
+        //         );
+        //     }
 
-            if (vUrl.pathname.endsWith('.flv') || vUrl.pathname.endsWith('.m3u8')) {
-                return (
-                    <ExtendedVideoManager
-                        videoId = { videoUrl } />
-                );
-            }
+        //     return <VideoManager videoId = { videoUrl } />;
 
-            return <VideoManager videoId = { videoUrl } />;
+        // }
 
-        }
-
-        return <YoutubeVideoManager videoId = { videoUrl } />;
+        // return <YoutubeVideoManager videoId = { videoUrl } />;
     }
 
     /**

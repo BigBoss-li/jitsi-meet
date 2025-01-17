@@ -137,6 +137,42 @@ const SignalSwitch = styled((props: IFilmstripSignalSwitchProps) => <Switch { ..
 });
 
 /**
+ * Signal props.
+ */
+interface ISignalProps {
+
+    /**
+     * 信号源id.
+     */
+    id: string;
+
+    /**
+     * 信号源ip.
+     */
+    ip: string;
+
+    /**
+     * 是否选中.
+     */
+    isSelected: boolean;
+
+    /**
+     * 信号源名称.
+     */
+    name: string;
+
+    /**
+     * 信号源类型.
+     */
+    type: string;
+
+    /**
+     * 信号源url.
+     */
+    url: string;
+}
+
+/**
  * The type of the React {@code Component} props of {@link Filmstrip}.
  */
 interface IProps extends WithTranslation {
@@ -360,14 +396,7 @@ interface IState {
      */
     mousePosition?: number | null;
 
-    signalList: Array<{
-        id: string;
-        ip: string;
-        isSelected: boolean;
-        name: string;
-        type: string;
-        url: string;
-      }>;
+    signalList: Array<ISignalProps>;
 
     titleTabIndex: number;
 
@@ -422,6 +451,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
         this._renderInformationItem = this._renderInformationItem.bind(this);
         this._onMessageListener = this._onMessageListener.bind(this);
         this._callChangeSharedVideos = this._callChangeSharedVideos.bind(this);
+        this._callChangeSharedSignals = this._callChangeSharedSignals.bind(this);
         this._onFileChange = this._onFileChange.bind(this);
         this._onButtonClick = this._onButtonClick.bind(this);
         window.addEventListener('message', this._onMessageListener, false);
@@ -435,6 +465,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
             leading: true,
             trailing: true
         });
+
+        this._debouncedSignalSwitch = debounce(this._callChangeSharedSignals, 1500, {
+            leading: true,
+            trailing: true
+        });
     }
 
     /**
@@ -445,21 +480,30 @@ class Filmstrip extends PureComponent<IProps, IState> {
     componentDidUpdate(prevProps: IProps) {
         if (this.props._orderedSignalUrls !== undefined
             && this.props._orderedSignalUrls !== prevProps._orderedSignalUrls) {
-            this._debouncedSwitch(this.props._orderedSignalUrls);
+            this._debouncedSignalSwitch(this.props._orderedSignalUrls);
         }
 
         if (this.props._signalLayout !== undefined && this.props._signalLayout !== prevProps._signalLayout) {
-
             const { signalList } = this.state;
             const { _orderedSignalUrls } = this.props;
 
-            const urls = signalList.filter(item => item.isSelected).map(item => item.url);
+            console.log('SharedVideo componentDidUpdate', this.props._signalLayout, _orderedSignalUrls);
 
+
+            const dispatchSignalList = signalList.filter((item: ISignalProps) => item.isSelected);
+
+            console.log('=====================start');
             if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
-                urls.sort((a, b) => _orderedSignalUrls.indexOf(a) - _orderedSignalUrls.indexOf(b));
+                const orderedSignalUrls = _orderedSignalUrls.map((url: string) => url);
+
+                // TODO: 信号源排序
+                dispatchSignalList.sort((a, b) =>
+                    orderedSignalUrls.indexOf(a.url) - orderedSignalUrls.indexOf(b.url));
             }
 
-            this._debouncedSwitch(urls);
+            console.log('=====================end', dispatchSignalList);
+
+            this._debouncedSignalSwitch(dispatchSignalList);
 
         }
     }
@@ -786,19 +830,27 @@ class Filmstrip extends PureComponent<IProps, IState> {
             signalList: newSignalList
         });
 
-        const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
+        const dispatchSignalList = newSignalList.filter((item: ISignalProps) => item.isSelected);
 
         if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
-            urls.sort((a, b) => _orderedSignalUrls.indexOf(a) - _orderedSignalUrls.indexOf(b));
+            dispatchSignalList.sort((a, b) => _orderedSignalUrls.indexOf(a.url) - _orderedSignalUrls.indexOf(b.url));
         }
 
-        if (urls.length > 0 && urls.length < 4) {
-            for (let i = urls.length; i < 4; i++) {
-                urls.push('#');
-            }
-        }
+        this._debouncedSignalSwitch(dispatchSignalList);
 
-        this._debouncedSwitch(urls);
+        // const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
+
+        // if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
+        //     urls.sort((a, b) => _orderedSignalUrls.indexOf(a) - _orderedSignalUrls.indexOf(b));
+        // }
+
+        // if (urls.length > 0 && urls.length < 4) {
+        //     for (let i = urls.length; i < 4; i++) {
+        //         urls.push('#');
+        //     }
+        // }
+
+        // this._debouncedSwitch(urls);
     }
 
     /**
@@ -811,6 +863,26 @@ class Filmstrip extends PureComponent<IProps, IState> {
         window.open(url, '_blank',
             `channelmode=yes,directories=no,
             location=no,toolbar=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no`);
+    }
+
+    /**
+     * 分享视频源.
+     *
+     * @param {Array<ISignalProps>} signals - 要分享的信号源.
+     * @returns {void}
+     */
+    _callChangeSharedSignals(signals: Array<ISignalProps>) {
+        const { _signalLayout } = this.props;
+
+        const signalMap = {
+            signalLayout: _signalLayout,
+            signals
+        };
+
+        console.log('SharedVideo _callChangeSharedSignals', signalMap);
+
+        APP.store.dispatch(playSharedVideosDef(JSON.stringify(signalMap)));
+
     }
 
     /**
@@ -845,7 +917,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
 
         return (<div className = 'signal__list'>
             {
-                signalList.map((signal: any) => (
+                signalList.map((signal: ISignalProps) => (
                     <div
                         className = 'signal-wrapper'
                         key = { signal.id }>
@@ -938,10 +1010,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
             this.setState({
                 signalList: newSignalList
             });
-
-            const urls = newSignalList.filter((item: any) => item.isSelected).map((item: any) => item.url);
-
-            this._debouncedSwitch(urls);
         } else if (type === 'information_list') {
             this.setState({
                 informationList: data
