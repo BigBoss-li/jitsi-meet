@@ -411,6 +411,7 @@ interface IState {
 class Filmstrip extends PureComponent<IProps, IState> {
     _throttledResize: Function;
     _debouncedSwitch: Function;
+    _debouncedSignalSwitch: Function;
     fileInputRef: React.RefObject<HTMLInputElement>;
 
     /**

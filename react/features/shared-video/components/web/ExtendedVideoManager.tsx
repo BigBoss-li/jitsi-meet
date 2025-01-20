@@ -328,8 +328,6 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     render() {
         const { videoId, _signalLayout } = this.props;
 
-        console.log('-3-3-3--3-3-3-3-3-3-3-3-3-3-3', videoId, _signalLayout);
-
         if (this.reactPlayersRef && this.reactPlayersRef.length > 0) {
             this.reactPlayersRef.forEach(ref => {
                 if (ref !== null) {
@@ -338,204 +336,208 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
             });
         }
 
-        const signalList = JSON.parse(videoId);
         let ele2;
 
-        if (signalList && signalList?.length > 0) {
-            this.reactPlayersRef = new Array(signalList.length);
+        if (videoId) {
+            const signalList = JSON.parse(videoId);
 
-            let maxSignals = -1;
-            let signalLayout = _signalLayout;
+            if (signalList && signalList?.length > 0) {
+                this.reactPlayersRef = new Array(signalList.length);
 
-            if (!signalLayout) {
-                if (signalList.length === 1) {
-                    signalLayout = 'ONE';
-                } else if (signalList.length === 2) {
-                    signalLayout = 'TWO';
-                } else if (signalList.length === 3 || signalList.length === 4) {
-                    signalLayout = 'FOUR';
-                }
-            }
+                let maxSignals = -1;
+                let signalLayout = _signalLayout;
 
-            if (signalLayout === 'ONE') {
-                maxSignals = 1;
-            } else if (signalLayout === 'TWO') {
-                maxSignals = 2;
-            } else if (signalLayout === 'ONE_LARGE_TWO') {
-                maxSignals = 3;
-            } else {
-                maxSignals = 4;
-            }
-
-            if (signalLayout === 'ONE_LARGE_TWO' || signalLayout === 'ONE_LARGE') {
-                const smallItems = [];
-                const largeUrl = signalList[0].url;
-
-                for (let i = 1; i < maxSignals; i++) {
-                    const signal = signalList[i];
-
-                    if (signal) {
-                        let videoPlayer;
-                        const url = signalList[i].url;
-
-                        if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
-                            videoPlayer = (
-                                <ReactPlayer
-                                    // eslint-disable-next-line react/jsx-no-bind
-                                    ref = { refItem => {
-                                        // eslint-disable-next-line react/jsx-no-bind
-                                        if (!this.reactPlayersRef[i]) {
-                                            this.reactPlayersRef[i] = refItem;
-                                        }
-                                    } }
-                                    { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
-                            );
-                        } else {
-                            videoPlayer = <WebRTCPlayer videoUrl = { url } />;
-                        }
-                        smallItems.push(
-                            <div
-                                className = { 'react-player-box' }
-                                data-idx = { i }
-                                draggable = { true }
-                                key = { i }
-                                onDragEnter = { this._onDragEnter }
-                                onDragLeave = { this._onDragLeave }
-                                // eslint-disable-next-line react/jsx-no-bind
-                                onDragOver = { e => e.preventDefault() }
-                                onDragStart = { this._onDragStart }
-                                onDrop = { this._onDrop }>
-                                {videoPlayer}
-                            </div>
-                        );
-                    } else {
-                        smallItems.push(
-                            <div
-                                className = { 'react-player-box box-no-signal' }
-                                data-idx = { i }
-                                draggable = { true }
-                                key = { i }
-                                onDragEnter = { this._onDragEnter }
-                                onDragLeave = { this._onDragLeave }
-                                // eslint-disable-next-line react/jsx-no-bind
-                                onDragOver = { e => e.preventDefault() }
-                                onDragStart = { this._onDragStart }
-                                onDrop = { this._onDrop }>
-                                <div className = { 'no-signal' }>暂无信号</div>
-                            </div>
-                        );
+                if (!signalLayout) {
+                    if (signalList.length === 1) {
+                        signalLayout = 'ONE';
+                    } else if (signalList.length === 2) {
+                        signalLayout = 'TWO';
+                    } else if (signalList.length === 3 || signalList.length === 4) {
+                        signalLayout = 'FOUR';
                     }
                 }
 
-                let videoPlayer2;
-
-                if (largeUrl && largeUrl !== '#' && largeUrl !== '') {
-                    if (largeUrl.endsWith('.flv') || largeUrl.endsWith('.m3u8')) {
-                        videoPlayer2 = (
-                            <ReactPlayer
-                                // eslint-disable-next-line react/jsx-no-bind
-                                ref = { refItem => {
-                                    // eslint-disable-next-line react/jsx-no-bind
-                                    if (!this.reactPlayersRef[0]) {
-                                        this.reactPlayersRef[0] = refItem;
-                                    }
-                                } }
-                                { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />
-                        );
-                    } else {
-                        videoPlayer2 = <WebRTCPlayer videoUrl = { largeUrl } />;
-                    }
+                if (signalLayout === 'ONE') {
+                    maxSignals = 1;
+                } else if (signalLayout === 'TWO') {
+                    maxSignals = 2;
+                } else if (signalLayout === 'ONE_LARGE_TWO') {
+                    maxSignals = 3;
                 } else {
-                    videoPlayer2 = (<div
-                        className = { 'react-player-box box-no-signal' }>
-                        <div className = { 'no-signal' }>暂无信号</div>
-                    </div>);
+                    maxSignals = 4;
                 }
 
+                if (signalLayout === 'ONE_LARGE_TWO' || signalLayout === 'ONE_LARGE') {
+                    const smallItems = [];
+                    const largeUrl = signalList[0].url;
 
-                const leftItem = (<div
-                    className = 'shared-video__large react-player-box'
-                    data-idx = { 0 }
-                    draggable = { true }
-                    key = { 0 }
-                    onDragEnter = { this._onDragEnter }
-                    onDragLeave = { this._onDragLeave }
-                    // eslint-disable-next-line react/jsx-no-bind
-                    onDragOver = { e => e.preventDefault() }
-                    onDragStart = { this._onDragStart }
-                    onDrop = { this._onDrop }>{videoPlayer2}</div>);
-                const rightItem = <div className = { 'shared-video__small' }>{smallItems}</div>;
+                    for (let i = 1; i < maxSignals; i++) {
+                        const signal = signalList[i];
 
-                ele2 = (
-                    <div className = { `shared-video shared-video-${signalLayout}` }>
-                        {leftItem}
-                        {rightItem}
-                    </div>
-                );
-            } else {
-                const listItems = [];
+                        if (signal) {
+                            let videoPlayer;
+                            const url = signalList[i].url;
 
-                for (let i = 0; i < maxSignals; i++) {
-
-                    const signal = signalList[i];
-
-                    if (signal) {
-                        let videoPlayer;
-                        const url = signalList[i].url;
-
-                        if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
-                            videoPlayer = (
-                                <ReactPlayer
+                            if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
+                                videoPlayer = (
+                                    <ReactPlayer
+                                        // eslint-disable-next-line react/jsx-no-bind
+                                        ref = { refItem => {
+                                            // eslint-disable-next-line react/jsx-no-bind
+                                            if (!this.reactPlayersRef[i]) {
+                                                this.reactPlayersRef[i] = refItem;
+                                            }
+                                        } }
+                                        { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                                );
+                            } else {
+                                videoPlayer = <WebRTCPlayer videoUrl = { url } />;
+                            }
+                            smallItems.push(
+                                <div
+                                    className = { 'react-player-box' }
                                     data-idx = { i }
+                                    draggable = { true }
+                                    key = { i }
+                                    onDragEnter = { this._onDragEnter }
+                                    onDragLeave = { this._onDragLeave }
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    onDragOver = { e => e.preventDefault() }
+                                    onDragStart = { this._onDragStart }
+                                    onDrop = { this._onDrop }>
+                                    {videoPlayer}
+                                </div>
+                            );
+                        } else {
+                            smallItems.push(
+                                <div
+                                    className = { 'react-player-box box-no-signal' }
+                                    data-idx = { i }
+                                    draggable = { true }
+                                    key = { i }
+                                    onDragEnter = { this._onDragEnter }
+                                    onDragLeave = { this._onDragLeave }
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    onDragOver = { e => e.preventDefault() }
+                                    onDragStart = { this._onDragStart }
+                                    onDrop = { this._onDrop }>
+                                    <div className = { 'no-signal' }>暂无信号</div>
+                                </div>
+                            );
+                        }
+                    }
+
+                    let videoPlayer2;
+
+                    if (largeUrl && largeUrl !== '#' && largeUrl !== '') {
+                        if (largeUrl.endsWith('.flv') || largeUrl.endsWith('.m3u8')) {
+                            videoPlayer2 = (
+                                <ReactPlayer
                                     // eslint-disable-next-line react/jsx-no-bind
                                     ref = { refItem => {
                                         // eslint-disable-next-line react/jsx-no-bind
-                                        if (!this.reactPlayersRef[i]) {
-                                            this.reactPlayersRef[i] = refItem;
+                                        if (!this.reactPlayersRef[0]) {
+                                            this.reactPlayersRef[0] = refItem;
                                         }
                                     } }
-                                    { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                                    { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />
                             );
                         } else {
-                            videoPlayer = <WebRTCPlayer videoUrl = { url } />;
+                            videoPlayer2 = <WebRTCPlayer videoUrl = { largeUrl } />;
                         }
-                        listItems.push(
-                            <div
-                                className = { 'react-player-box' }
-                                data-idx = { i }
-                                draggable = { true }
-                                key = { i }
-                                onDragEnter = { this._onDragEnter }
-                                onDragLeave = { this._onDragLeave }
-                                // eslint-disable-next-line react/jsx-no-bind
-                                onDragOver = { e => e.preventDefault() }
-                                onDragStart = { this._onDragStart }
-                                onDrop = { this._onDrop }>
-                                {videoPlayer}
-                            </div>
-                        );
                     } else {
-                        listItems.push(
-                            <div
-                                className = { 'react-player-box box-no-signal' }
-                                data-idx = { i }
-                                draggable = { true }
-                                key = { i }
-                                onDragEnter = { this._onDragEnter }
-                                onDragLeave = { this._onDragLeave }
-                                // eslint-disable-next-line react/jsx-no-bind
-                                onDragOver = { e => e.preventDefault() }
-                                onDragStart = { this._onDragStart }
-                                onDrop = { this._onDrop }>
-                                <div className = { 'no-signal' }>暂无信号</div>
-                            </div>
-                        );
+                        videoPlayer2 = (<div
+                            className = { 'react-player-box box-no-signal' }>
+                            <div className = { 'no-signal' }>暂无信号</div>
+                        </div>);
                     }
-                }
 
-                ele2 = <div className = { `shared-video shared-video-${signalLayout}` }>{listItems}</div>;
+
+                    const leftItem = (<div
+                        className = 'shared-video__large react-player-box'
+                        data-idx = { 0 }
+                        draggable = { true }
+                        key = { 0 }
+                        onDragEnter = { this._onDragEnter }
+                        onDragLeave = { this._onDragLeave }
+                        // eslint-disable-next-line react/jsx-no-bind
+                        onDragOver = { e => e.preventDefault() }
+                        onDragStart = { this._onDragStart }
+                        onDrop = { this._onDrop }>{videoPlayer2}</div>);
+                    const rightItem = <div className = { 'shared-video__small' }>{smallItems}</div>;
+
+                    ele2 = (
+                        <div className = { `shared-video shared-video-${signalLayout}` }>
+                            {leftItem}
+                            {rightItem}
+                        </div>
+                    );
+                } else {
+                    const listItems = [];
+
+                    for (let i = 0; i < maxSignals; i++) {
+
+                        const signal = signalList[i];
+
+                        if (signal) {
+                            let videoPlayer;
+                            const url = signalList[i].url;
+
+                            if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
+                                videoPlayer = (
+                                    <ReactPlayer
+                                        data-idx = { i }
+                                        // eslint-disable-next-line react/jsx-no-bind
+                                        ref = { refItem => {
+                                            // eslint-disable-next-line react/jsx-no-bind
+                                            if (!this.reactPlayersRef[i]) {
+                                                this.reactPlayersRef[i] = refItem;
+                                            }
+                                        } }
+                                        { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                                );
+                            } else {
+                                videoPlayer = <WebRTCPlayer videoUrl = { url } />;
+                            }
+                            listItems.push(
+                                <div
+                                    className = { 'react-player-box' }
+                                    data-idx = { i }
+                                    draggable = { true }
+                                    key = { i }
+                                    onDragEnter = { this._onDragEnter }
+                                    onDragLeave = { this._onDragLeave }
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    onDragOver = { e => e.preventDefault() }
+                                    onDragStart = { this._onDragStart }
+                                    onDrop = { this._onDrop }>
+                                    {videoPlayer}
+                                </div>
+                            );
+                        } else {
+                            listItems.push(
+                                <div
+                                    className = { 'react-player-box box-no-signal' }
+                                    data-idx = { i }
+                                    draggable = { true }
+                                    key = { i }
+                                    onDragEnter = { this._onDragEnter }
+                                    onDragLeave = { this._onDragLeave }
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    onDragOver = { e => e.preventDefault() }
+                                    onDragStart = { this._onDragStart }
+                                    onDrop = { this._onDrop }>
+                                    <div className = { 'no-signal' }>暂无信号</div>
+                                </div>
+                            );
+                        }
+                    }
+
+                    ele2 = <div className = { `shared-video shared-video-${signalLayout}` }>{listItems}</div>;
+                }
             }
         }
+
 
         return (
             <div
