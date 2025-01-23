@@ -111,8 +111,6 @@ class SharedVideo extends Component<IProps> {
 
         const { videoUrl: signalParams, _signalLayout: layout } = this.props;
 
-        console.log('SharedVideo getManager', signalParams);
-
         if (signalParams === undefined) {
             return null;
         }
@@ -128,7 +126,6 @@ class SharedVideo extends Component<IProps> {
             _signalLayout = signalLayout;
         }
 
-        console.log('**************************', videoUrl);
         if (!videoUrl || videoUrl === '') {
             return null;
         }

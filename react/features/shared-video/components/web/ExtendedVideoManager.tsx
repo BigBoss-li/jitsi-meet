@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { PLAYBACK_STATUSES } from '../../constants';
 
 import AbstractVideoManager, { IProps, _mapDispatchToProps, _mapStateToProps } from './AbstractVideoManager';
+import CentralControlPlayer from './CentralControlPlayer';
 import WebRTCPlayer from './WebRTCPlayer';
 
 interface IState {
@@ -224,6 +225,36 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     };
 
     /**
+     * 获取最高分辨率url.
+     *
+     * @param {Array<any>} signalOutputs -signalOutputs.
+     * @returns {string}
+     */
+    _getHeightResolutionUrl(signalOutputs: Array<any>) {
+        const resolution = [ '4K', '1080P', '720P', '360P' ];
+        const target = signalOutputs;
+
+        target.sort((a, b) => resolution.indexOf(a.resolutionName) - resolution.indexOf(b.resolutionName));
+
+        return target[0].url;
+    }
+
+    /**
+     * 获取最低分辨率url.
+     *
+     * @param {Array<any>} signalOutputs -signalOutputs.
+     * @returns {string}
+     */
+    _getLowResolutionUrl(signalOutputs: Array<any>) {
+        const resolution = [ '4K', '1080P', '720P', '360P' ];
+        const target = signalOutputs;
+
+        target.sort((a, b) => resolution.indexOf(b.resolutionName) - resolution.indexOf(a.resolutionName));
+
+        return target[0].url;
+    }
+
+    /**
      * 视频放大点击事件.
      *
      * @param {React.DragEvent<HTMLDivElement>} e - 拖动event.
@@ -369,14 +400,15 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
                 if (signalLayout === 'ONE_LARGE_TWO' || signalLayout === 'ONE_LARGE') {
                     const smallItems = [];
-                    const largeUrl = signalList[0].url;
+                    const largeUrl = this._getHeightResolutionUrl(signalList[0].meetingSignalOutputs);
 
                     for (let i = 1; i < maxSignals; i++) {
                         const signal = signalList[i];
 
                         if (signal) {
                             let videoPlayer;
-                            const url = signalList[i].url;
+
+                            const url = this._getLowResolutionUrl(signal.meetingSignalOutputs);
 
                             if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
                                 videoPlayer = (
@@ -390,6 +422,9 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                         } }
                                         { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
                                 );
+                            } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
+
+                                videoPlayer = <CentralControlPlayer videoUrl = { url } />;
                             } else {
                                 videoPlayer = <WebRTCPlayer videoUrl = { url } />;
                             }
@@ -442,6 +477,9 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     } }
                                     { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />
                             );
+                        } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
+
+                            videoPlayer = <CentralControlPlayer videoUrl = { url } />;
                         } else {
                             videoPlayer2 = <WebRTCPlayer videoUrl = { largeUrl } />;
                         }
@@ -481,7 +519,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
                         if (signal) {
                             let videoPlayer;
-                            const url = signalList[i].url;
+                            const url = this._getHeightResolutionUrl(signal.meetingSignalOutputs);
 
                             if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
                                 videoPlayer = (
@@ -496,6 +534,9 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                         } }
                                         { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
                                 );
+                            } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
+
+                                videoPlayer = <CentralControlPlayer videoUrl = { url } />;
                             } else {
                                 videoPlayer = <WebRTCPlayer videoUrl = { url } />;
                             }

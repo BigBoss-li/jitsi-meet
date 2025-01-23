@@ -137,9 +137,45 @@ const SignalSwitch = styled((props: IFilmstripSignalSwitchProps) => <Switch { ..
 });
 
 /**
+ * Signal output props.
+ */
+interface ISignalOutputProps {
+
+    /**
+     * 视频码率.
+     */
+    bitRate: string;
+
+    /**
+     * 视频帧率.
+     */
+    frameRate: string;
+
+    /**
+     * Id.
+     */
+    id: string;
+
+    /**
+     * 视频分辨率.
+     */
+    resolutionName: string;
+
+    /**
+     * 播放地址.
+     */
+    url: string;
+}
+
+/**
  * Signal props.
  */
 interface ISignalProps {
+
+    /**
+     * 目的类型.
+     */
+    destType: string;
 
     /**
      * 信号源id.
@@ -157,6 +193,11 @@ interface ISignalProps {
     isSelected: boolean;
 
     /**
+     * 信号源.
+     */
+    meetingSignalOutputs: Array<ISignalOutputProps>;
+
+    /**
      * 信号源名称.
      */
     name: string;
@@ -164,12 +205,13 @@ interface ISignalProps {
     /**
      * 信号源类型.
      */
-    type: string;
+    srcType: string;
 
     /**
-     * 信号源url.
+     * 信号源地址.
      */
-    url: string;
+    srcUrl: string;
+
 }
 
 /**
@@ -488,12 +530,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
             const { signalList } = this.state;
             const { _orderedSignalUrls } = this.props;
 
-            console.log('SharedVideo componentDidUpdate', this.props._signalLayout, _orderedSignalUrls);
-
-
             const dispatchSignalList = signalList.filter((item: ISignalProps) => item.isSelected);
 
-            console.log('=====================start');
             if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
                 const orderedSignalUrls = _orderedSignalUrls.map((url: string) => url);
 
@@ -501,9 +539,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 dispatchSignalList.sort((a, b) =>
                     orderedSignalUrls.indexOf(a.url) - orderedSignalUrls.indexOf(b.url));
             }
-
-            console.log('=====================end', dispatchSignalList);
-
             this._debouncedSignalSwitch(dispatchSignalList);
 
         }
@@ -838,20 +873,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
         }
 
         this._debouncedSignalSwitch(dispatchSignalList);
-
-        // const urls = newSignalList.filter(item => item.isSelected).map(item => item.url);
-
-        // if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
-        //     urls.sort((a, b) => _orderedSignalUrls.indexOf(a) - _orderedSignalUrls.indexOf(b));
-        // }
-
-        // if (urls.length > 0 && urls.length < 4) {
-        //     for (let i = urls.length; i < 4; i++) {
-        //         urls.push('#');
-        //     }
-        // }
-
-        // this._debouncedSwitch(urls);
     }
 
     /**
