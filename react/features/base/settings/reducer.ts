@@ -66,7 +66,7 @@ export interface ISettingsState {
     localFlipX?: boolean;
     maxStageParticipants?: number;
     micDeviceId?: string | boolean;
-    orderedSignalUrls?: string[];
+    orderedSignalUrls?: any[];
     serverURL?: string;
     signalLayout?: string;
     signalSettingsVisible?: boolean;

@@ -303,7 +303,7 @@ interface IProps extends WithTranslation {
      */
     _maxTopPanelHeight: number;
 
-    _orderedSignalUrls?: Array<string>;
+    _orderedSignalUrls?: Array<any>;
 
     /**
      * The participants in the call.
@@ -533,11 +533,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
             const dispatchSignalList = signalList.filter((item: ISignalProps) => item.isSelected);
 
             if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
-                const orderedSignalUrls = _orderedSignalUrls.map((url: string) => url);
+                const orderedSignalUrls = _orderedSignalUrls.map((signal: any) => signal.id);
 
                 // TODO: 信号源排序
                 dispatchSignalList.sort((a, b) =>
-                    orderedSignalUrls.indexOf(a.url) - orderedSignalUrls.indexOf(b.url));
+                    orderedSignalUrls.indexOf(a.id) - orderedSignalUrls.indexOf(b.id));
             }
             this._debouncedSignalSwitch(dispatchSignalList);
 

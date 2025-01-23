@@ -477,9 +477,9 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     } }
                                     { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />
                             );
-                        } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
+                        } else if (largeUrl.startsWith('wss://') || largeUrl.startsWith('ws://')) {
 
-                            videoPlayer = <CentralControlPlayer videoUrl = { url } />;
+                            videoPlayer2 = <CentralControlPlayer videoUrl = { largeUrl } />;
                         } else {
                             videoPlayer2 = <WebRTCPlayer videoUrl = { largeUrl } />;
                         }

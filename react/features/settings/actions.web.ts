@@ -154,7 +154,7 @@ export function setSignalSettingsLayout(value: string) {
 /**
  * Sets the visibility of the video settings.
  *
- * @param {Array<string>} signals - The new value.
+ * @param {Array<any>} signals - The new value.
  * @returns {Function}
  */
 export function updateSignalVideoOrder(signals: Array<any>) {

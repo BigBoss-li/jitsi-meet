@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+// @ts-ignore
 import { CentralControlAsync } from './central.sdk';
 
 interface IProps {
