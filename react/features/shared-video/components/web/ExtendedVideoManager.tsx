@@ -7,7 +7,11 @@ import { PLAYBACK_STATUSES } from '../../constants';
 
 import AbstractVideoManager, { IProps, _mapDispatchToProps, _mapStateToProps } from './AbstractVideoManager';
 import CentralControlPlayer from './CentralControlPlayer';
+// eslint-disable-next-line import/order
 import WebRTCPlayer from './WebRTCPlayer';
+
+// @ts-ignore
+import { enableDragDropTouch } from './drag-drop-touch.esm.min.js';
 
 interface IState {
     isMuted: boolean;
@@ -52,6 +56,11 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         this._onDragLeave = this._onDragLeave.bind(this);
         this._onDrop = this._onDrop.bind(this);
         this._onDragEnter = this._onDragEnter.bind(this);
+
+        // this._onTouchStart = this._onTouchStart.bind(this);
+
+        // this._onTouchEnd = this._onTouchEnd.bind(this);
+        // this.getTouchEle = this.getTouchEle.bind(this);
     }
 
     /**
@@ -255,6 +264,96 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     }
 
     /**
+     * 开始触摸事件.
+     *
+     * @param {React.DragEvent<HTMLDivElement>} e - 拖动event.
+     * @returns {void}
+     */
+    // _onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
+    //     const from = e.currentTarget.dataset.idx;
+
+    //     e.currentTarget.classList.add('drag-over');
+    //     const boxList = document.querySelectorAll('div.react-player-box');
+
+    //     boxList.forEach(box => {
+    //         if (from !== box.dataset.idx) {
+    //             box.classList.add('touch-over');
+    //         }
+    //     });
+    // }
+
+    /**
+     * 结束触摸事件.
+     *
+     * @param {React.DragEvent<HTMLDivElement>} e - 拖动event.
+     * @returns {void}
+     */
+    // _onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
+
+    //     const boxList = document.querySelectorAll('div.react-player-box');
+
+    //     boxList.forEach(box => {
+    //         box.classList.remove('touch-over', 'drag-over');
+    //     });
+    //     const touch = e.changedTouches[0];
+    //     const currentTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    //     const from = parseInt(this.getTouchEle(e.currentTarget).dataset.idx, 10);
+    //     const to = parseInt(this.getTouchEle(currentTarget).dataset.idx, 10);
+
+    //     if (from === to) {
+    //         return;
+    //     }
+
+    //     const { videoId } = this.props;
+
+    //     if (videoId !== undefined) {
+    //         const signalList = JSON.parse(videoId);
+
+    //         const fromUrl = signalList[from];
+    //         const toUrl = signalList[to];
+
+    //         signalList[from] = toUrl;
+    //         signalList[to] = fromUrl;
+
+    //         if (this.props._isOwner) {
+    //             this.props._updateSignalVideoOrder(signalList);
+    //         }
+    //     }
+    // }
+
+    /**
+     * 结束触摸事件.
+     *
+     * @param {React.DragEvent<HTMLDivElement>} e - 拖动event.
+     * @returns {void}
+     */
+    // _onTouchMove(e: React.TouchEvent<HTMLDivElement>) {
+
+    //     const touch = e.changedTouches[0];
+    //     const touchedElement = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    //     const currentTarget = this.getTouchEle(touchedElement);
+
+    //     console.log(currentTarget);
+    // }
+
+    /**
+     * 获取触摸节点.
+     *
+     * @param {HTMLDivElement} ele -ele.
+     * @returns {string}
+     */
+    // getTouchEle(ele: HTMLDivElement) {
+    //     if (ele.dataset.idx) {
+    //         return ele;
+    //     }
+    //     const parentEle = ele.parentElement;
+
+    //     return this.getTouchEle(parentEle);
+    // }
+
+    /**
      * 视频放大点击事件.
      *
      * @param {React.DragEvent<HTMLDivElement>} e - 拖动event.
@@ -359,6 +458,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     render() {
         const { videoId, _signalLayout } = this.props;
 
+        enableDragDropTouch();
+
         if (this.reactPlayersRef && this.reactPlayersRef.length > 0) {
             this.reactPlayersRef.forEach(ref => {
                 if (ref !== null) {
@@ -400,7 +501,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
                 if (signalLayout === 'ONE_LARGE_TWO' || signalLayout === 'ONE_LARGE') {
                     const smallItems = [];
-                    const largeUrl = this._getHeightResolutionUrl(signalList[0].meetingSignalOutputs);
+                    const largeUrl = signalList[0] && signalList[0].meetingSignalOutputs.length > 0
+                        ? this._getHeightResolutionUrl(signalList[0].meetingSignalOutputs) : '';
 
                     for (let i = 1; i < maxSignals; i++) {
                         const signal = signalList[i];
@@ -456,7 +558,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     onDragOver = { e => e.preventDefault() }
                                     onDragStart = { this._onDragStart }
                                     onDrop = { this._onDrop }>
-                                    <div className = { 'no-signal' }>暂无信号</div>
+                                    <div
+                                        className = { 'no-signal' }>暂无信号</div>
                                 </div>
                             );
                         }
