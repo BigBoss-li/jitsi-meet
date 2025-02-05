@@ -164,6 +164,8 @@ const LocalRecordingManager: ILocalRecordingManager = {
     },
 
     async sendBlobRecording(recordingData: any) {
+        this.binaryFileIndex++;
+
         // @ts-ignore
         const blob = new Blob(recordingData, { type: 'application/octet-stream' });
         const filename = `${this.binaryFileIndex}.bin`;
@@ -193,7 +195,6 @@ const LocalRecordingManager: ILocalRecordingManager = {
                 filename
             }
         }, '*');
-        this.recordingData = [];
     },
 
     /**
@@ -208,12 +209,6 @@ const LocalRecordingManager: ILocalRecordingManager = {
             this.audioContext = undefined;
             this.audioDestination = undefined;
             this.totalSize = MAX_SIZE;
-            setTimeout(() => {
-                if (this.recordingData.length > 0) {
-                    // this.saveRecording(this.recordingData, this.getFilename());
-                    this.sendBlobRecording(this.recordingData);
-                }
-            }, 1000);
         }
     },
 
@@ -338,17 +333,16 @@ const LocalRecordingManager: ILocalRecordingManager = {
         this.recorder.addEventListener('dataavailable', e => {
             if (e.data && e.data.size > 0) {
                 console.log(e);
-                this.recordingData.push(e.data);
+
+                if (this.recorder) {
+                    this.sendSplitRecording([ e.data ]);
+                } else {
+                    this.sendBlobRecording([ e.data ]);
+                }
+
                 this.totalSize -= e.data.size;
                 if (this.totalSize <= 0) {
                     dispatch(stopLocalVideoRecording());
-                }
-                this.fileSizeLimit -= e.data.size;
-                console.log('fileSizeLimit', this.fileSizeLimit);
-                if (this.fileSizeLimit <= 0) {
-                    this.fileSizeLimit = DEF_FILE_SIZE;
-                    console.log('reset', this.fileSizeLimit);
-                    this.sendSplitRecording(this.recordingData);
                 }
             }
         });
