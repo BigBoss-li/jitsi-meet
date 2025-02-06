@@ -25,6 +25,7 @@ interface ILocalRecordingManager {
     mediaType: string;
     mixAudioStream: (stream: MediaStream) => void;
     recorder: MediaRecorder | undefined;
+    recorderStopped: () => void;
     recordingData: Blob[];
     recordingType: string;
     roomName: string;
@@ -176,6 +177,13 @@ const LocalRecordingManager: ILocalRecordingManager = {
                 blob,
                 filename
             }
+        }, '*');
+    },
+
+    recorderStopped() {
+        window.parent.postMessage({
+            type: 'recorder_stopped',
+            data: {}
         }, '*');
     },
 
@@ -332,13 +340,9 @@ const LocalRecordingManager: ILocalRecordingManager = {
 
         this.recorder.addEventListener('dataavailable', e => {
             if (e.data && e.data.size > 0) {
-                console.log(e);
+                console.log('dataavailable', e);
 
-                if (this.recorder) {
-                    this.sendSplitRecording([ e.data ]);
-                } else {
-                    this.sendBlobRecording([ e.data ]);
-                }
+                this.sendSplitRecording([ e.data ]);
 
                 this.totalSize -= e.data.size;
                 if (this.totalSize <= 0) {
@@ -349,6 +353,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
 
         if (!onlySelf) {
             this.recorder.addEventListener('stop', () => {
+                this.recorderStopped();
                 this.stream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
                 gdmStream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
             });
@@ -362,7 +367,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
             });
         }
 
-        this.recorder.start(5000);
+        this.recorder.start(1000);
 
         window.parent.postMessage({
             type: 'recorder_start',
