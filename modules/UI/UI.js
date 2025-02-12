@@ -59,6 +59,9 @@ UI.start = function() {
         document.body.classList.add('mobile-browser');
     } else {
         document.body.classList.add('desktop-browser');
+        document.oncontextmenu = function() {
+            return false;
+        };
     }
 
     if (config.backgroundAlpha !== undefined) {
