@@ -130,8 +130,14 @@
 
                 .react-player-box {
                     width: 100%;
-                    // padding-bottom: calc(100% * 9 / 16);
+                    padding-bottom: calc(100% * 9 / 16);
                     position: relative;
+
+                    video {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                    }
 
                     > div {
                         position: absolute;
@@ -178,8 +184,14 @@
 
                 .react-player-box {
                     width: 100%;
-                    // padding-bottom: calc(100% * 9 / 16);
+                    padding-bottom: calc(100% * 9 / 16);
                     position: relative;
+
+                    video {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                    }
 
                     > div {
                         position: absolute;
