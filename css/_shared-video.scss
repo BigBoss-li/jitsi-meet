@@ -137,6 +137,10 @@
                         position: absolute;
                         left: 0;
                     }
+
+                    &.box-no-signal {
+                        padding-bottom: calc(100% * 9 / 16);
+                    }
                 }
             }
         }
@@ -180,6 +184,10 @@
                     > div {
                         position: absolute;
                         left: 0;
+                    }
+
+                    &.box-no-signal {
+                        padding-bottom: calc(100% * 9 / 16);
                     }
                 }
             }
