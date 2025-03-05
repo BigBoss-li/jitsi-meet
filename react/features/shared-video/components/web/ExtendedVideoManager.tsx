@@ -647,7 +647,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                 <div
                                     className = { 'react-player-box' }
                                     data-idx = { i }
-                                    draggable = { true }
+                                    draggable = { signalLayout !== 'ONE' }
                                     key = { i }
                                     onDragEnter = { this._onDragEnter }
                                     onDragLeave = { this._onDragLeave }
