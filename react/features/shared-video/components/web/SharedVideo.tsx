@@ -96,9 +96,10 @@ class SharedVideo extends Component<IProps> {
             width = `${clientWidth}px`;
         }
 
+        console.log(height);
+
         return {
-            width,
-            height
+            width
         };
     }
 

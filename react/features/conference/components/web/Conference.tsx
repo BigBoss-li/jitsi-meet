@@ -228,7 +228,9 @@ class Conference extends AbstractConference<IProps, any> {
                 <div
                     className = { _layoutClassName }
                     id = 'videoconference_page'
-                    onMouseMove = { isMobileBrowser() ? undefined : this._onShowToolbar }>
+                    onMouseEnter = { this._onMouseEnter }
+                    onMouseLeave = { this._onMouseLeave }
+                    onMouseMove = { this._onMouseMove }>
                     <ConferenceInfo />
                     <Notice />
                     <div
@@ -253,6 +255,9 @@ class Conference extends AbstractConference<IProps, any> {
                                 { t('toolbar.accessibilityLabel.heading') }
                             </span>
                             <Toolbox isConferenceJoined = { true } />
+                            <div
+                                className = 'toolbox-move-panel'
+                                onMouseMove = { isMobileBrowser() ? undefined : this._onShowToolbar } />
                         </>
                     )}
 

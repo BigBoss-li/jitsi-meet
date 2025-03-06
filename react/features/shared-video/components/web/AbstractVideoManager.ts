@@ -148,7 +148,7 @@ class AbstractVideoManager<S=void> extends PureComponent<IProps, S> {
      * @inheritdoc
      */
     componentDidMount() {
-        this.props._dockToolbox(true);
+        // this.props._dockToolbox(true);
         this.processUpdatedProps();
     }
 
