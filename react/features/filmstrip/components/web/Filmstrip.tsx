@@ -944,7 +944,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                         className = 'signal-wrapper'
                         key = { signal.id }>
                         <div className = 'signal__top'>
-                            <span className = 'signal-type'>{signal.type}</span>
+                            <span className = 'signal-type'>{signal.srcType}</span>
                             <span className = 'signal-name'>{signal.name}</span>
                         </div>
                         <div className = 'signal__footer'>
