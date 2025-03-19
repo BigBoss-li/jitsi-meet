@@ -143,6 +143,32 @@ export default class LargeVideoManager {
 
         this._dominantSpeakerAvatarContainer
             = document.getElementById('dominantSpeakerAvatarContainer');
+
+        const observeTarget = document.getElementById('sharedVideo');
+
+        window.parent.postMessage({
+            type: 'large_video_width_mutation',
+            data: {
+                width: observeTarget.clientWidth
+            }
+        }, '*');
+        const observer = new MutationObserver(mutationsList => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'attributes') {
+                    window.parent.postMessage({
+                        type: 'large_video_width_mutation',
+                        data: {
+                            width: mutation.target.clientWidth
+                        }
+                    }, '*');
+                }
+            }
+        });
+
+        observer.observe(observeTarget, {
+            attributeOldValue: true,
+            attributeFilter: [ 'style' ]
+        });
     }
 
     /**

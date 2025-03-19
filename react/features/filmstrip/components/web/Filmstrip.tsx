@@ -411,6 +411,8 @@ interface IProps extends WithTranslation {
 
 interface IState {
 
+    canvasOpening: boolean;
+
     /**
      * Initial top panel height on drag handle mouse down.
      */
@@ -472,7 +474,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
             dragFilmstripWidth: null,
             titleTabIndex: 0,
             signalList: [],
-            informationList: []
+            informationList: [],
+            canvasOpening: false
         };
 
         // Bind event handlers so they are only bound once for every instance.
@@ -605,7 +608,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
         } = this.props;
 
         const classes = withStyles.getClasses(this.props);
-        const { titleTabIndex } = this.state; // { isMouseDown, titleTabIndex }
+        const { titleTabIndex, canvasOpening } = this.state; // { isMouseDown, titleTabIndex }
         const tileViewActive = _currentLayout === LAYOUTS.TILE_VIEW;
 
         if (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.STAGE) {
@@ -647,6 +650,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             && _currentLayout !== LAYOUTS.TILE_VIEW
             && ((filmstripType === FILMSTRIP_TYPE.MAIN && !_filmstripDisabled)
                 || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+            && !canvasOpening
         ) {
 
             toolbar = this._renderToggleButton();
@@ -869,7 +873,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
         const dispatchSignalList = newSignalList.filter((item: ISignalProps) => item.isSelected);
 
         if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
-            dispatchSignalList.sort((a, b) => _orderedSignalUrls.indexOf(a.url) - _orderedSignalUrls.indexOf(b.url));
+            dispatchSignalList.sort((a, b) =>
+                _orderedSignalUrls.indexOf(a.srcUrl) - _orderedSignalUrls.indexOf(b.srcUrl));
         }
 
         this._debouncedSignalSwitch(dispatchSignalList);
@@ -1018,6 +1023,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {void}
      */
     _onMessageListener(e: any) {
+        const { dispatch } = this.props;
         const { type, data } = e.data;
         const { signalList } = this.state;
 
@@ -1036,6 +1042,15 @@ class Filmstrip extends PureComponent<IProps, IState> {
             this.setState({
                 informationList: data
             });
+        } else if (type === 'canvas_openning') {
+            this.setState({
+                canvasOpening: data
+            });
+            if (data) {
+                dispatch(setFilmstripVisible(false));
+            } else {
+                dispatch(setFilmstripVisible(true));
+            }
         }
     }
 

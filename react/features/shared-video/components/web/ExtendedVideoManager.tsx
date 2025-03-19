@@ -512,7 +512,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
                             const url = this._getLowResolutionUrl(signal.meetingSignalOutputs);
 
-                            if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
+                            if (url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4')) {
                                 videoPlayer = (
                                     <ReactPlayer
                                         // eslint-disable-next-line react/jsx-no-bind
@@ -568,7 +568,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     let videoPlayer2;
 
                     if (largeUrl && largeUrl !== '#' && largeUrl !== '') {
-                        if (largeUrl.endsWith('.flv') || largeUrl.endsWith('.m3u8')) {
+                        if (largeUrl.endsWith('.flv') || largeUrl.endsWith('.m3u8') || url.endsWith('.mp4')) {
                             videoPlayer2 = (
                                 <ReactPlayer
                                     // eslint-disable-next-line react/jsx-no-bind
@@ -624,7 +624,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                             let videoPlayer;
                             const url = this._getHeightResolutionUrl(signal.meetingSignalOutputs);
 
-                            if (url.endsWith('.flv') || url.endsWith('.m3u8')) {
+                            if (url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4')) {
                                 videoPlayer = (
                                     <ReactPlayer
                                         data-idx = { i }
