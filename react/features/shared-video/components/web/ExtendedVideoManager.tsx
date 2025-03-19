@@ -568,7 +568,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     let videoPlayer2;
 
                     if (largeUrl && largeUrl !== '#' && largeUrl !== '') {
-                        if (largeUrl.endsWith('.flv') || largeUrl.endsWith('.m3u8') || url.endsWith('.mp4')) {
+                        if (largeUrl.endsWith('.flv') || largeUrl.endsWith('.m3u8') || largeUrl.endsWith('.mp4')) {
                             videoPlayer2 = (
                                 <ReactPlayer
                                     // eslint-disable-next-line react/jsx-no-bind
