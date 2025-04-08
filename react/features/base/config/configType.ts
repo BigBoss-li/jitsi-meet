@@ -571,6 +571,7 @@ export interface IConfig {
         alwaysVisible?: boolean;
         autoHideWhileChatIsOpen?: boolean;
         initialTimeout?: number;
+        isHidden?: boolean;
         timeout?: number;
     };
     transcribeWithAppLanguage?: boolean;

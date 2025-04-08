@@ -44,7 +44,7 @@ export function isButtonEnabled(buttonName: string, state: IReduxState | Array<s
  */
 export function isToolboxVisible(state: IReduxState) {
     const { iAmRecorder, iAmSipGateway, toolbarConfig } = state['features/base/config'];
-    const { alwaysVisible } = toolbarConfig || {};
+    const { alwaysVisible, isHidden } = toolbarConfig || {};
     const {
         timeoutID,
         visible
@@ -52,7 +52,7 @@ export function isToolboxVisible(state: IReduxState) {
     const { audioSettingsVisible, videoSettingsVisible } = state['features/settings'];
     const whiteboardVisible = isWhiteboardVisible(state);
 
-    return Boolean(!iAmRecorder && !iAmSipGateway
+    return Boolean(!iAmRecorder && !iAmSipGateway && !isHidden
             && (
                 timeoutID
                 || visible
