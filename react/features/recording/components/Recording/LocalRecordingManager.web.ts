@@ -8,6 +8,15 @@ import { getLocalTrack, getTrackState } from '../../../base/tracks/functions';
 import { inIframe } from '../../../base/util/iframeUtils';
 import { stopLocalVideoRecording } from '../../actions.any';
 
+
+// @ts-ignore
+import { SrsRtcWhipWhepAsync } from './srs.sdk.js';
+
+
+// @ts-ignore
+// import { SrsRtcPublisherAsync } from './srs.sdk.js';
+
+
 interface ISelfRecording {
     on: boolean;
     withVideo: boolean;
@@ -33,7 +42,7 @@ interface ILocalRecordingManager {
     selfRecording: ISelfRecording;
     sendBlobRecording: (recordingData: Blob[]) => void;
     sendSplitRecording: (recordingData: Blob[]) => void;
-    startLocalRecording: (store: IStore, onlySelf: boolean) => Promise<void>;
+    startLocalRecording: (store: IStore, onlySelf: boolean, whipUrl: string) => Promise<void>;
     stopLocalRecording: () => void;
     stream: MediaStream | undefined;
     totalSize: number;
@@ -225,9 +234,11 @@ const LocalRecordingManager: ILocalRecordingManager = {
      *
      * @param {IStore} store - The redux store.
      * @param {boolean} onlySelf - Whether to record only self streams.
+     * @param {string} whipUrl - Whether to record only self streams.
      * @returns {void}
      */
-    async startLocalRecording(store, onlySelf) {
+    async startLocalRecording(store, onlySelf, whipUrl) {
+        console.log('startLocalRecording');
         const { dispatch, getState } = store;
 
         this.fileSizeLimit = DEF_FILE_SIZE;
@@ -306,6 +317,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
                 audio: false, // @ts-ignore
                 preferCurrentTab: true
             });
+
             document.title = currentTitle;
 
             const isBrowser = gdmStream.getVideoTracks()[0].getSettings().displaySurface === 'browser';
@@ -331,6 +343,16 @@ const LocalRecordingManager: ILocalRecordingManager = {
                 ...this.audioDestination?.stream.getAudioTracks() || [],
                 gdmStream.getVideoTracks()[0]
             ]);
+        }
+
+        if (whipUrl) {
+            try {
+                const srsRtcWhipWhepAsync = new SrsRtcWhipWhepAsync();
+
+                srsRtcWhipWhepAsync.publish(whipUrl, this.stream);
+            } catch (error) {
+                console.log('Error posting to WHIP endpoint:', error);
+            }
         }
 
         this.recorder = new MediaRecorder(this.stream, {

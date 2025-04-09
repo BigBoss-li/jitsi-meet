@@ -117,7 +117,7 @@ MiddlewareRegistry.register(({ dispatch, getState }) => next => action => {
         LocalRecordingManager.startLocalRecording({
             dispatch,
             getState
-        }, action.onlySelf)
+        }, action.onlySelf, action.whipUrl)
         .then(() => {
             const props = {
                 descriptionKey: 'recording.on',
