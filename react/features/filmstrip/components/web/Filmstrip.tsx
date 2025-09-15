@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Switch, Tab, Tabs } from '@mui/material';
+import { Switch } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import { debounce, throttle } from 'lodash-es';
@@ -52,56 +52,56 @@ import Thumbnail from './Thumbnail';
 import ThumbnailWrapper from './ThumbnailWrapper';
 import { styles } from './styles';
 
-interface IFilmstripTitleTabsProps {
-    children?: React.ReactNode;
-    onChange: (event: React.SyntheticEvent, newValue: number) => void;
-    value: number;
-}
+// interface IFilmstripTitleTabsProps {
+//     children?: React.ReactNode;
+//     onChange: (event: React.SyntheticEvent, newValue: number) => void;
+//     value: number;
+// }
 
-const FilmstripTitleTabs = styled((props: IFilmstripTitleTabsProps) =>
-    (<Tabs
-        { ...props }
-        TabIndicatorProps = {{ children: <span className = 'MuiTabs-indicatorSpan' /> }}
-        variant = 'fullWidth' />)
-)({
-    '& .MuiTabs-indicator': {
-        display: 'flex',
-        justifyContent: 'center',
-        backgroundColor: 'transparent',
-        height: '4px',
-        borderRadius: '2px'
-    },
-    '& .MuiTabs-indicatorSpan': {
-        maxWidth: 40,
-        width: '100%',
-        backgroundColor: '#fff'
-    }
-});
+// const FilmstripTitleTabs = styled((props: IFilmstripTitleTabsProps) =>
+//     (<Tabs
+//         { ...props }
+//         TabIndicatorProps = {{ children: <span className = 'MuiTabs-indicatorSpan' /> }}
+//         variant = 'fullWidth' />)
+// )({
+//     '& .MuiTabs-indicator': {
+//         display: 'flex',
+//         justifyContent: 'center',
+//         backgroundColor: 'transparent',
+//         height: '4px',
+//         borderRadius: '2px'
+//     },
+//     '& .MuiTabs-indicatorSpan': {
+//         maxWidth: 40,
+//         width: '100%',
+//         backgroundColor: '#fff'
+//     }
+// });
 
-interface IFilmstripTitleTabProps {
-    label: string;
-}
+// interface IFilmstripTitleTabProps {
+//     label: string;
+// }
 
-const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (<Tab
-    disableRipple = { true }
-    { ...props } />))({
-    textTransform: 'none',
-    lineHeight: '28px',
-    fontSize: '20px',
+// const FilmstripTitleTab = styled((props: IFilmstripTitleTabProps) => (<Tab
+//     disableRipple = { true }
+//     { ...props } />))({
+//     textTransform: 'none',
+//     lineHeight: '28px',
+//     fontSize: '20px',
 
-    // fontWeight: theme.typography.fontWeightRegular,
-    // fontSize: theme.typography.pxToRem(15),
-    // marginRight: theme.spacing(1),
-    color: 'rgba(255, 255, 255, 0.8)',
-    '&.Mui-selected': {
-        fontWeight: 'bold',
-        color: '#fff'
-    }
+//     // fontWeight: theme.typography.fontWeightRegular,
+//     // fontSize: theme.typography.pxToRem(15),
+//     // marginRight: theme.spacing(1),
+//     color: 'rgba(255, 255, 255, 0.8)',
+//     '&.Mui-selected': {
+//         fontWeight: 'bold',
+//         color: '#fff'
+//     }
 
-    // '&.Mui-focusVisible': {
-    // backgroundColor: 'rgba(100, 95, 228, 0.32)'
-    // }
-});
+//     // '&.Mui-focusVisible': {
+//     // backgroundColor: 'rgba(100, 95, 228, 0.32)'
+//     // }
+// });
 
 interface IFilmstripSignalSwitchProps {
     checked: boolean;
@@ -500,7 +500,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
         this._callChangeSharedSignals = this._callChangeSharedSignals.bind(this);
         this._onFileChange = this._onFileChange.bind(this);
         this._onButtonClick = this._onButtonClick.bind(this);
-        window.addEventListener('message', this._onMessageListener, false);
+
+        // window.addEventListener('message', this._onMessageListener, false);
 
         this._throttledResize = throttle(this._onFilmstripResize, 50, {
             leading: true,
@@ -608,7 +609,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
         } = this.props;
 
         const classes = withStyles.getClasses(this.props);
-        const { titleTabIndex, canvasOpening } = this.state; // { isMouseDown, titleTabIndex }
+        const { canvasOpening } = this.state; // { isMouseDown, titleTabIndex }
         const tileViewActive = _currentLayout === LAYOUTS.TILE_VIEW;
 
         if (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.STAGE) {
@@ -700,64 +701,64 @@ class Filmstrip extends PureComponent<IProps, IState> {
             </>
         );
 
-        const signal = (
-            <div
-                className = { clsx(
-                        this.props._videosClassName,
-                        !tileViewActive
-                            && (filmstripType === FILMSTRIP_TYPE.MAIN
-                                || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
-                ) }
-                id = 'remoteVideos'>
-                {
-                    !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
-                    && this._renderSignalItem()
-                }
-            </div>
-        );
+        // const signal = (
+        //     <div
+        //         className = { clsx(
+        //                 this.props._videosClassName,
+        //                 !tileViewActive
+        //                     && (filmstripType === FILMSTRIP_TYPE.MAIN
+        //                         || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+        //         ) }
+        //         id = 'remoteVideos'>
+        //         {
+        //             !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
+        //             && this._renderSignalItem()
+        //         }
+        //     </div>
+        // );
 
-        const information = (
-            <div
-                className = { clsx(
-                    this.props._videosClassName,
-                    !tileViewActive
-                        && (filmstripType === FILMSTRIP_TYPE.MAIN
-                            || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
-                ) }
-                id = 'remoteVideos'>
-                {
-                    !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
-                && this._renderInformationItem()
-                }
+        // const information = (
+        //     <div
+        //         className = { clsx(
+        //             this.props._videosClassName,
+        //             !tileViewActive
+        //                 && (filmstripType === FILMSTRIP_TYPE.MAIN
+        //                     || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+        //         ) }
+        //         id = 'remoteVideos'>
+        //         {
+        //             !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
+        //         && this._renderInformationItem()
+        //         }
 
-                <div className = 'information-footer' >
-                    <input
-                        onChange = { this._onFileChange }
-                        ref = { this.fileInputRef }
-                        type = 'file' />
-                    <button
-                        className = 'information-button'
-                        onClick = { this._onButtonClick }>
-                        <img
-                            className = 'button-icon'
-                            src = 'images/upload.png' />
-                        上传
-                    </button>
-                </div>
-            </div>
-        );
+        //         <div className = 'information-footer' >
+        //             <input
+        //                 onChange = { this._onFileChange }
+        //                 ref = { this.fileInputRef }
+        //                 type = 'file' />
+        //             <button
+        //                 className = 'information-button'
+        //                 onClick = { this._onButtonClick }>
+        //                 <img
+        //                     className = 'button-icon'
+        //                     src = 'images/upload.png' />
+        //                 上传
+        //             </button>
+        //         </div>
+        //     </div>
+        // );
 
-        const filmstripTabs = (
-            <div className = 'cssw_hacked_title_tabs'>
-                <FilmstripTitleTabs
-                    onChange = { this._onTitleTabChange }
-                    value = { titleTabIndex }>
-                    <FilmstripTitleTab label = '成员' />
-                    <FilmstripTitleTab label = '信号源' />
-                    <FilmstripTitleTab label = '资料' />
-                </FilmstripTitleTabs>
-            </div>
-        );
+        // const filmstripTabs = (
+        //     <div className = 'cssw_hacked_title_tabs'>
+        //         <FilmstripTitleTabs
+        //             onChange = { this._onTitleTabChange }
+        //             value = { titleTabIndex }>
+        //             <FilmstripTitleTab label = '成员' />
+        //             <FilmstripTitleTab label = '信号源' />
+        //             <FilmstripTitleTab label = '资料' />
+        //         </FilmstripTitleTabs>
+        //     </div>
+        // );
 
         return _isMini === false ? (
             <div
@@ -778,10 +779,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 </span>
                 { toolbar }
                 {
-                    filmstripTabs
-                }
-                {
-                    titleTabIndex === 0 ? filmstrip : titleTabIndex === 1 ? signal : information
+                    filmstrip
                 }
                 <AudioTracksContainer />
             </div>
