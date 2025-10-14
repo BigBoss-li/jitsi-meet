@@ -61,7 +61,7 @@ const getMimeType = (): string => {
     throw new Error('No MIME Type supported by MediaRecorder');
 };
 
-const VIDEO_BIT_RATE = 2500000; // 2.5Mbps in bits
+// const VIDEO_BIT_RATE = 2500000; // 2.5Mbps in bits
 const MAX_SIZE = 1073741824; // 1GB in bytes
 const DEF_FILE_SIZE = 1048576; // 1MB in bytes
 // const DEF_FILE_SIZE = 104857600; // 100MB in bytes
@@ -87,7 +87,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
 
     get mediaType() {
         if (this.selfRecording.on && !this.selfRecording.withVideo) {
-            return 'audio/mp3;';
+            return 'audio/webm;codecs=opus';
         }
         if (!preferredMediaType) {
             preferredMediaType = getMimeType();
@@ -252,7 +252,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
         this.selfRecording.on = onlySelf;
         this.recordingData = [];
         this.roomName = getRoomName(getState()) ?? '';
-        let gdmStream: MediaStream = new MediaStream();
+
         const tracks = getTrackState(getState());
 
         if (onlySelf) {
@@ -273,11 +273,11 @@ const LocalRecordingManager: ILocalRecordingManager = {
             if (!audioTrack && !videoTrack) {
                 throw new Error('NoLocalStreams');
             }
-            this.selfRecording.withVideo = Boolean(videoTrack);
+            this.selfRecording.withVideo = false;
             const localTracks = [];
 
             audioTrack && localTracks.push(audioTrack);
-            videoTrack && localTracks.push(videoTrack);
+
             this.stream = new MediaStream(localTracks);
         } else {
             if (supportsCaptureHandle) {
@@ -304,29 +304,8 @@ const LocalRecordingManager: ILocalRecordingManager = {
                 throw new Error('NoMicTrack');
             }
 
-            const currentTitle = document.title;
 
             document.title = i18next.t('localRecording.selectTabTitle');
-
-            // @ts-ignore
-            gdmStream = await navigator.mediaDevices.getDisplayMedia({
-                video: {
-                    displaySurface: 'browser',
-                    frameRate: 30
-                },
-                audio: false, // @ts-ignore
-                preferCurrentTab: true
-            });
-
-            document.title = currentTitle;
-
-            const isBrowser = gdmStream.getVideoTracks()[0].getSettings().displaySurface === 'browser';
-
-            if (!isBrowser || (supportsCaptureHandle // @ts-ignore
-                && gdmStream.getVideoTracks()[0].getCaptureHandle()?.handle !== `JitsiMeet-${tabId}`)) {
-                gdmStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-                throw new Error('WrongSurfaceSelected');
-            }
 
             this.initializeAudioMixer();
 
@@ -340,8 +319,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
                 }
             });
             this.stream = new MediaStream([
-                ...this.audioDestination?.stream.getAudioTracks() || [],
-                gdmStream.getVideoTracks()[0]
+                ...this.audioDestination?.stream.getAudioTracks() || []
             ]);
         }
 
@@ -356,8 +334,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
         }
 
         this.recorder = new MediaRecorder(this.stream, {
-            mimeType: this.mediaType,
-            videoBitsPerSecond: VIDEO_BIT_RATE
+            mimeType: 'audio/webm;codecs=opus'
         });
 
         this.recorder.addEventListener('dataavailable', e => {
@@ -377,11 +354,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
             this.recorder.addEventListener('stop', () => {
                 this.recorderStopped();
                 this.stream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-                gdmStream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-            });
 
-            gdmStream?.addEventListener('inactive', () => {
-                dispatch(stopLocalVideoRecording());
             });
 
             this.stream.addEventListener('inactive', () => {
