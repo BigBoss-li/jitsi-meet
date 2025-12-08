@@ -265,6 +265,14 @@
     }
 }
 
+.large-video-wrapper {
+    top: auto !important;
+    bottom: 0 !important;
+    height: 200px !important;
+    width: 400px !important;
+    z-index: 7 !important;
+}
+
 .avatar-container {
     @include maxSize(60px);
     @include absoluteAligning();

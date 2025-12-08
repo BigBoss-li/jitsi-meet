@@ -15,6 +15,7 @@ import { translate } from '../../../base/i18n/functions';
 import { JitsiTrackEvents } from '../../../base/lib-jitsi-meet';
 import VideoTrack from '../../../base/media/components/web/VideoTrack';
 import { MEDIA_TYPE } from '../../../base/media/constants';
+import { pinParticipant } from '../../../base/participants/actions';
 import {
     getLocalParticipant,
     getParticipantByIdOrUndefined,
@@ -40,6 +41,7 @@ import { getGifDisplayMode, getGifForParticipant } from '../../../gifs/functions
 import PresenceLabel from '../../../presence-status/components/PresenceLabel';
 import { LAYOUTS } from '../../../video-layout/constants';
 import { getCurrentLayout } from '../../../video-layout/functions.web';
+import { togglePinStageParticipant } from '../../actions';
 import {
     DISPLAY_MODE_TO_CLASS_NAME,
     DISPLAY_VIDEO,
@@ -61,9 +63,6 @@ import ThumbnailAudioIndicator from './ThumbnailAudioIndicator';
 import ThumbnailBottomIndicators from './ThumbnailBottomIndicators';
 import ThumbnailTopIndicators from './ThumbnailTopIndicators';
 import VirtualScreenshareParticipant from './VirtualScreenshareParticipant';
-
-// import { togglePinStageParticipant } from '../../actions';
-// import { pinParticipant } from '../../../base/participants/actions';
 
 /**
  * The type of the React {@code Component} state of {@link Thumbnail}.
@@ -739,14 +738,14 @@ class Thumbnail extends Component<IProps, IState> {
      * @returns {void}
      */
     _onClick() {
-        // const { _participant, dispatch, _stageFilmstripLayout } = this.props;
-        // const { id, pinned } = _participant;
+        const { _participant, dispatch, _stageFilmstripLayout } = this.props;
+        const { id, pinned } = _participant;
 
-        // if (_stageFilmstripLayout) {
-        //     dispatch(togglePinStageParticipant(id));
-        // } else {
-        //     dispatch(pinParticipant(pinned ? null : id));
-        // }
+        if (_stageFilmstripLayout) {
+            dispatch(togglePinStageParticipant(id));
+        } else {
+            dispatch(pinParticipant(pinned ? null : id));
+        }
     }
 
     /**

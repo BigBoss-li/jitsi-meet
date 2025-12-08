@@ -22,8 +22,6 @@ import { isWhiteboardEnabled } from '../../whiteboard/functions';
 import { setSeeWhatIsBeingShared } from '../actions.web';
 import { getLargeVideoParticipant } from '../functions';
 
-import ScreenSharePlaceholder from './ScreenSharePlaceholder.web';
-
 // Hack to detect Spot.
 const SPOT_DISPLAY_NAME = 'Meeting Room';
 
@@ -89,6 +87,8 @@ interface IProps {
      * Whether or not the screen sharing is visible.
      */
     _seeWhatIsBeingShared: boolean;
+
+    _sharedVideoStatus: string;
 
     /**
      * Whether or not to show dominant speaker badge.
@@ -190,15 +190,30 @@ class LargeVideo extends Component<IProps> {
      */
     render() {
         const {
-            _displayScreenSharingPlaceholder,
             _isChatOpen,
             _noAutoPlayVideo,
 
             // _showDominantSpeakerBadge,
-            _whiteboardEnabled
+            _whiteboardEnabled,
+            _sharedVideoStatus
         } = this.props;
         const style = this._getCustomStyles();
         const className = `videocontainer${_isChatOpen ? ' shift-right' : ''}`;
+        const largeVideoWrapperClassName = `${_sharedVideoStatus === 'start' ? 'large-video-wrapper' : ''}`;
+
+        console.log(_sharedVideoStatus, '=======');
+        const largeVideoStyle = {
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            zIndex: 10
+        };
+
+        const displayNone = {
+            display: 'none'
+        };
 
         return (
             <div
@@ -220,8 +235,12 @@ class LargeVideo extends Component<IProps> {
                 </div>
                 <div id = 'remotePresenceMessage' />
                 <span id = 'remoteConnectionMessage' />
-                <div id = 'largeVideoElementsContainer'>
-                    <div id = 'largeVideoBackgroundContainer' />
+                <div
+                    id = 'largeVideoElementsContainer'
+                    style = { largeVideoStyle }>
+                    <div
+                        id = 'largeVideoBackgroundContainer'
+                        style = { displayNone } />
                     {/*
                       * FIXME: the architecture of elements related to the large
                       * video and the naming. The background is not part of
@@ -230,8 +249,8 @@ class LargeVideo extends Component<IProps> {
                       * another container for the background and the
                       * largeVideoWrapper in order to hide/show them.
                       */}
-                    { _displayScreenSharingPlaceholder ? <ScreenSharePlaceholder /> : <></>}
                     <div
+                        className = { largeVideoWrapperClassName }
                         id = 'largeVideoWrapper'
                         onTouchEnd = { this._onDoubleTap }
                         ref = { this._wrapperRef }
@@ -359,6 +378,7 @@ function _mapStateToProps(state: IReduxState) {
     const { width: verticalFilmstripWidth, visible } = state['features/filmstrip'];
     const { defaultLocalDisplayName, hideDominantSpeakerBadge } = state['features/base/config'];
     const { seeWhatIsBeingShared } = state['features/large-video'];
+    const { status: sharedVideoStatus } = state['features/shared-video'];
     const localParticipantId = getLocalParticipant(state)?.id;
     const largeVideoParticipant = getLargeVideoParticipant(state);
     const videoTrack = getVideoTrackByParticipant(state, largeVideoParticipant);
@@ -383,7 +403,8 @@ function _mapStateToProps(state: IReduxState) {
         _verticalFilmstripWidth: verticalFilmstripWidth.current,
         _verticalViewMaxWidth: getVerticalViewMaxWidth(state),
         _visibleFilmstrip: visible,
-        _whiteboardEnabled: isWhiteboardEnabled(state)
+        _whiteboardEnabled: isWhiteboardEnabled(state),
+        _sharedVideoStatus: sharedVideoStatus
     };
 }
 

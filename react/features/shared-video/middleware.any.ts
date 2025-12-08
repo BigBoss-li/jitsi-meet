@@ -7,7 +7,7 @@ import { IJitsiConference } from '../base/conference/reducer';
 import { SET_CONFIG } from '../base/config/actionTypes';
 import { MEDIA_TYPE } from '../base/media/constants';
 import { PARTICIPANT_LEFT } from '../base/participants/actionTypes';
-import { participantJoined, participantLeft, pinParticipant } from '../base/participants/actions';
+import { participantJoined, participantLeft } from '../base/participants/actions';
 import { getLocalParticipant, getParticipantById, getParticipantDisplayName } from '../base/participants/functions';
 import { FakeParticipant } from '../base/participants/types';
 import MiddlewareRegistry from '../base/redux/MiddlewareRegistry';
@@ -256,7 +256,7 @@ function handleSharingVideoStatus(store: IStore, videoUrl: string,
             name: VIDEO_PLAYER_PARTICIPANT_NAME
         }));
 
-        dispatch(pinParticipant(videoUrl));
+        // dispatch(pinParticipant(videoUrl));
 
         if (localParticipantId === from) {
             dispatch(setSharedVideoStatus({
