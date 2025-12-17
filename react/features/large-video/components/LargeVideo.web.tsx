@@ -203,7 +203,7 @@ class LargeVideo extends Component<IProps> {
 
         console.log(_sharedVideoStatus, '=======');
         const largeVideoStyle = {
-            position: 'absolute' as 'absolute',
+            position: 'absolute' as const,
             top: 0,
             right: 0,
             bottom: 0,
