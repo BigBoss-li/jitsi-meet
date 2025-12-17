@@ -88,7 +88,7 @@ interface IProps {
      */
     _seeWhatIsBeingShared: boolean;
 
-    _sharedVideoStatus: string;
+    _sharedVideoStatus?: string;
 
     /**
      * Whether or not to show dominant speaker badge.
@@ -203,7 +203,7 @@ class LargeVideo extends Component<IProps> {
 
         console.log(_sharedVideoStatus, '=======');
         const largeVideoStyle = {
-            position: 'absolute',
+            position: 'absolute' as 'absolute',
             top: 0,
             right: 0,
             bottom: 0,
@@ -222,7 +222,7 @@ class LargeVideo extends Component<IProps> {
                 ref = { this._containerRef }
                 style = { style }>
                 <SharedVideo />
-                {_whiteboardEnabled && <Whiteboard />}
+                { _whiteboardEnabled && <Whiteboard /> }
                 <div id = 'etherpad' />
 
                 <Watermarks />
