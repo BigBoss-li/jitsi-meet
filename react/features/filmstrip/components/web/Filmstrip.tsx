@@ -1024,6 +1024,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
      */
     _onMessageListener(e: any) {
         const { dispatch } = this.props;
+
+        if (!e.data) {
+            return;
+        }
         const { type, data } = e.data;
         const { signalList } = this.state;
 
