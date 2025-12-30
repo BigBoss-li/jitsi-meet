@@ -18,10 +18,10 @@ import logger from './logger';
 
 const DEFAULT_STATE = {
     maxReceiverVideoQualityForLargeVideo: VIDEO_QUALITY_LEVELS.ULTRA,
-    maxReceiverVideoQualityForScreenSharingFilmstrip: VIDEO_QUALITY_LEVELS.HIGH,
-    maxReceiverVideoQualityForStageFilmstrip: VIDEO_QUALITY_LEVELS.HIGH,
-    maxReceiverVideoQualityForTileView: VIDEO_QUALITY_LEVELS.HIGH,
-    maxReceiverVideoQualityForVerticalFilmstrip: VIDEO_QUALITY_LEVELS.HIGH,
+    maxReceiverVideoQualityForScreenSharingFilmstrip: VIDEO_QUALITY_LEVELS.ULTRA,
+    maxReceiverVideoQualityForStageFilmstrip: VIDEO_QUALITY_LEVELS.ULTRA,
+    maxReceiverVideoQualityForTileView: VIDEO_QUALITY_LEVELS.ULTRA,
+    maxReceiverVideoQualityForVerticalFilmstrip: VIDEO_QUALITY_LEVELS.ULTRA,
     minHeightForQualityLvl: new Map(),
     preferredVideoQuality: VIDEO_QUALITY_LEVELS.ULTRA
 };
