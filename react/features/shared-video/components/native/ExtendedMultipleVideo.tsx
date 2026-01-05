@@ -47,11 +47,11 @@ class ExtendedMultipleVideo extends Component<IProps> {
         logger.info('ExtendedTwoVideo render playerHeight', playerHeight);
         logger.info('ExtendedTwoVideo render playerWidth', playerWidth);
 
-        const urlList = videoUrl?.split(',');
+        const videoUrlList = videoUrl?.split(',')?.slice(0, 4);
 
         const renderVideoList = [];
 
-        urlList?.forEach((url, index) => {
+        videoUrlList?.forEach((url, index) => {
             let videoPlayer;
 
             if (url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4')) {
@@ -111,14 +111,6 @@ function _mapStateToProps(state: IReduxState) {
 
     const playerWidth = playerBoxWidth;
     const playerHeight = playerWidth * 9 / 16;
-
-    // if (isWideScreen) {
-    //     playerHeight = playerBoxHeight;
-    //     playerWidth = playerHeight * 16 / 9;
-    // } else {
-    //     playerWidth = playerBoxWidth;
-    //     playerHeight = playerWidth * 9 / 16;
-    // }
 
     return {
         playerHeight,
