@@ -34,11 +34,12 @@ class ExtendedOneVideo extends Component<IProps> {
      */
     render() {
         const { videoUrl, playerHeight, playerWidth } = this.props;
+        const _videoUrl = videoUrl?.split(',')[0];
 
         return (
             <VideoManager
                 height = { playerHeight }
-                videoId = { videoUrl }
+                videoId = { _videoUrl }
                 width = { playerWidth } />
         );
 
