@@ -118,13 +118,13 @@ class VideoManager extends AbstractVideoManager<IState> {
      * @returns {void}
      */
     onPlaybackRateChange({ playbackRate }: { playbackRate: number; }) {
-        if (playbackRate === 0) {
-            this.setState({
-                paused: true
-            }, () => {
-                this.onPause();
-            });
-        }
+        // if (playbackRate === 0) {
+        //     this.setState({
+        //         paused: true
+        //     }, () => {
+        //         this.onPause();
+        //     });
+        // }
 
         if (playbackRate === 1) {
             this.setState({
@@ -153,16 +153,18 @@ class VideoManager extends AbstractVideoManager<IState> {
      */
     getPlayerOptions() {
         const { _isOwner, videoId, width, height } = this.props;
-        const { paused } = this.state;
+
+        // const { paused } = this.state;
 
         const options: any = {
-            paused,
+            paused: false,
             progressUpdateInterval: 5000,
-            resizeMode: 'cover' as const,
+            resizeMode: 'contain' as const,
             style: {
                 height,
                 width
             },
+            disableFocus: true,
             source: { uri: videoId },
             controls: _isOwner,
             pictureInPicture: false,
