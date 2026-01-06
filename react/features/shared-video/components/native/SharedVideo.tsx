@@ -100,6 +100,10 @@ class SharedVideo extends Component<IProps> {
      */
     render() {
         const { isOwner, videoUrl } = this.props;
+
+        if (!videoUrl) {
+            return null;
+        }
         const signalObj = JSON.parse(videoUrl);
         const { signals, signalLayout } = signalObj;
 
