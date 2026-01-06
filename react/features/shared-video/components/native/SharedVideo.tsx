@@ -6,12 +6,14 @@ import { IReduxState, IStore } from '../../../app/types';
 import { getLocalParticipant } from '../../../base/participants/functions';
 import { ASPECT_RATIO_WIDE } from '../../../base/responsive-ui/constants';
 import { setToolboxVisible } from '../../../toolbox/actions';
+import logger from '../../logger';
 
-import VideoManager from './VideoManager';
-import YoutubeVideoManager from './YoutubeVideoManager';
+import ExtendedVideoManager from './ExtendedVideoManager';
 import styles from './styles';
 
 interface IProps {
+
+    _signalLayout?: string;
 
     /**
      * The Redux dispatch function.
@@ -98,34 +100,24 @@ class SharedVideo extends Component<IProps> {
      * @returns {React$Element}
      */
     render() {
-        const {
-            isOwner,
-            playerHeight,
-            playerWidth,
-            videoUrl
-        } = this.props;
+        const { isOwner, videoUrl } = this.props;
 
-        if (!videoUrl) {
-            return null;
-        }
+        logger.info('rendering shared video', videoUrl);
+
+        const signalObj = JSON.parse(videoUrl);
+        const { signals, signalLayout } = signalObj;
+
+        logger.info('rendering shared signalObj', signalObj);
+        logger.info('rendering shared signals', signals);
+        logger.info('rendering shared layout', signalLayout);
 
         return (
             <View
                 pointerEvents = { isOwner ? 'auto' : 'none' }
                 style = { styles.videoContainer as ViewStyle } >
-                {videoUrl.match(/http/)
-                    ? (
-                        <VideoManager
-                            height = { playerHeight }
-                            videoId = { videoUrl }
-                            width = { playerWidth } />
-                    ) : (
-                        <YoutubeVideoManager
-                            height = { playerHeight }
-                            videoId = { videoUrl }
-                            width = { playerWidth } />
-                    )
-                }
+                <ExtendedVideoManager
+                    layout = { signalLayout }
+                    signals = { signals } />
             </View>
         );
     }
@@ -141,6 +133,7 @@ class SharedVideo extends Component<IProps> {
 function _mapStateToProps(state: IReduxState) {
     const { ownerId, videoUrl } = state['features/shared-video'];
     const { aspectRatio, clientHeight, clientWidth } = state['features/base/responsive-ui'];
+    const { signalLayout } = state['features/settings'];
 
     const isWideScreen = aspectRatio === ASPECT_RATIO_WIDE;
     const localParticipant = getLocalParticipant(state);
@@ -160,7 +153,8 @@ function _mapStateToProps(state: IReduxState) {
         isWideScreen,
         playerHeight,
         playerWidth,
-        videoUrl
+        videoUrl,
+        _signalLayout: signalLayout
     };
 }
 

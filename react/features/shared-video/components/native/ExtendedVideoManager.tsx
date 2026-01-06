@@ -5,9 +5,11 @@ import { connect } from 'react-redux';
 import { getLocalParticipant } from '../../../base/participants/functions';
 import logger from '../../logger';
 
-// import ExtendedOneVideo from './ExtendedOneVideo';
 import ExtendedMultipleVideo from './ExtendedMultipleVideo';
+import ExtendedOneLargeThreeVideo from './ExtendedOneLargeThreeVideo';
+import ExtendedOneLargeTwoVideo from './ExtendedOneLargeTwoVideo';
 import ExtendedOneVideo from './ExtendedOneVideo';
+import ExtendedTwoVideo from './ExtendedTwoVideo';
 import styles from './styles';
 
 interface IProps {
@@ -39,29 +41,32 @@ class ExtendedVideoManager extends Component<IProps> {
      */
     render() {
         const { signals, layout } = this.props;
-
-        logger.info('ExtendedVideoManager render layout', layout);
-
-        logger.info('ExtendedVideoManager render signals', typeof signals, signals);
-        const signal = signals[0];
-
-        logger.info('ExtendedVideoManager render signal', signal);
-        const { meetingSignalOutputs } = signal;
-        const output = meetingSignalOutputs[0];
-        const url = output?.url;
-
-        logger.info('ExtendedVideoManager render url', url);
-
+        const layoutMap = {
+            1: 'ONE',
+            2: 'TWO',
+            3: 'FOUR',
+            4: 'FOUR'
+        };
+        const videoUrl = signals.map(item => item.meetingSignalOutputs[0].url).join(',');
+        let _layout = layout;
         let _renderVideo = null;
 
-        if (layout === 'ONE') {
-            _renderVideo = <ExtendedOneVideo videoUrl = { url } />;
-        } else if (layout === 'ONE_LARGE_TWO') {
-            _renderVideo = <ExtendedOneVideo videoUrl = { url } />;
-        } else if (layout === 'ONE_LARGE') {
-            _renderVideo = <ExtendedOneVideo videoUrl = { url } />;
+        if (!layout || layout === '') {
+            _layout = layoutMap[signals.length];
+        }
+
+        logger.info('ExtendedVideoManager render layout', _layout);
+
+        if (_layout === 'ONE') {
+            _renderVideo = <ExtendedOneVideo videoUrl = { videoUrl } />;
+        } else if (_layout === 'TWO') {
+            _renderVideo = <ExtendedTwoVideo videoUrl = { videoUrl } />;
+        } else if (_layout === 'ONE_LARGE_TWO') {
+            _renderVideo = <ExtendedOneLargeTwoVideo videoUrl = { videoUrl } />;
+        } else if (_layout === 'ONE_LARGE_THREE') {
+            _renderVideo = <ExtendedOneLargeThreeVideo videoUrl = { videoUrl } />;
         } else {
-            _renderVideo = <ExtendedMultipleVideo videoUrl = { url } />;
+            _renderVideo = <ExtendedMultipleVideo videoUrl = { videoUrl } />;
         }
 
         return (
