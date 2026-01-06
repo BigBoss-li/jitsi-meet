@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Text, View } from 'react-native';
 import { connect } from 'react-redux';
 
-import logger from '../../logger';
-
+import AbstractExtendedVideo from './AbstractExtendedVideo';
 import VideoManager from './VideoManager';
 import WebRTCPlayer from './WebRTCPlayer';
 import styles from './styles';
@@ -31,27 +30,7 @@ interface IProps {
  *
  * @augments Component
  */
-class ExtendedTwoVideo extends Component<IProps> {
-
-    /**
-     * Match video url.
-     *
-     * @param {string} url - VideoUrl.
-     * @returns {boolean} Boolean.
-     */
-    matchNormalVideoUrl(url: string) {
-        return url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4');
-    }
-
-    /**
-     * Match WS video url.
-     *
-     * @param {string} url - VideoUrl.
-     * @returns {boolean} Boolean.
-     */
-    matchWsVideoUrl(url: string) {
-        return url.startsWith('wss://') || url.startsWith('ws://');
-    }
+class ExtendedTwoVideo extends AbstractExtendedVideo<IProps> {
 
     /**
      * Render video container.
@@ -124,17 +103,6 @@ class ExtendedTwoVideo extends Component<IProps> {
         const videoUrlList = videoUrl?.split(',');
         const leftVideoUrlList = videoUrlList?.slice(0, 1);
         const rightVideoUrlList = videoUrlList?.slice(1, 3);
-
-        logger.info('ExtendedOneLargeTwo render videoUrl', videoUrl);
-        logger.info('ExtendedOneLargeTwo render', leftContainerHeight,
-            leftContainerWidth,
-            rightContainerHeight,
-            rightContainerWidth,
-            leftPlayerWidth,
-            leftPlayerHeight,
-            rightPlayerWidth,
-            rightPlayerHeight);
-
         const renderLeftVideoList = this.renderVideoList(leftVideoUrlList || [], leftPlayerWidth, leftPlayerHeight);
         const renderRightVideoList = this.renderVideoList(rightVideoUrlList || [], rightPlayerWidth, rightPlayerHeight,
             2 - rightVideoUrlList?.length || 0);

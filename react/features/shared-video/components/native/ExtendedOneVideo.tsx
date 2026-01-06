@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 
 import { ASPECT_RATIO_WIDE } from '../../../base/responsive-ui/constants';
 
+import AbstractExtendedVideo from './AbstractExtendedVideo';
 import VideoManager from './VideoManager';
+import WebRTCPlayer from './WebRTCPlayer';
 
 interface IProps {
 
@@ -25,7 +27,7 @@ interface IProps {
  *
  * @augments Component
  */
-class ExtendedOneVideo extends Component<IProps> {
+class ExtendedOneVideo extends AbstractExtendedVideo<IProps> {
 
     /**
      * Implements React Component's render.
@@ -36,12 +38,20 @@ class ExtendedOneVideo extends Component<IProps> {
         const { videoUrl, playerHeight, playerWidth } = this.props;
         const _videoUrl = videoUrl?.split(',')[0];
 
-        return (
-            <VideoManager
+        let videoPlayer;
+
+        if (this.matchNormalVideoUrl(_videoUrl)) {
+            videoPlayer = (<VideoManager
                 height = { playerHeight }
                 videoId = { _videoUrl }
-                width = { playerWidth } />
-        );
+                width = { playerWidth } />);
+        } else if (this.matchWsVideoUrl(_videoUrl)) {
+            // TODO CentralControl not supported
+        } else {
+            videoPlayer = <WebRTCPlayer videoUrl = { _videoUrl } />;
+        }
+
+        return videoPlayer;
 
     }
 }

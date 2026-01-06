@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Text, View } from 'react-native';
 import { connect } from 'react-redux';
 
-import logger from '../../logger';
-
+import AbstractExtendedVideo from './AbstractExtendedVideo';
 import VideoManager from './VideoManager';
 import WebRTCPlayer from './WebRTCPlayer';
 import styles from './styles';
@@ -33,33 +32,28 @@ interface IProps {
  *
  * @augments Component
  */
-class ExtendedMultipleVideo extends Component<IProps> {
+class ExtendedMultipleVideo extends AbstractExtendedVideo<IProps> {
 
     /**
-     * Implements React Component's render.
+     * Render video container.
      *
-     * @inheritdoc
+     * @param {string[]} videoUrlList - VideoUrlList.
+     * @param {number} emptySize - EmptySize.
+     * @returns {void}
      */
-    render() {
-        const { videoUrl, playerHeight, playerWidth, playerBoxHeight, playerBoxWidth } = this.props;
-
-        logger.info('ExtendedTwoVideo render videoUrl', videoUrl);
-        logger.info('ExtendedTwoVideo render playerHeight', playerHeight);
-        logger.info('ExtendedTwoVideo render playerWidth', playerWidth);
-
-        const videoUrlList = videoUrl?.split(',')?.slice(0, 4);
-
+    renderVideoList(videoUrlList: string[], emptySize = 0) {
+        const { playerHeight, playerWidth, playerBoxHeight, playerBoxWidth } = this.props;
         const renderVideoList = [];
 
-        videoUrlList?.forEach((url, index) => {
+        videoUrlList.forEach((url, index) => {
             let videoPlayer;
 
-            if (url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4')) {
+            if (this.matchNormalVideoUrl(url)) {
                 videoPlayer = (<VideoManager
                     height = { playerHeight }
                     videoId = { url }
                     width = { playerWidth } />);
-            } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
+            } else if (this.matchWsVideoUrl(url)) {
                 // TODO CentralControl not supported
             } else {
                 videoPlayer = <WebRTCPlayer videoUrl = { url } />;
@@ -74,18 +68,32 @@ class ExtendedMultipleVideo extends Component<IProps> {
             </View>);
         });
 
-        const emptyDomCount = 4 - videoUrlList?.length;
+        if (emptySize > 0) {
+            for (let i = 0; i < emptySize; i++) {
+                renderVideoList.push(<View
+                    key = { `empty_${i}` }
+                    style = { [ styles.videoWrapper as ViewStyle, {
+                        height: playerBoxHeight,
+                        width: playerBoxWidth
+                    } ] } >
+                    <Text>暂无信号</Text>
+                </View>);
+            }
 
-        for (let i = 0; i < emptyDomCount; i++) {
-            renderVideoList.push(<View
-                key = { `empty_${i}` }
-                style = { [ styles.videoWrapper as ViewStyle, {
-                    height: playerBoxHeight,
-                    width: playerBoxWidth
-                } ] } >
-                <Text>暂无信号</Text>
-            </View>);
         }
+
+        return renderVideoList;
+    }
+
+    /**
+     * Implements React Component's render.
+     *
+     * @inheritdoc
+     */
+    render() {
+        const { videoUrl } = this.props;
+        const videoUrlList = videoUrl?.split(',')?.slice(0, 4);
+        const renderVideoList = this.renderVideoList(videoUrlList || [], 4 - (videoUrlList?.length || 0));
 
         return (<View style = { styles.multipleVideoContainer as ViewStyle } >
             {renderVideoList}

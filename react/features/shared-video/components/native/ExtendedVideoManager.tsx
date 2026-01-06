@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import { connect } from 'react-redux';
 
 import { getLocalParticipant } from '../../../base/participants/functions';
-import logger from '../../logger';
 
 import ExtendedMultipleVideo from './ExtendedMultipleVideo';
 import ExtendedOneLargeThreeVideo from './ExtendedOneLargeThreeVideo';
@@ -54,8 +53,6 @@ class ExtendedVideoManager extends Component<IProps> {
         if (!layout || layout === '') {
             _layout = layoutMap[signals.length];
         }
-
-        logger.info('ExtendedVideoManager render layout', _layout);
 
         if (_layout === 'ONE') {
             _renderVideo = <ExtendedOneVideo videoUrl = { videoUrl } />;

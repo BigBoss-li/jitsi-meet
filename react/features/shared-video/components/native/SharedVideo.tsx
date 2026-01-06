@@ -6,7 +6,6 @@ import { IReduxState, IStore } from '../../../app/types';
 import { getLocalParticipant } from '../../../base/participants/functions';
 import { ASPECT_RATIO_WIDE } from '../../../base/responsive-ui/constants';
 import { setToolboxVisible } from '../../../toolbox/actions';
-import logger from '../../logger';
 
 import ExtendedVideoManager from './ExtendedVideoManager';
 import styles from './styles';
@@ -101,15 +100,8 @@ class SharedVideo extends Component<IProps> {
      */
     render() {
         const { isOwner, videoUrl } = this.props;
-
-        logger.info('rendering shared video', videoUrl);
-
         const signalObj = JSON.parse(videoUrl);
         const { signals, signalLayout } = signalObj;
-
-        logger.info('rendering shared signalObj', signalObj);
-        logger.info('rendering shared signals', signals);
-        logger.info('rendering shared layout', signalLayout);
 
         return (
             <View

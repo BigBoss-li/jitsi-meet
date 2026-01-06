@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Text, View } from 'react-native';
 import { connect } from 'react-redux';
 
-import logger from '../../logger';
-
+import AbstractExtendedVideo from './AbstractExtendedVideo';
 import VideoManager from './VideoManager';
 import WebRTCPlayer from './WebRTCPlayer';
 import styles from './styles';
@@ -33,7 +32,44 @@ interface IProps {
  *
  * @augments Component
  */
-class ExtendedTwoVideo extends Component<IProps> {
+class ExtendedTwoVideo extends AbstractExtendedVideo<IProps> {
+
+    /**
+     * Render video container.
+     *
+     * @param {string[]} videoUrlList - VideoUrlList.
+     * @param {number} playerWidth - PlayerWidth.
+     * @param {number} playerHeight - PlayerHeight.
+     * @param {number} emptySize - EmptySize.
+     * @returns {void}
+     */
+    renderVideoList(videoUrlList: string[], playerWidth: number, playerHeight: number, emptySize = 0) {
+        const renderVideoList = [];
+
+        videoUrlList.forEach(url => {
+            let videoPlayer;
+
+            if (this.matchNormalVideoUrl(url)) {
+                videoPlayer = (<VideoManager
+                    height = { playerHeight }
+                    videoId = { url }
+                    width = { playerWidth } />);
+            } else if (this.matchWsVideoUrl(url)) {
+                // TODO CentralControl not supported
+            } else {
+                videoPlayer = <WebRTCPlayer videoUrl = { url } />;
+            }
+            renderVideoList.push(videoPlayer);
+        });
+
+        if (emptySize > 0) {
+            for (let i = 0; i < emptySize; i++) {
+                renderVideoList.push(<Text>暂无信号</Text>);
+            }
+        }
+
+        return renderVideoList;
+    }
 
     /**
      * Implements React Component's render.
@@ -42,51 +78,31 @@ class ExtendedTwoVideo extends Component<IProps> {
      */
     render() {
         const { videoUrl, playerHeight, playerWidth, containerWidth, containerHeight } = this.props;
-        const renderVideoList = [];
-        const videoUrlList = videoUrl?.split(',')?.slice(0, 2);
-
-        logger.info('ExtendedTwoVideo render videoUrl', videoUrl);
-
-        videoUrlList?.forEach((url, index) => {
-            let videoPlayer;
-
-            if (url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4')) {
-                videoPlayer = (<VideoManager
-                    height = { playerHeight }
-                    videoId = { url }
-                    width = { playerWidth } />);
-            } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
-                // TODO CentralControl not supported
-            } else {
-                videoPlayer = <WebRTCPlayer videoUrl = { url } />;
-            }
-            renderVideoList.push(<View
-                key = { `video_${index}` }
-                style = { [ styles.videoWrapper as ViewStyle, {
-                    height: containerHeight,
-                    width: containerWidth
-                } ] } >
-                {videoPlayer}
-            </View>);
-        });
-
-        const emptyDomCount = 2 - videoUrlList?.length;
-
-        for (let i = 0; i < emptyDomCount; i++) {
-            renderVideoList.push(<View
-                key = { `empty_${i}` }
-                style = { [ styles.videoWrapper as ViewStyle, {
-                    height: containerHeight,
-                    width: containerWidth
-                } ] } >
-                <Text>暂无信号</Text>
-            </View>);
-        }
+        const videoUrlList = videoUrl?.split(',');
+        const leftVideoUrlList = videoUrlList?.slice(0, 1);
+        const rightVideoUrlList = videoUrlList?.slice(1, 2);
+        const renderLeftVideoList = this.renderVideoList(leftVideoUrlList || [], playerWidth, playerHeight,
+            1 - (leftVideoUrlList?.length || 0));
+        const renderRightVideoList = this.renderVideoList(rightVideoUrlList || [], playerWidth, playerHeight,
+            1 - (rightVideoUrlList?.length || 0));
 
         return (
             <View
                 style = { styles.multipleVideoContainer as ViewStyle } >
-                {renderVideoList}
+                <View
+                    style = { [ styles.videoWrapper as ViewStyle, {
+                        height: containerHeight,
+                        width: containerWidth
+                    } ] } >
+                    {renderLeftVideoList}
+                </View>
+                <View
+                    style = { [ styles.videoWrapper as ViewStyle, {
+                        height: containerHeight,
+                        width: containerWidth
+                    } ] } >
+                    {renderRightVideoList}
+                </View>
             </View>
         );
 
