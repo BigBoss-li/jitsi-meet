@@ -4,11 +4,11 @@ import { connect } from 'react-redux';
 
 import { getLocalParticipant } from '../../../base/participants/functions';
 
+import ExtendedDoubleVideo from './ExtendedDoubleVideo';
 import ExtendedMultipleVideo from './ExtendedMultipleVideo';
 import ExtendedOneLargeThreeVideo from './ExtendedOneLargeThreeVideo';
 import ExtendedOneLargeTwoVideo from './ExtendedOneLargeTwoVideo';
-import ExtendedOneVideo from './ExtendedOneVideo';
-import ExtendedTwoVideo from './ExtendedTwoVideo';
+import ExtendedSingleVideo from './ExtendedSingleVideo';
 import styles from './styles';
 
 interface IProps {
@@ -54,15 +54,20 @@ class ExtendedVideoManager extends Component<IProps> {
             _layout = layoutMap[signals.length];
         }
 
-        if (_layout === 'ONE') {
-            _renderVideo = <ExtendedOneVideo videoUrl = { videoUrl } />;
-        } else if (_layout === 'TWO') {
-            _renderVideo = <ExtendedTwoVideo videoUrl = { videoUrl } />;
-        } else if (_layout === 'ONE_LARGE_TWO') {
+        switch (_layout) {
+        case 'ONE':
+            _renderVideo = <ExtendedSingleVideo videoUrl = { videoUrl } />;
+            break;
+        case 'TWO':
+            _renderVideo = <ExtendedDoubleVideo videoUrl = { videoUrl } />;
+            break;
+        case 'ONE_LARGE_TWO':
             _renderVideo = <ExtendedOneLargeTwoVideo videoUrl = { videoUrl } />;
-        } else if (_layout === 'ONE_LARGE') {
+            break;
+        case 'ONE_LARGE':
             _renderVideo = <ExtendedOneLargeThreeVideo videoUrl = { videoUrl } />;
-        } else {
+            break;
+        default:
             _renderVideo = <ExtendedMultipleVideo videoUrl = { videoUrl } />;
         }
 

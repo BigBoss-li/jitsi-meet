@@ -32,7 +32,7 @@ interface IProps {
  *
  * @augments Component
  */
-class ExtendedTwoVideo extends AbstractExtendedVideo<IProps> {
+class ExtendedDoubleVideo extends AbstractExtendedVideo<IProps> {
 
     /**
      * Render video container.
@@ -133,4 +133,4 @@ function _mapStateToProps(state: IReduxState) {
     };
 }
 
-export default connect(_mapStateToProps)(ExtendedTwoVideo);
+export default connect(_mapStateToProps)(ExtendedDoubleVideo);

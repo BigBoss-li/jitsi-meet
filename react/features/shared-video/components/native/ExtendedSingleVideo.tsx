@@ -27,7 +27,7 @@ interface IProps {
  *
  * @augments Component
  */
-class ExtendedOneVideo extends AbstractExtendedVideo<IProps> {
+class ExtendedSingleVideo extends AbstractExtendedVideo<IProps> {
 
     /**
      * Implements React Component's render.
@@ -84,4 +84,4 @@ function _mapStateToProps(state: IReduxState) {
     };
 }
 
-export default connect(_mapStateToProps)(ExtendedOneVideo);
+export default connect(_mapStateToProps)(ExtendedSingleVideo);
