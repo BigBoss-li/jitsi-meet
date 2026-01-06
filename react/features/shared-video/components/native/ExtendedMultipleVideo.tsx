@@ -74,7 +74,7 @@ class ExtendedMultipleVideo extends Component<IProps> {
             </View>);
         });
 
-        const emptyDomCount = 4 - urlList?.length;
+        const emptyDomCount = 4 - videoUrlList?.length;
 
         for (let i = 0; i < emptyDomCount; i++) {
             renderVideoList.push(<View

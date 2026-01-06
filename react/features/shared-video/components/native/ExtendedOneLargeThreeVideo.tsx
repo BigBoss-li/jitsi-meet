@@ -11,19 +11,17 @@ import styles from './styles';
 
 interface IProps {
 
-    containerHeight: number;
+    leftContainerHeight: number;
 
-    containerWidth: number;
+    leftContainerWidth: number;
+    leftPlayerHeight: number;
+    leftPlayerWidth: number;
+    rightContainerHeight: number;
+    rightContainerWidth: number;
 
-    /**
-     * The available player width.
-     */
-    playerHeight: number;
+    rightPlayerHeight: number;
 
-    /**
-     * The available player width.
-     */
-    playerWidth: number;
+    rightPlayerWidth: number;
 
     videoUrl?: string;
 }
@@ -36,26 +34,46 @@ interface IProps {
 class ExtendedTwoVideo extends Component<IProps> {
 
     /**
-     * Implements React Component's render.
+     * Match video url.
      *
-     * @inheritdoc
+     * @param {string} url - VideoUrl.
+     * @returns {boolean} Boolean.
      */
-    render() {
-        const { videoUrl, playerHeight, playerWidth, containerWidth, containerHeight } = this.props;
+    matchNormalVideoUrl(url: string) {
+        return url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4');
+    }
+
+    /**
+     * Match WS video url.
+     *
+     * @param {string} url - VideoUrl.
+     * @returns {boolean} Boolean.
+     */
+    matchWsVideoUrl(url: string) {
+        return url.startsWith('wss://') || url.startsWith('ws://');
+    }
+
+    /**
+     * Render video container.
+     *
+     * @param {string[]} videoUrlList - VideoUrlList.
+     * @param {number} playerWidth - PlayerWidth.
+     * @param {number} playerHeight - PlayerHeight.
+     * @param {number} emptySize - EmptySize.
+     * @returns {void}
+     */
+    renderVideoList(videoUrlList: string[], playerWidth: number, playerHeight: number, emptySize = 0) {
         const renderVideoList = [];
-        const videoUrlList = videoUrl?.split(',')?.slice(0, 2);
 
-        logger.info('ExtendedTwoVideo render videoUrl', videoUrl);
-
-        videoUrlList?.forEach((url, index) => {
+        videoUrlList.forEach((url, index) => {
             let videoPlayer;
 
-            if (url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4')) {
+            if (this.matchNormalVideoUrl(url)) {
                 videoPlayer = (<VideoManager
                     height = { playerHeight }
                     videoId = { url }
                     width = { playerWidth } />);
-            } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
+            } else if (this.matchWsVideoUrl(url)) {
                 // TODO CentralControl not supported
             } else {
                 videoPlayer = <WebRTCPlayer videoUrl = { url } />;
@@ -63,30 +81,81 @@ class ExtendedTwoVideo extends Component<IProps> {
             renderVideoList.push(<View
                 key = { `video_${index}` }
                 style = { [ styles.videoWrapper as ViewStyle, {
-                    height: containerHeight,
-                    width: containerWidth
+                    height: playerHeight,
+                    width: playerWidth
                 } ] } >
                 {videoPlayer}
             </View>);
         });
 
-        const emptyDomCount = 2 - videoUrlList?.length;
+        if (emptySize > 0) {
+            for (let i = 0; i < emptySize; i++) {
+                renderVideoList.push(<View
+                    key = { `empty_${i}` }
+                    style = { [ styles.videoWrapper as ViewStyle, {
+                        height: playerHeight,
+                        width: playerWidth
+                    } ] } >
+                    <Text>暂无信号</Text>
+                </View>);
+            }
 
-        for (let i = 0; i < emptyDomCount; i++) {
-            renderVideoList.push(<View
-                key = { `empty_${i}` }
-                style = { [ styles.videoWrapper as ViewStyle, {
-                    height: containerHeight,
-                    width: containerWidth
-                } ] } >
-                <Text>暂无信号</Text>
-            </View>);
         }
+
+        return renderVideoList;
+    }
+
+    /**
+     * Implements React Component's render.
+     *
+     * @inheritdoc
+     */
+    render() {
+        const { videoUrl, leftContainerHeight,
+            leftContainerWidth,
+            rightContainerHeight,
+            rightContainerWidth,
+            leftPlayerWidth,
+            leftPlayerHeight,
+            rightPlayerWidth,
+            rightPlayerHeight } = this.props;
+
+
+        const videoUrlList = videoUrl?.split(',');
+        const leftVideoUrlList = videoUrlList?.slice(0, 1);
+        const rightVideoUrlList = videoUrlList?.slice(1, 4);
+
+        logger.info('ExtendedOneLargeThree render videoUrl', videoUrl);
+        logger.info('ExtendedOneLargeThree render', leftContainerHeight,
+            leftContainerWidth,
+            rightContainerHeight,
+            rightContainerWidth,
+            leftPlayerWidth,
+            leftPlayerHeight,
+            rightPlayerWidth,
+            rightPlayerHeight);
+
+        const renderLeftVideoList = this.renderVideoList(leftVideoUrlList || [], leftPlayerWidth, leftPlayerHeight);
+        const renderRightVideoList = this.renderVideoList(rightVideoUrlList || [], rightPlayerWidth, rightPlayerHeight,
+            3 - rightVideoUrlList?.length || 0);
 
         return (
             <View
                 style = { styles.multipleVideoContainer as ViewStyle } >
-                {renderVideoList}
+                <View
+                    style = { [ styles.largeTwoVideoLeftContainer as ViewStyle, {
+                        height: leftContainerHeight,
+                        width: leftContainerWidth
+                    } ] } >
+                    {renderLeftVideoList}
+                </View>
+                <View
+                    style = { [ styles.largeTwoVideoRightContainer as ViewStyle, {
+                        height: rightContainerHeight,
+                        width: rightContainerWidth
+                    } ] } >
+                    {renderRightVideoList}
+                </View>
             </View>
         );
 
@@ -103,17 +172,26 @@ class ExtendedTwoVideo extends Component<IProps> {
 function _mapStateToProps(state: IReduxState) {
     const { clientHeight, clientWidth } = state['features/base/responsive-ui'];
 
-    const containerHeight = clientHeight;
-    const containerWidth = clientWidth / 2;
+    const leftContainerHeight = clientHeight;
+    const leftContainerWidth = clientWidth * 3 / 4;
+    const rightContainerHeight = clientHeight;
+    const rightContainerWidth = clientWidth / 4;
 
-    const playerWidth = containerWidth;
-    const playerHeight = playerWidth * 9 / 16;
+    const leftPlayerWidth = leftContainerWidth;
+    const leftPlayerHeight = leftPlayerWidth * 9 / 16;
+
+    const rightPlayerWidth = rightContainerWidth;
+    const rightPlayerHeight = rightPlayerWidth * 9 / 16;
 
     return {
-        playerHeight,
-        playerWidth,
-        containerHeight,
-        containerWidth
+        leftContainerHeight,
+        leftContainerWidth,
+        rightContainerHeight,
+        rightContainerWidth,
+        leftPlayerWidth,
+        leftPlayerHeight,
+        rightPlayerWidth,
+        rightPlayerHeight
     };
 }
 

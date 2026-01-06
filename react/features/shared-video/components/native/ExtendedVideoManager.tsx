@@ -63,7 +63,7 @@ class ExtendedVideoManager extends Component<IProps> {
             _renderVideo = <ExtendedTwoVideo videoUrl = { videoUrl } />;
         } else if (_layout === 'ONE_LARGE_TWO') {
             _renderVideo = <ExtendedOneLargeTwoVideo videoUrl = { videoUrl } />;
-        } else if (_layout === 'ONE_LARGE_THREE') {
+        } else if (_layout === 'ONE_LARGE') {
             _renderVideo = <ExtendedOneLargeThreeVideo videoUrl = { videoUrl } />;
         } else {
             _renderVideo = <ExtendedMultipleVideo videoUrl = { videoUrl } />;
