@@ -166,16 +166,15 @@ class VideoManager extends AbstractVideoManager<IState> {
             },
             disableFocus: true,
             source: { uri: videoId },
-            controls: _isOwner,
+            controls: false,
             pictureInPicture: false,
-            onProgress: this.onProgress,
             onError: (event: Error) => {
                 logger.error('Error in the player:', event);
             }
         };
 
         if (_isOwner) {
-            options.onPlaybackRateChange = this.onPlaybackRateChange;
+            // options.onPlaybackRateChange = this.onPlaybackRateChange;
         }
 
         return options;
