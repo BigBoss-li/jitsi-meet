@@ -86,6 +86,7 @@ import { default as IconShareDoc } from './share-doc.svg';
 import { default as IconShare } from './share.svg';
 import { default as IconShortcuts } from './shortcuts.svg';
 import { default as IconSignal } from './signal.svg';
+import { default as IconSignalOutput } from './signaloutput.svg';
 import { default as IconSip } from './sip.svg';
 import { default as IconSites } from './sites.svg';
 import { default as IconRemoteControlStart } from './start-remote-control.svg';
@@ -216,6 +217,7 @@ export const DEFAULT_ICON: Record<string, any> = {
     IconVideo,
     IconVideoOff,
     IconSignal,
+    IconSignalOutput,
     IconVolumeOff,
     IconVolumeUp,
     IconWarning,

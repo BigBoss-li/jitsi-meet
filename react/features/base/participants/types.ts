@@ -84,3 +84,20 @@ export interface IJitsiParticipant {
     getSources: () => Map<string, Map<string, ISourceInfo>>;
     isHidden: () => boolean;
 }
+
+export interface IMeetingSignal {
+    checked: boolean;
+    id: string;
+    ip: string;
+    meetingSignalOutputs: IMeetingSignalOutput[];
+    name: string;
+    srcType: string;
+}
+
+export interface IMeetingSignalOutput {
+    bitRate: string;
+    id: string;
+    resolution: string;
+    url: string;
+
+}

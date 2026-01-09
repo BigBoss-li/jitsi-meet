@@ -9,6 +9,7 @@ import { getFeatureFlag } from '../../../base/flags/functions';
 import AudioDeviceToggleButton from '../../../mobile/audio-mode/components/AudioDeviceToggleButton';
 import PictureInPictureButton from '../../../mobile/picture-in-picture/components/PictureInPictureButton';
 import ParticipantsPaneButton from '../../../participants-pane/components/native/ParticipantsPaneButton';
+import SignalsPaneButton from '../../../participants-pane/components/native/SignalsPaneButton';
 import { isParticipantsPaneEnabled } from '../../../participants-pane/functions';
 import { isRoomNameEnabled } from '../../../prejoin/functions';
 import ToggleCameraButton from '../../../toolbox/components/native/ToggleCameraButton';
@@ -108,6 +109,9 @@ const TitleBar = (props: IProps) => {
                         styles = { styles.titleBarButton } />
                 </View>
             }
+            <View style = { styles.titleBarButtonContainer }>
+                <SignalsPaneButton styles = { styles.titleBarButton } />
+            </View>
         </View>
     );
 };

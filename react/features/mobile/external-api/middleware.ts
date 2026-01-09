@@ -54,6 +54,7 @@ import { closeChat, openChat, sendMessage, setPrivateMessageRecipient } from '..
 import { setRequestingSubtitles } from '../../subtitles/actions.any';
 import { CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED } from '../../toolbox/actionTypes';
 import { muteLocal } from '../../video-menu/actions.native';
+import { setMeetingSignals } from '../meeting-signal/actions';
 import { ENTER_PICTURE_IN_PICTURE } from '../picture-in-picture/actionTypes';
 // @ts-ignore
 import { isExternalAPIAvailable } from '../react-native-sdk/functions';
@@ -419,6 +420,20 @@ function _registerForNativeEvents(store: IStore) {
     eventEmitter.addListener(ExternalAPI.TOGGLE_CAMERA, () => {
         dispatch(toggleCameraFacingMode());
     });
+
+    eventEmitter.addListener(ExternalAPI.MEETING_SIGNAL, ({ meetingSignals }: any) => {
+        logger.info('Received meeting signal:', meetingSignals);
+        try {
+            const signals = typeof meetingSignals === 'string'
+                ? JSON.parse(meetingSignals)
+                : meetingSignals;
+
+            dispatch(setMeetingSignals(signals));
+        } catch (error) {
+            console.warn('Cannot parse meeting signal', error, meetingSignals);
+        }
+
+    });
 }
 
 /**
@@ -439,6 +454,7 @@ function _unregisterForNativeEvents() {
     eventEmitter.removeAllListeners(ExternalAPI.SEND_CHAT_MESSAGE);
     eventEmitter.removeAllListeners(ExternalAPI.SET_CLOSED_CAPTIONS_ENABLED);
     eventEmitter.removeAllListeners(ExternalAPI.TOGGLE_CAMERA);
+    eventEmitter.removeAllListeners(ExternalAPI.MEETING_SIGNAL);
 }
 
 /**

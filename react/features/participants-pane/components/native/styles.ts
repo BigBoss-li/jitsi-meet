@@ -289,5 +289,29 @@ export default {
         ...BaseTheme.typography.heading6,
         color: BaseTheme.palette.warning02,
         marginLeft: BaseTheme.spacing[2]
+    },
+
+    meetingSignalContent: {
+        justifyContent: 'space-between'
+    },
+
+    meetingSignalDetailsContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        width: '70%'
+    },
+
+    meetingSignalTypeLabel: {
+        color: '#08ccbc',
+        overflow: 'hidden',
+        marginRight: BaseTheme.spacing[3]
+    },
+
+    meetingSignalSwitch: {
+        display: 'flex',
+        flexDirection: 'row',
+        width: '20%',
+        justifyContent: 'flex-end'
     }
+
 };

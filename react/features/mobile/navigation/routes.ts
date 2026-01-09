@@ -16,6 +16,7 @@ export const screen = {
         liveStream: 'Live stream',
         main: 'Conference',
         participants: 'Participants',
+        signals: 'Signals',
         root: 'Conference root',
         recording: 'Recording',
         salesforce: 'Link to Salesforce',

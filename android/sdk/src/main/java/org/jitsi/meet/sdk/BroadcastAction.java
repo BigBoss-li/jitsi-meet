@@ -78,7 +78,8 @@ public class BroadcastAction {
         SEND_CHAT_MESSAGE("org.jitsi.meet.SEND_CHAT_MESSAGE"),
         SET_VIDEO_MUTED("org.jitsi.meet.SET_VIDEO_MUTED"),
         SET_CLOSED_CAPTIONS_ENABLED("org.jitsi.meet.SET_CLOSED_CAPTIONS_ENABLED"),
-        TOGGLE_CAMERA("org.jitsi.meet.TOGGLE_CAMERA");
+        TOGGLE_CAMERA("org.jitsi.meet.TOGGLE_CAMERA"),
+        MEETING_SIGNAL("org.jitsi.meet.MEETING_SIGNAL");
 
         private final String action;
 

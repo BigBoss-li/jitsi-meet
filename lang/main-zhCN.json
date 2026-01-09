@@ -825,6 +825,9 @@
         "search": "搜索参会者",
         "title": "参会者"
     },
+    "signalsPane": {
+        "title": "信号源"
+    },
     "passwordDigitsOnly": "最多{{number}}位数字",
     "passwordSetRemotely": "由其他参会者设置",
     "pinParticipant": "{{participantName}} - 固定",

@@ -43,6 +43,12 @@ public class BroadcastIntentHelper {
         return intent;
     }
 
+    public static Intent buildSetMeetingSignalsIntent(String meetingSignalsJson) {
+        Intent intent = new Intent(BroadcastAction.Type.MEETING_SIGNAL.getAction());
+        intent.putExtra("meetingSignals", meetingSignalsJson);
+        return intent;
+    }
+
     public static Intent buildSetVideoMutedIntent(boolean muted) {
         Intent intent = new Intent(BroadcastAction.Type.SET_VIDEO_MUTED.getAction());
         intent.putExtra("muted", muted);
@@ -54,7 +60,7 @@ public class BroadcastIntentHelper {
         intent.putExtra("enabled", enabled);
         return intent;
     }
-    
+
     public static Intent buildRetrieveParticipantsInfo(String requestId) {
         Intent intent = new Intent(BroadcastAction.Type.RETRIEVE_PARTICIPANTS_INFO.getAction());
         intent.putExtra("requestId", requestId);

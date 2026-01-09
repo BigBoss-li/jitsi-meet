@@ -26,6 +26,7 @@ import AddPeopleDialog
     from '../../../../../invite/components/add-people-dialog/native/AddPeopleDialog';
 // @ts-ignore
 import ParticipantsPane from '../../../../../participants-pane/components/native/ParticipantsPane';
+import SignalsPane from '../../../../../participants-pane/components/native/SignalsPane';
 // @ts-ignore
 import StartLiveStreamDialog from '../../../../../recording/components/LiveStream/native/StartLiveStreamDialog';
 import StartRecordingDialog
@@ -125,6 +126,13 @@ const ConferenceNavigationContainer = () => {
                     options = {{
                         ...participantsScreenOptions,
                         title: t('participantsPane.title')
+                    }} />
+                <ConferenceStack.Screen
+                    component = { SignalsPane }
+                    name = { screen.conference.signals }
+                    options = {{
+                        ...participantsScreenOptions,
+                        title: t('signalsPane.title')
                     }} />
                 <ConferenceStack.Screen
                     component = { SecurityDialog }
