@@ -582,6 +582,20 @@ function _sendConferenceEvent(
         const isAudioMuted = isLocalTrackMuted(localTracks, MEDIA_TYPE.AUDIO);
 
         data.isAudioMuted = isAudioMuted;
+
+        if (type === CONFERENCE_JOINED) {
+            const participantsInfo = [];
+            const remoteParticipants = getRemoteParticipants(store);
+            const localParticipant = getLocalParticipant(store);
+
+            localParticipant && participantsInfo.push(participantToParticipantInfo(localParticipant));
+            remoteParticipants.forEach(participant => {
+                if (!participant.fakeParticipant) {
+                    participantsInfo.push(participantToParticipantInfo(participant));
+                }
+            });
+            data.participantsInfo = JSON.stringify(participantsInfo);
+        }
     }
 
     if (_swallowEvent(store, action, data)) {
