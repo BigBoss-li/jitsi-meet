@@ -8,8 +8,6 @@ import { hideSheet } from '../../../base/dialog/actions';
 import BottomSheet from '../../../base/dialog/components/native/BottomSheet';
 import { bottomSheetStyles } from '../../../base/dialog/components/native/styles';
 import SettingsButton from '../../../base/settings/components/native/SettingsButton';
-import BreakoutRoomsButton
-    from '../../../breakout-rooms/components/native/BreakoutRoomsButton';
 import SharedDocumentButton from '../../../etherpad/components/SharedDocumentButton.native';
 import ReactionMenu from '../../../reactions/components/native/ReactionMenu';
 import { shouldDisplayReactionsButtons } from '../../../reactions/functions.any';
@@ -125,7 +123,6 @@ class OverflowMenu extends PureComponent<IProps, IState> {
      */
     render() {
         const {
-            _isBreakoutRoomsSupported,
             _isSpeakerStatsDisabled,
             _isSharedVideoEnabled,
             _shouldDisplayReactionsButtons,
@@ -179,7 +176,6 @@ class OverflowMenu extends PureComponent<IProps, IState> {
                 {!toolbarButtons.has('screensharing') && <ScreenSharingButton { ...buttonProps } />}
                 {!_isSpeakerStatsDisabled && <SpeakerStatsButton { ...buttonProps } />}
                 {!toolbarButtons.has('tileview') && <TileViewButton { ...buttonProps } />}
-                {_isBreakoutRoomsSupported && <BreakoutRoomsButton { ...buttonProps } />}
                 {/* @ts-ignore */}
                 <Divider style = { styles.divider as ViewStyle } />
                 <ClosedCaptionButton { ...buttonProps } />
