@@ -49,6 +49,12 @@ public class BroadcastIntentHelper {
         return intent;
     }
 
+    public static Intent buildSetScreenRecordEnabledIntent(boolean isRecording) {
+        Intent intent = new Intent(BroadcastAction.Type.SCREEN_RECORD.getAction());
+        intent.putExtra("isRecording", isRecording);
+        return intent;
+    }
+
     public static Intent buildSetVideoMutedIntent(boolean muted) {
         Intent intent = new Intent(BroadcastAction.Type.SET_VIDEO_MUTED.getAction());
         intent.putExtra("muted", muted);

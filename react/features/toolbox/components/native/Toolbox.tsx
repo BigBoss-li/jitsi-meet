@@ -9,6 +9,7 @@ import Platform from '../../../base/react/Platform.native';
 import ChatButton from '../../../chat/components/native/ChatButton';
 import ReactionsMenuButton from '../../../reactions/components/native/ReactionsMenuButton';
 import { shouldDisplayReactionsButtons } from '../../../reactions/functions.any';
+import RecordButton from '../../../recording/components/Recording/native/RecordButton';
 import TileViewButton from '../../../video-layout/components/TileViewButton';
 import { iAmVisitor } from '../../../visitors/functions';
 import { getMovableButtons, isToolboxVisible } from '../../functions.native';
@@ -65,7 +66,7 @@ interface IProps {
  * @returns {React$Element}
  */
 function Toolbox(props: IProps) {
-    const { _endConferenceSupported, _shouldDisplayReactionsButtons, _styles, _visible, _iAmVisitor, _width } = props;
+    const { _endConferenceSupported, _shouldDisplayReactionsButtons, _styles, _visible, _iAmVisitor } = props;
 
     if (!_visible) {
         return null;
@@ -73,7 +74,7 @@ function Toolbox(props: IProps) {
 
     const bottomEdge = Platform.OS === 'ios' && _visible;
     const { buttonStylesBorderless, hangupButtonStyles, toggledButtonStyles } = _styles;
-    const additionalButtons = getMovableButtons(_width);
+    const additionalButtons = getMovableButtons();
     const backgroundToggledStyle = {
         ...toggledButtonStyles,
         style: [
@@ -122,6 +123,11 @@ function Toolbox(props: IProps) {
                         styles = { buttonStylesBorderless }
                         toggledStyles = { backgroundToggledStyle } />)}
                 {additionalButtons.has('tileview') && <TileViewButton styles = { buttonStylesBorderless } />}
+
+                {<RecordButton
+                    styles = { buttonStylesBorderless }
+                    toggledStyles = { backgroundToggledStyle } />}
+
                 {!_iAmVisitor && <OverflowMenuButton
                     styles = { buttonStylesBorderless }
                     toggledStyles = { toggledButtonStyles } />

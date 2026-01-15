@@ -53,6 +53,7 @@ import { ICallIntegrationState } from '../mobile/call-integration/reducer';
 import { IMobileExternalApiState } from '../mobile/external-api/reducer';
 import { IFullScreenState } from '../mobile/full-screen/reducer';
 import { IMeetingSignalsExternalApiState } from '../mobile/meeting-signal/reducer';
+import { IScreenRecordExternalApiState } from '../mobile/screen-record/reducer';
 import { IMobileWatchOSState } from '../mobile/watchos/reducer';
 import { INoAudioSignalState } from '../no-audio-signal/reducer';
 import { INoiseDetectionState } from '../noise-detection/reducer';
@@ -144,6 +145,7 @@ export interface IReduxState {
     'features/mobile/audio-mode': IMobileAudioModeState;
     'features/mobile/external-api': IMobileExternalApiState;
     'features/mobile/meeting-signal': IMeetingSignalsExternalApiState;
+    'features/mobile/screen-record': IScreenRecordExternalApiState;
     'features/mobile/watchos': IMobileWatchOSState;
     'features/no-audio-signal': INoAudioSignalState;
     'features/noise-detection': INoiseDetectionState;

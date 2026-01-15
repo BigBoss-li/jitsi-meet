@@ -18,6 +18,8 @@ export const CLEAR_TOOLBOX_TIMEOUT = 'CLEAR_TOOLBOX_TIMEOUT';
  */
 export const CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED = 'CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED';
 
+export const CUSTOM_SCREEN_RECORD_PRESSED = 'CUSTOM_SCREEN_RECORD_PRESSED'
+
 /**
  * The type of (redux) action which updates whether the conference is or is not
  * currently in full screen view.

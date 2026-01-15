@@ -8,30 +8,15 @@ import { hideSheet } from '../../../base/dialog/actions';
 import BottomSheet from '../../../base/dialog/components/native/BottomSheet';
 import { bottomSheetStyles } from '../../../base/dialog/components/native/styles';
 import SettingsButton from '../../../base/settings/components/native/SettingsButton';
-import SharedDocumentButton from '../../../etherpad/components/SharedDocumentButton.native';
 import ReactionMenu from '../../../reactions/components/native/ReactionMenu';
 import { shouldDisplayReactionsButtons } from '../../../reactions/functions.any';
-import LiveStreamButton from '../../../recording/components/LiveStream/native/LiveStreamButton';
-import RecordButton from '../../../recording/components/Recording/native/RecordButton';
-import SecurityDialogButton
-    from '../../../security/components/security-dialog/native/SecurityDialogButton';
-import SharedVideoButton from '../../../shared-video/components/native/SharedVideoButton';
 import { isSharedVideoEnabled } from '../../../shared-video/functions';
-import SpeakerStatsButton from '../../../speaker-stats/components/native/SpeakerStatsButton';
 import { isSpeakerStatsDisabled } from '../../../speaker-stats/functions';
-import ClosedCaptionButton from '../../../subtitles/components/native/ClosedCaptionButton';
-import TileViewButton from '../../../video-layout/components/TileViewButton';
 import styles from '../../../video-menu/components/native/styles';
-import WhiteboardButton from '../../../whiteboard/components/native/WhiteboardButton';
 import { customOverflowMenuButtonPressed } from '../../actions.native';
 import { getMovableButtons } from '../../functions.native';
 
-import AudioOnlyButton from './AudioOnlyButton';
 import CustomOptionButton from './CustomOptionButton';
-import LinkToSalesforceButton from './LinkToSalesforceButton';
-import OpenCarmodeButton from './OpenCarmodeButton';
-import RaiseHandButton from './RaiseHandButton';
-import ScreenSharingButton from './ScreenSharingButton';
 
 
 /**
@@ -123,8 +108,6 @@ class OverflowMenu extends PureComponent<IProps, IState> {
      */
     render() {
         const {
-            _isSpeakerStatsDisabled,
-            _isSharedVideoEnabled,
             _shouldDisplayReactionsButtons,
             _width,
             dispatch
@@ -157,29 +140,9 @@ class OverflowMenu extends PureComponent<IProps, IState> {
                     ? this._renderReactionMenu
                     : undefined }>
                 { this._renderCustomOverflowMenuButtons(topButtonProps) }
-                <OpenCarmodeButton { ...topButtonProps } />
-                <AudioOnlyButton { ...buttonProps } />
-                {
-                    !_shouldDisplayReactionsButtons && !toolbarButtons.has('raisehand')
-                        && <RaiseHandButton { ...buttonProps } />
-                }
+
                 {/* @ts-ignore */}
                 <Divider style = { styles.divider as ViewStyle } />
-                <SecurityDialogButton { ...buttonProps } />
-                <RecordButton { ...buttonProps } />
-                <LiveStreamButton { ...buttonProps } />
-                <LinkToSalesforceButton { ...buttonProps } />
-                <WhiteboardButton { ...buttonProps } />
-                {/* @ts-ignore */}
-                <Divider style = { styles.divider as ViewStyle } />
-                {_isSharedVideoEnabled && <SharedVideoButton { ...buttonProps } />}
-                {!toolbarButtons.has('screensharing') && <ScreenSharingButton { ...buttonProps } />}
-                {!_isSpeakerStatsDisabled && <SpeakerStatsButton { ...buttonProps } />}
-                {!toolbarButtons.has('tileview') && <TileViewButton { ...buttonProps } />}
-                {/* @ts-ignore */}
-                <Divider style = { styles.divider as ViewStyle } />
-                <ClosedCaptionButton { ...buttonProps } />
-                <SharedDocumentButton { ...buttonProps } />
                 <SettingsButton { ...buttonProps } />
             </BottomSheet>
         );

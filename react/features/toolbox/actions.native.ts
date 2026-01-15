@@ -1,4 +1,4 @@
-import { CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED } from './actionTypes';
+import { CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED, CUSTOM_SCREEN_RECORD_PRESSED } from './actionTypes';
 
 export * from './actions.any';
 
@@ -41,5 +41,22 @@ export function customOverflowMenuButtonPressed(id: string, text: string) {
         type: CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED,
         id,
         text
+    };
+}
+
+/**
+ * Creates a (redux) action which signals that a custom screen record button was pressed.
+ *
+ * @param {boolean} isRecording - Whether the screen record button is pressed or not.
+ * @returns {{
+ *     type: CUSTOM_SCREEN_RECORD_PRESSED,
+ *     isRecording: boolean
+ * }}
+ */
+export function customScreenRecordPressed(isRecording: boolean) {
+
+    return {
+        type: CUSTOM_SCREEN_RECORD_PRESSED,
+        isRecording
     };
 }

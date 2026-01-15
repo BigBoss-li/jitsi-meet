@@ -1,12 +1,9 @@
-import { createToolbarEvent } from '../../../analytics/AnalyticsEvents';
-import { sendAnalytics } from '../../../analytics/functions';
+
 import { IReduxState } from '../../../app/types';
 import { IconRecord, IconStop } from '../../../base/icons/svg';
-import { MEET_FEATURES } from '../../../base/jwt/constants';
-import { JitsiRecordingConstants } from '../../../base/lib-jitsi-meet';
 import AbstractButton, { IProps as AbstractButtonProps } from '../../../base/toolbox/components/AbstractButton';
-import { maybeShowPremiumFeatureDialog } from '../../../jaas/actions';
-import { canStopRecording, getRecordButtonProps } from '../../functions';
+import { customScreenRecordPressed } from '../../../toolbox/actions.native';
+import { getRecordButtonProps } from '../../functions';
 
 /**
  * The type of the React {@code Component} props of
@@ -72,17 +69,27 @@ export default class AbstractRecordButton<P extends IProps> extends AbstractButt
     _handleClick() {
         const { _isRecordingRunning, dispatch } = this.props;
 
-        sendAnalytics(createToolbarEvent(
-            'recording.button',
-            {
-                'is_recording': _isRecordingRunning,
-                type: JitsiRecordingConstants.mode.FILE
-            }));
-        const dialogShown = dispatch(maybeShowPremiumFeatureDialog(MEET_FEATURES.RECORDING));
 
-        if (!dialogShown) {
-            this._onHandleClick();
+        // const { dispatch } = this.props;
+        if (_isRecordingRunning) {
+            dispatch(customScreenRecordPressed(false));
+        } else {
+            dispatch(customScreenRecordPressed(true));
         }
+
+
+        // sendAnalytics(createToolbarEvent(
+        //     'recording.button',
+        //     {
+        //         'is_recording': _isRecordingRunning,
+        //         type: JitsiRecordingConstants.mode.FILE
+        //     }));
+
+        // const dialogShown = dispatch(maybeShowPremiumFeatureDialog(MEET_FEATURES.RECORDING));
+
+        // if (!dialogShown) {
+        //     this._onHandleClick();
+        // }
     }
 
     /**
@@ -124,6 +131,10 @@ export default class AbstractRecordButton<P extends IProps> extends AbstractButt
  */
 export function _mapStateToProps(state: IReduxState) {
     const {
+        isRecording
+    } = state['features/mobile/screen-record'];
+
+    const {
         disabled: _disabled,
         tooltip: _tooltip,
         visible
@@ -131,7 +142,7 @@ export function _mapStateToProps(state: IReduxState) {
 
     return {
         _disabled,
-        _isRecordingRunning: canStopRecording(state),
+        _isRecordingRunning: isRecording,
         _tooltip,
         visible
     };
