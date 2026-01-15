@@ -16,7 +16,7 @@ export * from './functions.any';
  * @returns {Set}
  */
 export function getMovableButtons(): Set<string> {
-    const buttons: string[] = [ 'togglecamera', 'screensharing', 'tileview' ];
+    const buttons: string[] = [ 'togglecamera', 'tileview' ];
 
     return new Set(buttons);
 }
