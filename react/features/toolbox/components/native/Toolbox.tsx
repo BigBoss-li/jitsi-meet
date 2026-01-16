@@ -5,7 +5,9 @@ import { connect } from 'react-redux';
 
 import { IReduxState } from '../../../app/types';
 import ColorSchemeRegistry from '../../../base/color-scheme/ColorSchemeRegistry';
+import { isLocalParticipantModerator } from '../../../base/participants/functions';
 import Platform from '../../../base/react/Platform.native';
+import SettingsButton from '../../../base/settings/components/native/SettingsButton';
 import ChatButton from '../../../chat/components/native/ChatButton';
 import ReactionsMenuButton from '../../../reactions/components/native/ReactionsMenuButton';
 import { shouldDisplayReactionsButtons } from '../../../reactions/functions.any';
@@ -17,7 +19,6 @@ import HangupButton from '../HangupButton';
 
 import AudioMuteButton from './AudioMuteButton';
 import HangupMenuButton from './HangupMenuButton';
-import OverflowMenuButton from './OverflowMenuButton';
 import RaiseHandButton from './RaiseHandButton';
 import ScreenSharingButton from './ScreenSharingButton';
 import VideoMuteButton from './VideoMuteButton';
@@ -37,6 +38,8 @@ interface IProps {
      * Whether we are in visitors mode.
      */
     _iAmVisitor: boolean;
+
+    _isModerator: boolean;
 
     /**
      * Whether or not any reactions buttons should be visible.
@@ -66,7 +69,8 @@ interface IProps {
  * @returns {React$Element}
  */
 function Toolbox(props: IProps) {
-    const { _endConferenceSupported, _shouldDisplayReactionsButtons, _styles, _visible, _iAmVisitor } = props;
+    const { _endConferenceSupported, _shouldDisplayReactionsButtons,
+        _styles, _visible, _iAmVisitor, _isModerator } = props;
 
     if (!_visible) {
         return null;
@@ -124,15 +128,15 @@ function Toolbox(props: IProps) {
                         toggledStyles = { backgroundToggledStyle } />)}
                 {additionalButtons.has('tileview') && <TileViewButton styles = { buttonStylesBorderless } />}
 
-                {<RecordButton
+                {_isModerator && <RecordButton
                     styles = { buttonStylesBorderless }
                     toggledStyles = { backgroundToggledStyle } />}
 
-                {!_iAmVisitor && <OverflowMenuButton
+                {<SettingsButton
                     styles = { buttonStylesBorderless }
-                    toggledStyles = { toggledButtonStyles } />
-                }
-                { _endConferenceSupported
+                    toggledStyles = { backgroundToggledStyle } />}
+
+                {_endConferenceSupported
                     ? <HangupMenuButton />
                     : <HangupButton
                         styles = { hangupButtonStyles } />
@@ -161,7 +165,8 @@ function _mapStateToProps(state: IReduxState) {
         _visible: isToolboxVisible(state),
         _iAmVisitor: iAmVisitor(state),
         _width: state['features/base/responsive-ui'].clientWidth,
-        _shouldDisplayReactionsButtons: shouldDisplayReactionsButtons(state)
+        _shouldDisplayReactionsButtons: shouldDisplayReactionsButtons(state),
+        _isModerator: isLocalParticipantModerator(state)
     };
 }
 

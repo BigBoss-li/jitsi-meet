@@ -167,6 +167,31 @@ export default {
         paddingHorizontal: 10
     },
 
+    recordView: {
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        borderBottomLeftRadius: 3,
+        borderTopLeftRadius: 3,
+        flexShrink: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        paddingHorizontal: 10
+    },
+
+    recordName: {
+        color: BaseTheme.palette.text01,
+        ...BaseTheme.typography.bodyShortBold,
+        paddingVertical: 6
+    },
+
+    recordDot: {
+        backgroundColor: BaseTheme.palette.support09,
+        borderRadius: BaseTheme.shape.borderRadius,
+        height: 8,
+        marginRight: 8,
+        width: 8
+    },
+
     roomNameWrapper: {
         flexDirection: 'row',
         marginRight: 10,

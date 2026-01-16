@@ -38,6 +38,8 @@ interface IProps {
      */
     _isParticipantsPaneEnabled: boolean;
 
+    _isRecording: boolean;
+
     /**
      * Name of the meeting we're currently in.
      */
@@ -62,7 +64,7 @@ interface IProps {
  * @returns {JSX.Element}
  */
 const TitleBar = (props: IProps) => {
-    const { _isParticipantsPaneEnabled, _visible } = props;
+    const { _isParticipantsPaneEnabled, _visible, _isRecording } = props;
 
     if (!_visible) {
         return null;
@@ -94,6 +96,17 @@ const TitleBar = (props: IProps) => {
                     </View>
                 }
                 {/* eslint-disable-next-line react/jsx-no-bind */}
+                {
+                    _isRecording
+                    && <View style = { styles.recordView as ViewStyle }>
+                        <View style = { styles.recordDot as ViewStyle } />
+                        <Text
+                            numberOfLines = { 1 }
+                            style = { styles.roomName }>
+                            录制中
+                        </Text>
+                    </View>
+                }
                 <Labels createOnPress = { props._createOnPress } />
             </View>
             <View style = { styles.titleBarButtonContainer }>
@@ -124,6 +137,7 @@ const TitleBar = (props: IProps) => {
  */
 function _mapStateToProps(state: IReduxState) {
     const { hideConferenceTimer } = state['features/base/config'];
+    const { isRecording } = state['features/mobile/screen-record'];
     const startTimestamp = getConferenceTimestamp(state);
 
     return {
@@ -132,7 +146,8 @@ function _mapStateToProps(state: IReduxState) {
         _isParticipantsPaneEnabled: isParticipantsPaneEnabled(state),
         _meetingName: getConferenceName(state),
         _roomNameEnabled: isRoomNameEnabled(state),
-        _visible: isToolboxVisible(state)
+        _visible: isToolboxVisible(state),
+        _isRecording: isRecording
     };
 }
 
