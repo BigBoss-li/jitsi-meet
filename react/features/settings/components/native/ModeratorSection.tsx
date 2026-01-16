@@ -18,9 +18,10 @@ import FormSection from './FormSection';
 const ModeratorSection = () => {
     const dispatch = useDispatch();
     const {
-        followMeActive,
+        // followMeActive,
         followMeEnabled,
-        followMeRecorderActive,
+
+        // followMeRecorderActive,
         followMeRecorderEnabled,
         startAudioMuted,
         startVideoMuted,
@@ -52,7 +53,7 @@ const ModeratorSection = () => {
         dispatch(updateSettings({ soundsReactions: enabled }));
     }, [ dispatch, updateSettings, setStartReactionsMuted ]);
 
-    const followMeRecorderChecked = followMeRecorderEnabled && !followMeRecorderActive;
+    // const followMeRecorderChecked = followMeRecorderEnabled && !followMeRecorderActive;
 
     const moderationSettings = useMemo(() => {
         const moderation = [
@@ -68,18 +69,13 @@ const ModeratorSection = () => {
                 state: startVideoMuted,
                 onChange: onStartVideoMutedToggled
             },
-            {
-                disabled: followMeActive || followMeRecorderActive,
-                label: 'settings.followMe',
-                state: followMeEnabled && !followMeActive && !followMeRecorderChecked,
-                onChange: onFollowMeToggled
-            },
-            {
-                disabled: followMeRecorderActive || followMeActive,
-                label: 'settings.followMeRecorder',
-                state: followMeRecorderChecked,
-                onChange: onFollowMeRecorderToggled
-            },
+
+            // {
+            //     disabled: followMeRecorderActive || followMeActive,
+            //     label: 'settings.followMeRecorder',
+            //     state: followMeRecorderChecked,
+            //     onChange: onFollowMeRecorderToggled
+            // },
             {
                 disabled: false,
                 label: 'settings.startReactionsMuted',

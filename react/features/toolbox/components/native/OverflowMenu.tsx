@@ -142,7 +142,6 @@ class OverflowMenu extends PureComponent<IProps, IState> {
                 { this._renderCustomOverflowMenuButtons(topButtonProps) }
 
                 {/* @ts-ignore */}
-                <Divider style = { styles.divider as ViewStyle } />
                 <SettingsButton { ...buttonProps } />
             </BottomSheet>
         );
