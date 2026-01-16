@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import { FixedSizeGrid, FixedSizeList } from 'react-window';
 import { withStyles } from 'tss-react/mui';
 
+import { checkMeetingSignal } from '../../../../features/meeting-signal/actions';
 import { ACTION_SHORTCUT_TRIGGERED, createShortcutEvent, createToolbarEvent } from '../../../analytics/AnalyticsEvents';
 import { sendAnalytics } from '../../../analytics/functions';
 import { IReduxState, IStore } from '../../../app/types';
@@ -303,6 +304,8 @@ interface IProps extends WithTranslation {
      */
     _maxTopPanelHeight: number;
 
+    _meetingSignals: Array<ISignalProps>;
+
     _orderedSignalUrls?: Array<any>;
 
     /**
@@ -440,8 +443,6 @@ interface IState {
      */
     mousePosition?: number | null;
 
-    signalList: Array<ISignalProps>;
-
     titleTabIndex: number;
 
 }
@@ -473,7 +474,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
             mousePosition: null,
             dragFilmstripWidth: null,
             titleTabIndex: 0,
-            signalList: [],
             informationList: [],
             canvasOpening: false
         };
@@ -524,16 +524,27 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @inheritdoc
      */
     componentDidUpdate(prevProps: IProps) {
+        if (this.props._meetingSignals !== prevProps._meetingSignals) {
+            const dispatchSignalList = this.props._meetingSignals.filter((item: ISignalProps) => item.checked);
+
+            if (this.props._orderedSignalUrls !== undefined && this.props._orderedSignalUrls.length > 0) {
+                dispatchSignalList.sort((a, b) =>
+                    this.props._orderedSignalUrls.indexOf(a.srcUrl) - _orderedSignalUrls.indexOf(b.srcUrl));
+            }
+
+            this._debouncedSignalSwitch(dispatchSignalList);
+        }
+
         if (this.props._orderedSignalUrls !== undefined
             && this.props._orderedSignalUrls !== prevProps._orderedSignalUrls) {
             this._debouncedSignalSwitch(this.props._orderedSignalUrls);
         }
 
         if (this.props._signalLayout !== undefined && this.props._signalLayout !== prevProps._signalLayout) {
-            const { signalList } = this.state;
+            const { _meetingSignals } = this.props;
             const { _orderedSignalUrls } = this.props;
 
-            const dispatchSignalList = signalList.filter((item: ISignalProps) => item.isSelected);
+            const dispatchSignalList = _meetingSignals.filter((item: ISignalProps) => item.checked);
 
             if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
                 const orderedSignalUrls = _orderedSignalUrls.map((signal: any) => signal.id);
@@ -662,10 +673,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
                     className = { clsx(
                         this.props._videosClassName,
                         !tileViewActive
-                            && (filmstripType === FILMSTRIP_TYPE.MAIN
-                                || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
-                            && !_resizableFilmstrip
-                            && 'filmstrip-hover',
+                        && (filmstripType === FILMSTRIP_TYPE.MAIN
+                            || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+                        && !_resizableFilmstrip
+                        && 'filmstrip-hover',
                         _verticalViewGrid && 'vertical-view-grid'
                     ) }
                     id = 'remoteVideos'>
@@ -703,10 +714,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
         const signal = (
             <div
                 className = { clsx(
-                        this.props._videosClassName,
-                        !tileViewActive
-                            && (filmstripType === FILMSTRIP_TYPE.MAIN
-                                || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+                    this.props._videosClassName,
+                    !tileViewActive
+                    && (filmstripType === FILMSTRIP_TYPE.MAIN
+                        || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
                 ) }
                 id = 'remoteVideos'>
                 {
@@ -721,13 +732,13 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 className = { clsx(
                     this.props._videosClassName,
                     !tileViewActive
-                        && (filmstripType === FILMSTRIP_TYPE.MAIN
-                            || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
+                    && (filmstripType === FILMSTRIP_TYPE.MAIN
+                        || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
                 ) }
                 id = 'remoteVideos'>
                 {
                     !_disableSelfView && !tileViewActive && filmstripType === FILMSTRIP_TYPE.MAIN
-                && this._renderInformationItem()
+                    && this._renderInformationItem()
                 }
 
                 <div className = 'information-footer' >
@@ -776,7 +787,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
                     role = 'heading'>
                     {t('filmstrip.accessibilityLabel.heading')}
                 </span>
-                { toolbar }
+                {toolbar}
                 {
                     filmstripTabs
                 }
@@ -841,43 +852,16 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {void}
      */
     async _onSwitchChange(e: React.ChangeEvent<HTMLDivElement>, value: boolean) {
-        const id = e.target?.dataset.id;
-        const { signalList } = this.state;
-        const { _orderedSignalUrls } = this.props;
+        const { dispatch, _meetingSignals } = this.props;
         const MAX_SHARED_VIDEO_LENGTH = 4;
-
-        const selected = signalList.filter((signal: any) => signal.isSelected);
+        const id = e.target?.dataset.id;
+        const selected = _meetingSignals.filter((signal: any) => signal.checked);
 
         if (selected.length >= MAX_SHARED_VIDEO_LENGTH && value) {
             return;
         }
 
-        const newSignalList = signalList.map((signal: any) => {
-            let isSelected = signal.isSelected;
-
-            if (signal.id === id) {
-                isSelected = value;
-            }
-
-            return {
-                ...signal,
-                isSelected
-            };
-        });
-
-
-        this.setState({
-            signalList: newSignalList
-        });
-
-        const dispatchSignalList = newSignalList.filter((item: ISignalProps) => item.isSelected);
-
-        if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
-            dispatchSignalList.sort((a, b) =>
-                _orderedSignalUrls.indexOf(a.srcUrl) - _orderedSignalUrls.indexOf(b.srcUrl));
-        }
-
-        this._debouncedSignalSwitch(dispatchSignalList);
+        dispatch(checkMeetingSignal(id, value));
     }
 
     /**
@@ -939,35 +923,39 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {React.DOMElement}
      */
     _renderSignalItem() {
-        const { signalList } = this.state;
-        const { _isModerator, _switchDisabled } = this.props;
+        const { _isModerator, _switchDisabled, _meetingSignals } = this.props;
 
-        return (<div className = 'signal__list'>
-            {
-                signalList.map((signal: ISignalProps) => (
-                    <div
-                        className = 'signal-wrapper'
-                        key = { signal.id }>
-                        <div className = 'signal__top'>
-                            <span className = 'signal-type'>{signal.srcType}</span>
-                            <span className = 'signal-name'>{signal.name}</span>
+        if (_meetingSignals.length > 0) {
+            return (<div className = 'signal__list'>
+                {
+                    _meetingSignals.map((signal: ISignalProps) => (
+                        <div
+                            className = 'signal-wrapper'
+                            key = { signal.id }>
+                            <div className = 'signal__top'>
+                                <span className = 'signal-type'>{signal.srcType}</span>
+                                <span className = 'signal-name'>{signal.name}</span>
+                            </div>
+                            <div className = 'signal__footer'>
+                                <div className = 'signal-ip' />
+
+                                {
+                                    _isModerator && <SignalSwitch
+                                        checked = { Boolean(signal.checked) }
+                                        disabled = { _switchDisabled || false }
+                                        inputProps = {{ 'data-id': signal.id }}
+                                        onChange = { this._onSwitchChange } />
+                                }
+
+                            </div>
                         </div>
-                        <div className = 'signal__footer'>
-                            <div className = 'signal-ip' />
+                    ))
+                }
+            </div>);
+        }
 
-                            {
-                                _isModerator && <SignalSwitch
-                                    checked = { signal.isSelected }
-                                    disabled = { _switchDisabled || false }
-                                    inputProps = {{ 'data-id': signal.id }}
-                                    onChange = { this._onSwitchChange } />
-                            }
+        return null;
 
-                        </div>
-                    </div>
-                ))
-            }
-        </div>);
     }
 
     /**
@@ -1004,9 +992,9 @@ class Filmstrip extends PureComponent<IProps, IState> {
                                 key = { id }
                                 // eslint-disable-next-line react/jsx-no-bind
                                 onClick = { () => this._onFileDownload(filePath) }>
-                                { image }
+                                {image}
                                 <div className = 'information-name'>
-                                    { name }
+                                    {name}
                                 </div>
                             </div>
                         );
@@ -1029,20 +1017,8 @@ class Filmstrip extends PureComponent<IProps, IState> {
             return;
         }
         const { type, data } = e.data;
-        const { signalList } = this.state;
 
-        if (type === 'signal_list') {
-            const newSignalList = data.map((s: any) => {
-                return {
-                    ...s,
-                    isSelected: signalList.some((l: any) => l.id === s.id && l.isSelected)
-                };
-            });
-
-            this.setState({
-                signalList: newSignalList
-            });
-        } else if (type === 'information_list') {
+        if (type === 'information_list') {
             this.setState({
                 informationList: data
             });
@@ -1493,6 +1469,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
 function _mapStateToProps(state: IReduxState, ownProps: any) {
     const { _hasScroll = false, filmstripType, _topPanelFilmstrip, _remoteParticipants } = ownProps;
     const { ownerId } = state['features/shared-video'];
+    const { meetingSignals } = state['features/meeting-signal'];
     const { toolbarButtons } = state['features/toolbox'];
     const { iAmRecorder, isMini } = state['features/base/config'];
     const { topPanelHeight, topPanelVisible, visible, width: verticalFilmstripWidth } = state['features/filmstrip'];
@@ -1569,7 +1546,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _orderedSignalUrls: orderedSignalUrls,
         _isMini: isMini || false,
         _isModerator,
-        _switchDisabled
+        _switchDisabled,
+        _meetingSignals: meetingSignals
     };
 }
 

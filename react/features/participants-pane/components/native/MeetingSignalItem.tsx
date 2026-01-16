@@ -124,7 +124,7 @@ class MeetingSignalItem extends PureComponent<IProps> {
 function mapStateToProps(state: IReduxState, ownProps: any) {
     const { participant } = ownProps;
     const { ownerId } = state['features/shared-video'];
-    const { meetingSignals } = state['features/mobile/meeting-signal'];
+    const { meetingSignals } = state['features/meeting-signal'];
     const localParticipantId = getLocalParticipant(state)?.id;
 
     let _localVideoOwner = true;

@@ -97,6 +97,7 @@ import {
     resizeLargeVideo
 } from '../../react/features/large-video/actions.web';
 import { answerKnockingParticipant, toggleLobbyMode } from '../../react/features/lobby/actions';
+import { setMeetingSignals } from '../../react/features/meeting-signal/actions';
 import { setNoiseSuppressionEnabled } from '../../react/features/noise-suppression/actions';
 import { hideNotification, showNotification } from '../../react/features/notifications/actions';
 import { NOTIFICATION_TIMEOUT_TYPE, NOTIFICATION_TYPE } from '../../react/features/notifications/constants';
@@ -574,9 +575,8 @@ function initCommands() {
             }
         },
         'set-meeting-signals': signals => {
-            console.log('Set meeting signals', signals);
 
-            // APP.store.dispatch(setMeetingSignals(signals));
+            APP.store.dispatch(setMeetingSignals(signals));
         },
         'stop-share-video': () => {
             sendAnalytics(createApiEvent('share.video.stop'));

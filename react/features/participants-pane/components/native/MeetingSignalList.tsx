@@ -27,7 +27,7 @@ const MeetingSignalList = () => {
     );
 
     const meetingSignals = useSelector(
-        (state: IReduxState) => state['features/mobile/meeting-signal'].meetingSignals);
+        (state: IReduxState) => state['features/meeting-signal'].meetingSignals);
 
     const isFirstRender = useRef(true);
     const checkedCount = meetingSignals.filter(item => item.checked).length;

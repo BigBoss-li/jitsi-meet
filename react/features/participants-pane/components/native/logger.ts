@@ -1,3 +1,3 @@
 import { getLogger } from '../../../base/logging/functions';
 
-export default getLogger('features/mobile/meeting-signal');
+export default getLogger('features/meeting-signal');
