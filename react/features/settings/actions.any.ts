@@ -1,3 +1,5 @@
+import { IStore } from '../app/types';
+
 import {
     SET_SIGNAL_LAYOUT
 } from './actionTypes';

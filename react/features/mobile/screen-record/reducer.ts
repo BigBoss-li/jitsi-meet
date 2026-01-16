@@ -10,8 +10,8 @@ const DEFAULT_STATE = {
     isRecording: false
 };
 
-ReducerRegistry.register<IMeetingSignalsExternalApiState>('features/mobile/screen-record',
-    (state = DEFAULT_STATE, action): IMeetingSignalsExternalApiState => {
+ReducerRegistry.register<IScreenRecordExternalApiState>('features/mobile/screen-record',
+    (state = DEFAULT_STATE, action): IScreenRecordExternalApiState => {
         switch (action.type) {
         case SCREEN_RECORD_UPDATED: {
             return {
