@@ -573,6 +573,11 @@ function initCommands() {
                 APP.store.dispatch(playSharedVideo(id));
             }
         },
+        'set-meeting-signals': signals => {
+            console.log('Set meeting signals', signals);
+
+            // APP.store.dispatch(setMeetingSignals(signals));
+        },
         'stop-share-video': () => {
             sendAnalytics(createApiEvent('share.video.stop'));
             APP.store.dispatch(stopSharedVideo());

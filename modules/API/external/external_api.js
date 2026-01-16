@@ -72,6 +72,7 @@ const commands = {
     showNotification: 'show-notification',
     startRecording: 'start-recording',
     startShareVideo: 'start-share-video',
+    setMeetingSignals: 'set-meeting-signals',
     stopRecording: 'stop-recording',
     stopShareVideo: 'stop-share-video',
     subject: 'subject',
@@ -907,7 +908,7 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
      */
     executeCommand(name, ...args) {
         if (!(name in commands)) {
-            console.error('Not supported command name.');
+            console.error('Not supported command name.', name);
 
             return;
         }
