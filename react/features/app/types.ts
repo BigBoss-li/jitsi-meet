@@ -47,6 +47,7 @@ import { IJaaSState } from '../jaas/reducer';
 import { IKeyboardShortcutsState } from '../keyboard-shortcuts/types';
 import { ILargeVideoState } from '../large-video/reducer';
 import { ILobbyState } from '../lobby/reducer';
+import { IMeetingFilesExternalApiState } from '../meeting-file/reducer';
 import { IMeetingSignalsExternalApiState } from '../meeting-signal/reducer';
 import { IMobileAudioModeState } from '../mobile/audio-mode/reducer';
 import { IBackgroundState } from '../mobile/background/reducer';
@@ -142,6 +143,7 @@ export interface IReduxState {
     'features/keyboard-shortcuts': IKeyboardShortcutsState;
     'features/large-video': ILargeVideoState;
     'features/lobby': ILobbyState;
+    'features/meeting-file': IMeetingFilesExternalApiState;
     'features/meeting-signal': IMeetingSignalsExternalApiState;
     'features/mobile/audio-mode': IMobileAudioModeState;
     'features/mobile/external-api': IMobileExternalApiState;

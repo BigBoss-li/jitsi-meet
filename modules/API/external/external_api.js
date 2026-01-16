@@ -73,6 +73,7 @@ const commands = {
     startRecording: 'start-recording',
     startShareVideo: 'start-share-video',
     setMeetingSignals: 'set-meeting-signals',
+    setMeetingFiles: 'set-meeting-files',
     stopRecording: 'stop-recording',
     stopShareVideo: 'stop-share-video',
     subject: 'subject',

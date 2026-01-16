@@ -173,6 +173,8 @@ interface ISignalOutputProps {
  */
 interface ISignalProps {
 
+    checked?: boolean;
+
     /**
      * 目的类型.
      */
@@ -526,10 +528,11 @@ class Filmstrip extends PureComponent<IProps, IState> {
     componentDidUpdate(prevProps: IProps) {
         if (this.props._meetingSignals !== prevProps._meetingSignals) {
             const dispatchSignalList = this.props._meetingSignals.filter((item: ISignalProps) => item.checked);
+            const { _orderedSignalUrls } = this.props;
 
-            if (this.props._orderedSignalUrls !== undefined && this.props._orderedSignalUrls.length > 0) {
+            if (_orderedSignalUrls !== undefined && _orderedSignalUrls.length > 0) {
                 dispatchSignalList.sort((a, b) =>
-                    this.props._orderedSignalUrls.indexOf(a.srcUrl) - _orderedSignalUrls.indexOf(b.srcUrl));
+                    _orderedSignalUrls.indexOf(a.srcUrl) - _orderedSignalUrls.indexOf(b.srcUrl));
             }
 
             this._debouncedSignalSwitch(dispatchSignalList);
@@ -541,8 +544,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
         }
 
         if (this.props._signalLayout !== undefined && this.props._signalLayout !== prevProps._signalLayout) {
-            const { _meetingSignals } = this.props;
-            const { _orderedSignalUrls } = this.props;
+            const { _meetingSignals, _orderedSignalUrls } = this.props;
 
             const dispatchSignalList = _meetingSignals.filter((item: ISignalProps) => item.checked);
 
@@ -856,6 +858,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
         const MAX_SHARED_VIDEO_LENGTH = 4;
         const id = e.target?.dataset.id;
         const selected = _meetingSignals.filter((signal: any) => signal.checked);
+
+        if (!id) {
+            return;
+        }
 
         if (selected.length >= MAX_SHARED_VIDEO_LENGTH && value) {
             return;
