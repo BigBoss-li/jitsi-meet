@@ -97,6 +97,7 @@ import {
     resizeLargeVideo
 } from '../../react/features/large-video/actions.web';
 import { answerKnockingParticipant, toggleLobbyMode } from '../../react/features/lobby/actions';
+import { setMeetingCanvasStatus } from '../../react/features/meeting-canvas/actions';
 import { setMeetingFiles } from '../../react/features/meeting-file/actions';
 import { setMeetingSignals } from '../../react/features/meeting-signal/actions';
 import { setNoiseSuppressionEnabled } from '../../react/features/noise-suppression/actions';
@@ -580,6 +581,9 @@ function initCommands() {
         },
         'set-meeting-files': files => {
             APP.store.dispatch(setMeetingFiles(files));
+        },
+        'set-meeting-canvas-status': isOpen => {
+            APP.store.dispatch(setMeetingCanvasStatus(isOpen));
         },
         'stop-share-video': () => {
             sendAnalytics(createApiEvent('share.video.stop'));

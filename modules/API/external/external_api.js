@@ -74,6 +74,7 @@ const commands = {
     startShareVideo: 'start-share-video',
     setMeetingSignals: 'set-meeting-signals',
     setMeetingFiles: 'set-meeting-files',
+    setMeetingCanvasStatus: 'set-meeting-canvas-status',
     stopRecording: 'stop-recording',
     stopShareVideo: 'stop-share-video',
     subject: 'subject',

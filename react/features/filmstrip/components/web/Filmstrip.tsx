@@ -268,6 +268,8 @@ interface IProps extends WithTranslation {
      */
     _iAmRecorder: boolean;
 
+    _isCanvasOpen: boolean;
+
     /**
      * Whether the filmstrip button is enabled.
      */
@@ -419,8 +421,6 @@ interface IProps extends WithTranslation {
 
 interface IState {
 
-    canvasOpening: boolean;
-
     /**
      * Initial top panel height on drag handle mouse down.
      */
@@ -479,8 +479,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             mousePosition: null,
             dragFilmstripWidth: null,
             titleTabIndex: 0,
-            informationList: [],
-            canvasOpening: false
+            informationList: []
         };
 
         // Bind event handlers so they are only bound once for every instance.
@@ -500,12 +499,10 @@ class Filmstrip extends PureComponent<IProps, IState> {
         this._onFileDownload = this._onFileDownload.bind(this);
         this._renderSignalItem = this._renderSignalItem.bind(this);
         this._renderInformationItem = this._renderInformationItem.bind(this);
-        this._onMessageListener = this._onMessageListener.bind(this);
         this._callChangeSharedVideos = this._callChangeSharedVideos.bind(this);
         this._callChangeSharedSignals = this._callChangeSharedSignals.bind(this);
         this._onFileChange = this._onFileChange.bind(this);
         this._onButtonClick = this._onButtonClick.bind(this);
-        window.addEventListener('message', this._onMessageListener, false);
 
         this._throttledResize = throttle(this._onFilmstripResize, 50, {
             leading: true,
@@ -560,6 +557,16 @@ class Filmstrip extends PureComponent<IProps, IState> {
             }
             this._debouncedSignalSwitch(dispatchSignalList);
 
+        }
+
+        if (this.props._isCanvasOpen !== prevProps._isCanvasOpen) {
+            const { dispatch } = this.props;
+
+            if (this.props._isCanvasOpen) {
+                dispatch(setFilmstripVisible(false));
+            } else {
+                dispatch(setFilmstripVisible(true));
+            }
         }
     }
 
@@ -620,11 +627,12 @@ class Filmstrip extends PureComponent<IProps, IState> {
             _verticalViewMaxWidth,
             filmstripType,
             _isMini,
+            _isCanvasOpen,
             t
         } = this.props;
 
         const classes = withStyles.getClasses(this.props);
-        const { titleTabIndex, canvasOpening } = this.state; // { isMouseDown, titleTabIndex }
+        const { titleTabIndex } = this.state; // { isMouseDown, titleTabIndex }
         const tileViewActive = _currentLayout === LAYOUTS.TILE_VIEW;
 
         if (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.STAGE) {
@@ -666,7 +674,7 @@ class Filmstrip extends PureComponent<IProps, IState> {
             && _currentLayout !== LAYOUTS.TILE_VIEW
             && ((filmstripType === FILMSTRIP_TYPE.MAIN && !_filmstripDisabled)
                 || (filmstripType === FILMSTRIP_TYPE.STAGE && _topPanelFilmstrip))
-            && !canvasOpening
+            && !_isCanvasOpen
         ) {
 
             toolbar = this._renderToggleButton();
@@ -1011,36 +1019,6 @@ class Filmstrip extends PureComponent<IProps, IState> {
                 }
             </div>
         );
-    }
-
-    /**
-     * Message listener.
-     *
-     * @param {any} e -received data.
-     * @returns {void}
-     */
-    _onMessageListener(e: any) {
-        const { dispatch } = this.props;
-
-        if (!e.data) {
-            return;
-        }
-        const { type, data } = e.data;
-
-        if (type === 'information_list') {
-            this.setState({
-                informationList: data
-            });
-        } else if (type === 'canvas_openning') {
-            this.setState({
-                canvasOpening: data
-            });
-            if (data) {
-                dispatch(setFilmstripVisible(false));
-            } else {
-                dispatch(setFilmstripVisible(true));
-            }
-        }
     }
 
     /**
@@ -1479,6 +1457,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
     const { _hasScroll = false, filmstripType, _topPanelFilmstrip, _remoteParticipants } = ownProps;
     const { ownerId } = state['features/shared-video'];
     const { meetingSignals } = state['features/meeting-signal'];
+    const { isCanvasOpen } = state['features/meeting-canvas'];
     const { meetingFiles } = state['features/meeting-file'];
     const { toolbarButtons } = state['features/toolbox'];
     const { iAmRecorder, isMini } = state['features/base/config'];
@@ -1506,8 +1485,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         isVisible = _topPanelVisible;
     }
     const videosClassName = `filmstrip__videos${isVisible ? '' : ' hidden'}${_hasScroll ? ' has-scroll' : ''}`;
-    const className = `${remoteVideosVisible || ownProps._verticalViewGrid ? '' : 'hide-videos'} ${
-        shouldReduceHeight ? 'reduce-height' : ''
+    const className = `${remoteVideosVisible || ownProps._verticalViewGrid
+        ? '' : 'hide-videos'} ${shouldReduceHeight ? 'reduce-height' : ''
     } ${shiftRight ? 'shift-right' : ''} ${collapseTileView ? 'collapse' : ''} ${isVisible ? '' : 'hidden'}`.trim();
 
     const _currentLayout = getCurrentLayout();
@@ -1558,7 +1537,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _isModerator,
         _switchDisabled,
         _meetingSignals: meetingSignals,
-        _meetingFiles: meetingFiles
+        _meetingFiles: meetingFiles,
+        _isCanvasOpen: isCanvasOpen
     };
 }
 
