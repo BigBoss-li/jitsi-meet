@@ -51,10 +51,10 @@ import { getLocalTracks, isLocalTrackMuted } from '../../base/tracks/functions.n
 import { ITrack } from '../../base/tracks/types';
 import { CLOSE_CHAT, OPEN_CHAT } from '../../chat/actionTypes';
 import { closeChat, openChat, sendMessage, setPrivateMessageRecipient } from '../../chat/actions.native';
+import { setMeetingSignals } from '../../meeting-signal/actions';
 import { setRequestingSubtitles } from '../../subtitles/actions.any';
 import { CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED, CUSTOM_SCREEN_RECORD_PRESSED } from '../../toolbox/actionTypes';
 import { muteLocal } from '../../video-menu/actions.native';
-import { setMeetingSignals } from '../meeting-signal/actions';
 import { ENTER_PICTURE_IN_PICTURE } from '../picture-in-picture/actionTypes';
 // @ts-ignore
 import { isExternalAPIAvailable } from '../react-native-sdk/functions';

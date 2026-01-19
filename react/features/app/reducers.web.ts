@@ -17,7 +17,6 @@ import '../screenshot-capture/reducer';
 import '../talk-while-muted/reducer';
 import '../virtual-background/reducer';
 import '../web-hid/reducer';
-import '../meeting-signal/reducer';
 import '../meeting-file/reducer';
 
 import './reducers.any';
