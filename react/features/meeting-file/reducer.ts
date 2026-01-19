@@ -1,9 +1,10 @@
 import ReducerRegistry from '../base/redux/ReducerRegistry';
 
 import { MEETING_FILES_UPDATED } from './actionTypes';
+import { IMeetingFile } from './types';
 
 export interface IMeetingFilesExternalApiState {
-    meetingFiles: any[];
+    meetingFiles: Array<IMeetingFile>;
 }
 
 const DEFAULT_STATE = {

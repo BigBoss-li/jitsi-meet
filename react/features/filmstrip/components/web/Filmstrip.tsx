@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import { FixedSizeGrid, FixedSizeList } from 'react-window';
 import { withStyles } from 'tss-react/mui';
 
+import { IMeetingFile } from '../../../../features/meeting-file/types';
 import { checkMeetingSignal } from '../../../../features/meeting-signal/actions';
 import { ACTION_SHORTCUT_TRIGGERED, createShortcutEvent, createToolbarEvent } from '../../../analytics/AnalyticsEvents';
 import { sendAnalytics } from '../../../analytics/functions';
@@ -305,6 +306,8 @@ interface IProps extends WithTranslation {
      * The maximum height of the top panel.
      */
     _maxTopPanelHeight: number;
+
+    _meetingFiles: Array<IMeetingFile>;
 
     _meetingSignals: Array<ISignalProps>;
 
@@ -970,12 +973,12 @@ class Filmstrip extends PureComponent<IProps, IState> {
      * @returns {React.DOMElement}
      */
     _renderInformationItem() {
-        const { informationList } = this.state;
+        const { _meetingFiles } = this.props;
 
         return (
             <div className = 'information-list'>
                 {
-                    informationList?.map((information: any) => {
+                    _meetingFiles?.map((information: any) => {
                         const { id, fileName: name, fileType: type, filePath } = information;
                         let imageUrl;
 
@@ -1476,6 +1479,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
     const { _hasScroll = false, filmstripType, _topPanelFilmstrip, _remoteParticipants } = ownProps;
     const { ownerId } = state['features/shared-video'];
     const { meetingSignals } = state['features/meeting-signal'];
+    const { meetingFiles } = state['features/meeting-file'];
     const { toolbarButtons } = state['features/toolbox'];
     const { iAmRecorder, isMini } = state['features/base/config'];
     const { topPanelHeight, topPanelVisible, visible, width: verticalFilmstripWidth } = state['features/filmstrip'];
@@ -1553,7 +1557,8 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _isMini: isMini || false,
         _isModerator,
         _switchDisabled,
-        _meetingSignals: meetingSignals
+        _meetingSignals: meetingSignals,
+        _meetingFiles: meetingFiles
     };
 }
 
