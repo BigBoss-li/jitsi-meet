@@ -56,7 +56,7 @@ class WebRTCPlayer extends Component<IProps> {
 
         try {
             this.player = new SrsRtcWhipWhepAsync();
-            const result = await this.player.play(videoUrl, { audioOnly: true });
+            const result = await this.player.play(videoUrl, { audioOnly: false });
 
             this.stream = result?.stream || null;
             this.forceUpdate();
