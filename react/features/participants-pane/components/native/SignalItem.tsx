@@ -12,7 +12,7 @@ import { useDispatch } from 'react-redux';
 
 import { IMeetingSignal } from '../../../base/participants/types';
 import Switch from '../../../base/ui/components/native/Switch';
-import { checkMeetingSignal } from '../../../mobile/meeting-signal/actions';
+import { checkMeetingSignal } from '../../../meeting-signal/actions';
 import { type MediaState } from '../../constants';
 
 import styles from './styles';
