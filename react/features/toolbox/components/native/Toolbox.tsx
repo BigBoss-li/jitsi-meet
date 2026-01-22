@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import { IReduxState } from '../../../app/types';
 import ColorSchemeRegistry from '../../../base/color-scheme/ColorSchemeRegistry';
 import { isLocalParticipantModerator } from '../../../base/participants/functions';
-import Platform from '../../../base/react/Platform.native';
 import SettingsButton from '../../../base/settings/components/native/SettingsButton';
 import ChatButton from '../../../chat/components/native/ChatButton';
 import ReactionsMenuButton from '../../../reactions/components/native/ReactionsMenuButton';
@@ -70,13 +69,8 @@ interface IProps {
  */
 function Toolbox(props: IProps) {
     const { _endConferenceSupported, _shouldDisplayReactionsButtons,
-        _styles, _visible, _iAmVisitor, _isModerator } = props;
+        _styles, _iAmVisitor, _isModerator } = props;
 
-    if (!_visible) {
-        return null;
-    }
-
-    const bottomEdge = Platform.OS === 'ios' && _visible;
     const { buttonStylesBorderless, hangupButtonStyles, toggledButtonStyles } = _styles;
     const additionalButtons = getMovableButtons();
     const backgroundToggledStyle = {
@@ -101,7 +95,6 @@ function Toolbox(props: IProps) {
                 accessibilityRole = 'toolbar'
 
                 // @ts-ignore
-                edges = { [ bottomEdge && 'bottom' ].filter(Boolean) }
                 pointerEvents = 'box-none'
                 style = { style as ViewStyle }>
                 {!_iAmVisitor && <AudioMuteButton

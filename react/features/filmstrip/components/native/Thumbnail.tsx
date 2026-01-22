@@ -370,7 +370,6 @@ class Thumbnail extends PureComponent<IProps> {
 
         return (
             <Container
-                onClick = { this._onClick }
                 onLongPress = { this._onThumbnailLongPress }
                 style = { [
                     styles.thumbnail,

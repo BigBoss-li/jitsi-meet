@@ -440,10 +440,7 @@ class Conference extends AbstractConference<IProps, State> {
 
                 <SafeAreaView
                     pointerEvents = 'box-none'
-                    style = {
-                        (_toolboxVisible
-                            ? styles.titleBarSafeViewColor
-                            : styles.titleBarSafeViewTransparent) as ViewStyle }>
+                    style = { styles.titleBarSafeViewColor as ViewStyle }>
                     <TitleBar _createOnPress = { this._createOnPress } />
                 </SafeAreaView>
                 <SafeAreaView

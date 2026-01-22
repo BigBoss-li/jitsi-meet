@@ -61,7 +61,7 @@ export default {
         flexGrow: 0,
         position: 'absolute',
         right: BaseTheme.spacing[0],
-        top: BaseTheme.spacing[0]
+        top: BaseTheme.spacing[10]
     },
 
     /**

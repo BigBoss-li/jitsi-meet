@@ -318,13 +318,15 @@ function _mapStateToProps(state: IReduxState) {
     const showRemoteVideos = shouldRemoteVideosBeVisible(state);
     const responsiveUI = state['features/base/responsive-ui'];
 
+    const filteredParticipants = remoteParticipants.filter(p => p.indexOf('signals') === -1);
+
     return {
         _aspectRatio: responsiveUI.aspectRatio,
         _clientHeight: responsiveUI.clientHeight,
         _clientWidth: responsiveUI.clientWidth,
         _disableSelfView: disableSelfView,
         _localParticipantId: getLocalParticipant(state)?.id ?? '',
-        _participants: showRemoteVideos ? remoteParticipants : NO_REMOTE_VIDEOS,
+        _participants: showRemoteVideos ? filteredParticipants : NO_REMOTE_VIDEOS,
         _toolboxVisible: isToolboxVisible(state),
         _visible: enabled && isFilmstripVisible(state)
     };

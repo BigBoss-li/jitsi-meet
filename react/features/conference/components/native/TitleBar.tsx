@@ -64,11 +64,11 @@ interface IProps {
  * @returns {JSX.Element}
  */
 const TitleBar = (props: IProps) => {
-    const { _isParticipantsPaneEnabled, _visible, _isRecording } = props;
+    const { _isParticipantsPaneEnabled, _isRecording } = props;
 
-    if (!_visible) {
-        return null;
-    }
+    // if (!_visible) {
+    //     return null;
+    // }
 
     return (
         <View
