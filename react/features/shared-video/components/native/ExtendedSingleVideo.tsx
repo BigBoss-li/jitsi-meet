@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { ASPECT_RATIO_WIDE } from '../../../base/responsive-ui/constants';
 
 import AbstractExtendedVideo from './AbstractExtendedVideo';
+import CentralControlPlayer from './CentralControlPlayer';
 import VideoManager from './VideoManager';
 import WebRTCPlayer from './WebRTCPlayer';
 
@@ -46,7 +47,7 @@ class ExtendedSingleVideo extends AbstractExtendedVideo<IProps> {
                 videoId = { _videoUrl }
                 width = { playerWidth } />);
         } else if (this.matchWsVideoUrl(_videoUrl)) {
-            // TODO CentralControl not supported
+            videoPlayer = <CentralControlPlayer videoUrl = { _videoUrl } />;
         } else {
             videoPlayer = <WebRTCPlayer videoUrl = { _videoUrl } />;
         }

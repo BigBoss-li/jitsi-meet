@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { connect } from 'react-redux';
 
 import AbstractExtendedVideo from './AbstractExtendedVideo';
+import CentralControlPlayer from './CentralControlPlayer';
 import VideoManager from './VideoManager';
 import WebRTCPlayer from './WebRTCPlayer';
 import styles from './styles';
@@ -54,6 +55,7 @@ class ExtendedTwoVideo extends AbstractExtendedVideo<IProps> {
                     width = { playerWidth } />);
             } else if (this.matchWsVideoUrl(url)) {
                 // TODO CentralControl not supported
+                videoPlayer = <CentralControlPlayer videoUrl = { url } />;
             } else {
                 videoPlayer = <WebRTCPlayer videoUrl = { url } />;
             }

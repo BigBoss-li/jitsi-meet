@@ -105,17 +105,19 @@ export function SrsRtcWhipWhepAsync() {
             throw new Error(`invalid WHEP url ${url}`);
         }
 
-        if (!options?.videoOnly) {
+        if (!options?.audioOnly) {
             self.pc.addTransceiver('audio', { direction: 'recvonly' });
         }
-        if (!options?.audioOnly) {
+        if (!options?.videoOnly) {
             self.pc.addTransceiver('video', { direction: 'recvonly' });
         }
 
         self.pc.ontrack = function (event) {
-            event.streams[0]?.getTracks().forEach(track => {
-                self.stream.addTrack(track);
-            });
+            if (event.streams && event.streams[0]) {
+                event.streams[0].getTracks().forEach(track => {
+                    self.stream.addTrack(track);
+                });
+            }
             self.ontrack && self.ontrack(event);
         };
 
@@ -162,7 +164,8 @@ export function SrsRtcWhipWhepAsync() {
     };
 
     self.pc = new RTCPeerConnection({
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      sdpSemantics: 'unified-plan'
     });
 
     // To keep api consistent between player and publisher.
