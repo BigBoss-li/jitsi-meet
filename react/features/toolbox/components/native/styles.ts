@@ -102,7 +102,9 @@ const styles = {
         maxWidth: 580,
         marginLeft: 'auto',
         marginRight: 'auto',
-        width: '100%'
+        width: '100%',
+        paddingLeft: BaseTheme.spacing[2],
+        paddingRight: BaseTheme.spacing[2]
     },
 
     iconImageStyles: {

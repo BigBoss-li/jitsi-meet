@@ -69,7 +69,11 @@ interface IProps {
  */
 function Toolbox(props: IProps) {
     const { _endConferenceSupported, _shouldDisplayReactionsButtons,
-        _styles, _iAmVisitor, _isModerator } = props;
+        _styles, _visible, _iAmVisitor, _isModerator } = props;
+
+    if (!_visible) {
+        return null;
+    }
 
     const { buttonStylesBorderless, hangupButtonStyles, toggledButtonStyles } = _styles;
     const additionalButtons = getMovableButtons();

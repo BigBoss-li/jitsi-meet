@@ -188,7 +188,7 @@ class ParticipantView extends Component<IProps> {
 
         return (
             <Container
-                onClick = { renderVideo || renderSharedVideo ? undefined : onPress }
+                onClick = { onPress }
                 style = {{
                     ...styles.participantView,
                     ...this.props.style

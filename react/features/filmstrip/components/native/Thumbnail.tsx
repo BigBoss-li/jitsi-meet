@@ -85,6 +85,8 @@ interface IProps {
      */
     _localVideoOwner: boolean;
 
+    _ownerId: string;
+
     /**
      * The ID of the participant obtain from the participant object in Redux.
      *
@@ -171,7 +173,11 @@ class Thumbnail extends PureComponent<IProps> {
      * @returns {void}
      */
     _onClick() {
-        const { _participantId, _pinned, dispatch, tileView } = this.props;
+        const { _participantId, _pinned, _ownerId, dispatch, tileView } = this.props;
+
+        if (_ownerId !== undefined) {
+            return;
+        }
 
         if (tileView) {
             dispatch(toggleToolboxVisible());
@@ -370,6 +376,7 @@ class Thumbnail extends PureComponent<IProps> {
 
         return (
             <Container
+                onClick = { this._onClick }
                 onLongPress = { this._onThumbnailLongPress }
                 style = { [
                     styles.thumbnail,
@@ -430,6 +437,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         _isVirtualScreenshare: isScreenShareParticipant(participant),
         _local: participant?.local,
         _localVideoOwner: Boolean(ownerId === localParticipantId),
+        _ownerId: ownerId,
         _participantId: id ?? '',
         _pinned: participant?.pinned,
         _raisedHand: hasRaisedHand(participant),
