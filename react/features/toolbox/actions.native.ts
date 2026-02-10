@@ -1,4 +1,5 @@
-import { CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED, CUSTOM_SCREEN_RECORD_PRESSED } from './actionTypes';
+import { CENTRAL_CONTROL_VIDEO, CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED,
+    CUSTOM_SCREEN_RECORD_PRESSED } from './actionTypes';
 
 export * from './actions.any';
 
@@ -58,5 +59,21 @@ export function customScreenRecordPressed(isRecording: boolean) {
     return {
         type: CUSTOM_SCREEN_RECORD_PRESSED,
         isRecording
+    };
+}
+
+/**
+ * Plays a video through central control.
+ *
+ * @param {string} videoUrl - The video URL to play.
+ * @returns {{
+ *     type: CENTRAL_CONTROL_VIDEO,
+ *    videoUrl: string
+ * }}
+ */
+export function centralControlVideoPlay(videoUrl: string) {
+    return {
+        type: CENTRAL_CONTROL_VIDEO,
+        videoUrl
     };
 }
