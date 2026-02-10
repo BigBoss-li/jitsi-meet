@@ -98,6 +98,7 @@ import {
 } from '../../react/features/large-video/actions.web';
 import { answerKnockingParticipant, toggleLobbyMode } from '../../react/features/lobby/actions';
 import { setMeetingCanvasStatus } from '../../react/features/meeting-canvas/actions';
+import { updateCandidate, updateOffer } from '../../react/features/meeting-central-control/actions';
 import { setMeetingFiles } from '../../react/features/meeting-file/actions';
 import { setMeetingSignals } from '../../react/features/meeting-signal/actions';
 import { setNoiseSuppressionEnabled } from '../../react/features/noise-suppression/actions';
@@ -578,6 +579,12 @@ function initCommands() {
         },
         'set-meeting-signals': signals => {
             APP.store.dispatch(setMeetingSignals(signals));
+        },
+        'update-offer': (videoUrl, offer) => {
+            APP.store.dispatch(updateOffer(videoUrl, offer));
+        },
+        'update-candidate': (videoUrl, candidate) => {
+            APP.store.dispatch(updateCandidate(videoUrl, candidate));
         },
         'set-meeting-files': files => {
             APP.store.dispatch(setMeetingFiles(files));

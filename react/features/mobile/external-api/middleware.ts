@@ -51,9 +51,11 @@ import { getLocalTracks, isLocalTrackMuted } from '../../base/tracks/functions.n
 import { ITrack } from '../../base/tracks/types';
 import { CLOSE_CHAT, OPEN_CHAT } from '../../chat/actionTypes';
 import { closeChat, openChat, sendMessage, setPrivateMessageRecipient } from '../../chat/actions.native';
+import { updateCandidate, updateOffer } from '../../meeting-central-control/actions';
 import { setMeetingSignals } from '../../meeting-signal/actions';
 import { setRequestingSubtitles } from '../../subtitles/actions.any';
-import { CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED, CUSTOM_SCREEN_RECORD_PRESSED } from '../../toolbox/actionTypes';
+import { CENTRAL_CONTROL_VIDEO, CENTRAL_CONTROL_VIDEO_ANSWER, CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED,
+    CUSTOM_SCREEN_RECORD_PRESSED } from '../../toolbox/actionTypes';
 import { muteLocal } from '../../video-menu/actions.native';
 import { ENTER_PICTURE_IN_PICTURE } from '../picture-in-picture/actionTypes';
 // @ts-ignore
@@ -212,6 +214,37 @@ externalAPIEnabled && MiddlewareRegistry.register(store => next => action => {
                 isRecording
             });
 
+        break;
+    }
+
+    case CENTRAL_CONTROL_VIDEO: {
+        const { videoUrl } = action;
+
+        logger.log('central control video', videoUrl);
+
+        sendEvent(
+            store,
+            CENTRAL_CONTROL_VIDEO,
+            {
+                videoUrl
+            }
+        );
+        break;
+    }
+
+    case CENTRAL_CONTROL_VIDEO_ANSWER: {
+        const { videoUrl, answer } = action;
+
+        logger.log('central control video answer', videoUrl, answer);
+
+        sendEvent(
+            store,
+            CENTRAL_CONTROL_VIDEO_ANSWER,
+            {
+                videoUrl,
+                answer
+            }
+        );
         break;
     }
 
@@ -453,6 +486,16 @@ function _registerForNativeEvents(store: IStore) {
         logger.info('Received screen record:', isRecording);
         dispatch(setScreenRecord(isRecording));
     });
+
+    eventEmitter.addListener(ExternalAPI.CENTRAL_CONTROL_OFFER, ({ videoUrl, offer }: any) => {
+        logger.info('Received central control video:', videoUrl);
+        dispatch(updateOffer(videoUrl, offer));
+    });
+
+    eventEmitter.addListener(ExternalAPI.CENTRAL_CONTROL_ANSWER, ({ videoUrl, answer }: any) => {
+        logger.info('Received central control video:', videoUrl);
+        dispatch(updateCandidate(videoUrl, answer));
+    });
 }
 
 /**
@@ -474,6 +517,8 @@ function _unregisterForNativeEvents() {
     eventEmitter.removeAllListeners(ExternalAPI.SET_CLOSED_CAPTIONS_ENABLED);
     eventEmitter.removeAllListeners(ExternalAPI.TOGGLE_CAMERA);
     eventEmitter.removeAllListeners(ExternalAPI.MEETING_SIGNAL);
+    eventEmitter.removeAllListeners(ExternalAPI.CENTRAL_CONTROL_OFFER);
+    eventEmitter.removeAllListeners(ExternalAPI.CENTRAL_CONTROL_ANSWER);
 }
 
 /**

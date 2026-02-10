@@ -58,3 +58,4 @@ import '../videosipgw/reducer';
 import '../visitors/reducer';
 import '../whiteboard/reducer';
 import '../meeting-signal/reducer';
+import '../meeting-central-control/reducer';

@@ -48,6 +48,7 @@ import { IKeyboardShortcutsState } from '../keyboard-shortcuts/types';
 import { ILargeVideoState } from '../large-video/reducer';
 import { ILobbyState } from '../lobby/reducer';
 import { IMeetingCanvasExternalApiState } from '../meeting-canvas/reducer';
+import { IMeetingCentralControlExternalApiState } from '../meeting-central-control/reducer';
 import { IMeetingFilesExternalApiState } from '../meeting-file/reducer';
 import { IMeetingSignalsExternalApiState } from '../meeting-signal/reducer';
 import { IMobileAudioModeState } from '../mobile/audio-mode/reducer';
@@ -145,6 +146,7 @@ export interface IReduxState {
     'features/large-video': ILargeVideoState;
     'features/lobby': ILobbyState;
     'features/meeting-canvas': IMeetingCanvasExternalApiState;
+    'features/meeting-central-control': IMeetingCentralControlExternalApiState;
     'features/meeting-file': IMeetingFilesExternalApiState;
     'features/meeting-signal': IMeetingSignalsExternalApiState;
     'features/mobile/audio-mode': IMobileAudioModeState;

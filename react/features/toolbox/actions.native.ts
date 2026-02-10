@@ -1,5 +1,5 @@
-import { CENTRAL_CONTROL_VIDEO, CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED,
-    CUSTOM_SCREEN_RECORD_PRESSED } from './actionTypes';
+import { CENTRAL_CONTROL_VIDEO, CENTRAL_CONTROL_VIDEO_ANSWER,
+    CUSTOM_OVERFLOW_MENU_BUTTON_PRESSED, CUSTOM_SCREEN_RECORD_PRESSED } from './actionTypes';
 
 export * from './actions.any';
 
@@ -75,5 +75,24 @@ export function centralControlVideoPlay(videoUrl: string) {
     return {
         type: CENTRAL_CONTROL_VIDEO,
         videoUrl
+    };
+}
+
+/**
+ * Plays a video through central control.
+ *
+ * @param {string} videoUrl - The video URL to play.
+ * @param {string} answer - The answer to the offer.
+ * @returns {{
+ *     type: CENTRAL_CONTROL_VIDEO_ANSWER,
+ *      videoUrl: string,
+ *      answer: string
+ * }}
+ */
+export function centralControlVideoAnswer(videoUrl: string, answer: string) {
+    return {
+        type: CENTRAL_CONTROL_VIDEO_ANSWER,
+        videoUrl,
+        answer
     };
 }

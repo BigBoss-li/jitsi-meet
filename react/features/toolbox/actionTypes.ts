@@ -22,6 +22,8 @@ export const CUSTOM_SCREEN_RECORD_PRESSED = 'CUSTOM_SCREEN_RECORD_PRESSED';
 
 export const CENTRAL_CONTROL_VIDEO = 'CENTRAL_CONTROL_VIDEO';
 
+export const CENTRAL_CONTROL_VIDEO_ANSWER = 'CENTRAL_CONTROL_VIDEO_ANSWER';
+
 /**
  * The type of (redux) action which updates whether the conference is or is not
  * currently in full screen view.

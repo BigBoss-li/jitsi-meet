@@ -73,6 +73,8 @@ const commands = {
     startRecording: 'start-recording',
     startShareVideo: 'start-share-video',
     setMeetingSignals: 'set-meeting-signals',
+    updateOffer: 'update-offer',
+    updateCandidate: 'update-candidate',
     setMeetingFiles: 'set-meeting-files',
     setMeetingCanvasStatus: 'set-meeting-canvas-status',
     stopRecording: 'stop-recording',
