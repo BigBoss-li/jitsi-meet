@@ -488,13 +488,13 @@ function _registerForNativeEvents(store: IStore) {
     });
 
     eventEmitter.addListener(ExternalAPI.CENTRAL_CONTROL_OFFER, ({ videoUrl, offer }: any) => {
-        logger.info('Received central control video:', videoUrl);
+        logger.info('Received central control video:', videoUrl, offer);
         dispatch(updateOffer(videoUrl, offer));
     });
 
-    eventEmitter.addListener(ExternalAPI.CENTRAL_CONTROL_ANSWER, ({ videoUrl, answer }: any) => {
-        logger.info('Received central control video:', videoUrl);
-        dispatch(updateCandidate(videoUrl, answer));
+    eventEmitter.addListener(ExternalAPI.CENTRAL_CONTROL_CANDIDATE, ({ videoUrl, candidate }: any) => {
+        logger.info('Received central control video:', videoUrl, candidate);
+        dispatch(updateCandidate(videoUrl, candidate));
     });
 }
 
@@ -518,7 +518,7 @@ function _unregisterForNativeEvents() {
     eventEmitter.removeAllListeners(ExternalAPI.TOGGLE_CAMERA);
     eventEmitter.removeAllListeners(ExternalAPI.MEETING_SIGNAL);
     eventEmitter.removeAllListeners(ExternalAPI.CENTRAL_CONTROL_OFFER);
-    eventEmitter.removeAllListeners(ExternalAPI.CENTRAL_CONTROL_ANSWER);
+    eventEmitter.removeAllListeners(ExternalAPI.CENTRAL_CONTROL_CANDIDATE);
 }
 
 /**

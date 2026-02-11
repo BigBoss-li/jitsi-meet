@@ -12,6 +12,8 @@ import { MEETING_CANDIDATE_UPDATED, MEETING_CENTRAL_CONTROL_UPDATED, MEETING_OFF
  * }}
  */
 export function updateOffer(videoUrl: string, offer: string) {
+    console.log('updateOffer', videoUrl, offer);
+
     return {
         type: MEETING_OFFER_UPDATED,
         videoUrl,
@@ -31,6 +33,8 @@ export function updateOffer(videoUrl: string, offer: string) {
  * }}
  */
 export function updateCandidate(videoUrl: string, candidate: string) {
+    console.log('updateCandidate', videoUrl, candidate);
+
     return {
         type: MEETING_CANDIDATE_UPDATED,
         videoUrl,

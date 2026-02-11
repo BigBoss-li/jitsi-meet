@@ -16,6 +16,10 @@ ReducerRegistry.register<IMeetingCentralControlExternalApiState>(
         switch (action.type) {
         case MEETING_OFFER_UPDATED: {
             const { videoUrl, offer } = action;
+
+            console.log('reducer MEETING_OFFER_UPDATED START', videoUrl, offer);
+            console.log('current state centralControl:', state.centralControl);
+            console.log('reducer MEETING_OFFER_UPDATED', videoUrl, offer);
             const centralControl = new Map(state.centralControl);
             const current = centralControl.get(videoUrl)
                 || { candidate: '',
@@ -34,6 +38,10 @@ ReducerRegistry.register<IMeetingCentralControlExternalApiState>(
 
         case MEETING_CANDIDATE_UPDATED: {
             const { videoUrl, candidate } = action;
+
+            console.log('reducer MEETING_CANDIDATE_UPDATED START', videoUrl, candidate);
+            console.log('current state centralControl:', state.centralControl);
+            console.log('reducer MEETING_CANDIDATE_UPDATED', videoUrl, candidate);
             const centralControl = new Map(state.centralControl);
             const current = centralControl.get(videoUrl)
                 || { candidate: '',
