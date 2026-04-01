@@ -85,3 +85,20 @@ see our [guidelines for contributing](CONTRIBUTING.md).
 Built with ❤️ by the Jitsi team at <a href="https://8x8.com" target="_blank">8x8</a> and our community.
 </p>
 </footer>
+
+build android sdk:  
+```bash
+./android/scripts/release-sdk.sh /Users/lizhuangzhi/software/mvnRepo
+
+# 降低cpu核数，避免卡顿
+UV_THREADPOOL_SIZE=2 ./android/scripts/release-sdk.sh /Users/lizhuangzhi/software/mvnRepo
+```
+修改native代码时实时显示修改内容
+```bash
+npx react-native start
+```
+
+自动编译运行android
+```bash
+./auto-build.sh
+```

@@ -7,6 +7,8 @@ const process = require('process');
 const webpack = require('webpack');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
+// const TerserPlugin = require('terser-webpack-plugin');
+
 /**
  * The URL of the Jitsi Meet deployment to be proxy to in the context of
  * development with webpack-dev-server.
@@ -98,6 +100,8 @@ function getConfig(options = {}) {
 
     return {
         devtool: isProduction ? 'source-map' : 'eval-source-map',
+
+        // devtool: false,
         mode: isProduction ? 'production' : 'development',
         module: {
             rules: [ {
@@ -176,6 +180,12 @@ function getConfig(options = {}) {
         optimization: {
             concatenateModules: isProduction,
             minimize: isProduction
+
+            // minimizer: [
+            //     new TerserPlugin({
+            //         parallel: 2
+            //     })
+            // ]
         },
         output: {
             filename: `[name]${isProduction ? '.min' : ''}.js`,

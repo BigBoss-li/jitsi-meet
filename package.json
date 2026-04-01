@@ -111,6 +111,7 @@
     "react-native-video": "6.0.0-alpha.11",
     "react-native-watch-connectivity": "1.1.0",
     "react-native-webrtc": "124.0.4",
+    "react-native-websocket": "^1.0.2",
     "react-native-webview": "13.8.7",
     "react-native-youtube-iframe": "2.3.0",
     "react-player": "file:3rd/react-player-2.16.0.tgz",
