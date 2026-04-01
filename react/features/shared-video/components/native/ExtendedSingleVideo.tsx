@@ -1,14 +1,21 @@
 import React from 'react';
+import { WebView } from 'react-native-webview';
 import { connect } from 'react-redux';
 
 import { ASPECT_RATIO_WIDE } from '../../../base/responsive-ui/constants';
+import logger from '../../logger';
 
 import AbstractExtendedVideo from './AbstractExtendedVideo';
-import CentralControlPlayer from './CentralControlPlayer';
 import VideoManager from './VideoManager';
 import WebRTCPlayer from './WebRTCPlayer';
+import { CENTRAL_PLAYER_HTML } from './WebView/centralPlayerHtml';
 
 interface IProps {
+
+    /**
+     * The Redux dispatch function.
+     */
+    dispatch: IStore['dispatch'];
 
     /**
      * The available player width.
@@ -31,6 +38,16 @@ interface IProps {
 class ExtendedSingleVideo extends AbstractExtendedVideo<IProps> {
 
     /**
+     * Handles WebView message events.
+     *
+     * @param {Object} event - The message event.
+     * @returns {void}
+     */
+    _onWebViewMessage(event: any): void {
+        logger.log('WebView message:', event.nativeEvent.data);
+    }
+
+    /**
      * Implements React Component's render.
      *
      * @inheritdoc
@@ -47,7 +64,19 @@ class ExtendedSingleVideo extends AbstractExtendedVideo<IProps> {
                 videoId = { _videoUrl }
                 width = { playerWidth } />);
         } else if (this.matchWsVideoUrl(_videoUrl)) {
-            videoPlayer = <CentralControlPlayer videoUrl = { _videoUrl } />;
+            logger.log('matchWsVideoUrl', _videoUrl);
+
+            const html = CENTRAL_PLAYER_HTML.replace('WS_URL_PLACEHOLDER', _videoUrl);
+
+            videoPlayer = (<WebView
+                domStorageEnabled = { true }
+                javaScriptEnabled = { true }
+                onMessage = { this._onWebViewMessage }
+                source = {{ html }}
+                style = {{
+                    width: playerWidth,
+                    height: playerHeight
+                }} />);
         } else {
             videoPlayer = <WebRTCPlayer videoUrl = { _videoUrl } />;
         }

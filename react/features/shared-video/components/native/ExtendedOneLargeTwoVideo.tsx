@@ -1,11 +1,12 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { connect } from 'react-redux';
 
 import AbstractExtendedVideo from './AbstractExtendedVideo';
-import CentralControlPlayer from './CentralControlPlayer';
 import VideoManager from './VideoManager';
 import WebRTCPlayer from './WebRTCPlayer';
+import { CENTRAL_PLAYER_HTML } from './WebView/centralPlayerHtml';
 import styles from './styles';
 
 
@@ -54,8 +55,16 @@ class ExtendedTwoVideo extends AbstractExtendedVideo<IProps> {
                     videoId = { url }
                     width = { playerWidth } />);
             } else if (this.matchWsVideoUrl(url)) {
-                // TODO CentralControl not supported
-                videoPlayer = <CentralControlPlayer videoUrl = { url } />;
+                const html = CENTRAL_PLAYER_HTML.replace('WS_URL_PLACEHOLDER', url);
+
+                videoPlayer = (<WebView
+                    domStorageEnabled = { true }
+                    javaScriptEnabled = { true }
+                    source = {{ html }}
+                    style = {{
+                        width: playerWidth,
+                        height: playerHeight
+                    }} />);
             } else {
                 videoPlayer = <WebRTCPlayer videoUrl = { url } />;
             }

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Central Control Player</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    #videoContainer {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #videoElement {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background-color: #000;
+    }
+
+    #status {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #00ff88;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: monospace;
+      z-index: 1000;
+    }
+
+    #error {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 0, 0, 0.8);
+      color: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      text-align: center;
+      display: none;
+      z-index: 1000;
+    }
+
+    #error h3 {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">初始化中...</div>
+  <div id="videoContainer">
+    <video
+      id="videoElement"
+      autoplay
+      playsinline
+      muted
+    ></video>
+  </div>
+  <div id="error">
+    <h3>播放失败</h3>
+    <p id="errorMessage"></p>
+  </div>
+
+  <script>
+    // 全局变量
+    let pc = null;
+    let ws = null;
+    let stream = null;
+    let sourceGuid = null;
+    let wsUrl = null;
+    let reconnectAttempts = 0;
+    const MAX_RECONNECT_ATTEMPTS = 5;
+    const RECONNECT_DELAY = 3000;
+
+    // DOM 元素
+    const statusEl = document.getElementById('status');
+    const videoEl = document.getElementById('videoElement');
+    const errorEl = document.getElementById('error');
+    const errorMessageEl = document.getElementById('errorMessage');
+
+    // 更新状态
+    function updateStatus(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      statusEl.textContent = `[${timestamp}] ${message}`;
+      console.log(message);
+      sendToRN({ type: 'status', message });
+    }
+
+    // 显示错误
+    function showError(message) {
+      errorEl.style.display = 'block';
+      errorMessageEl.textContent = message;
+      updateStatus(`错误: ${message}`);
+      sendToRN({ type: 'error', message });
+    }
+
+    // 隐藏错误
+    function hideError() {
+      errorEl.style.display = 'none';
+    }
+
+    // 发送消息到 React Native
+    function sendToRN(data) {
+      try {
+        const payload = JSON.stringify(data);
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage(payload);
+        } else if (window.parent) {
+          window.parent.postMessage(payload, '*');
+        }
+      } catch (e) {
+        console.error('发送消息失败:', e);
+      }
+    }
+
+    // 解析 URL 参数
+    function getUrlParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    // 创建 RTCPeerConnection
+    function createPeerConnection() {
+      const config = {
+        iceServers: [{ urls: 'stun:stun4.l.google.com:19302' }]
+      };
+      pc = new RTCPeerConnection(config);
+
+      pc.ontrack = (event) => {
+        updateStatus('收到轨道数据');
+        if (!stream) {
+          stream = new MediaStream();
+          videoEl.srcObject = stream;
+        }
+        stream.addTrack(event.track);
+      };
+
+      pc.onicecandidate = (event) => {
+        if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(event.candidate));
+        }
+      };
+
+      pc.onconnectionstatechange = () => {
+        updateStatus(`连接状态: ${pc.connectionState}`);
+        sendToRN({ type: 'connectionState', state: pc.connectionState });
+      };
+
+      pc.oniceconnectionstatechange = () => {
+        updateStatus(`ICE 状态: ${pc.iceConnectionState}`);
+      };
+
+      return pc;
+    }
+
+    // 处理 SDP 消息
+    async function handleSdpMessage(sdpData) {
+      updateStatus('处理 SDP...');
+      try {
+        const sdpJson = JSON.parse(sdpData);
+
+        if (sdpJson.candidate) {
+          await pc.addIceCandidate(new RTCIceCandidate(sdpJson));
+          updateStatus('添加 ICE 候选成功');
+        } else if (sdpJson.sdp) {
+          await pc.setRemoteDescription(new RTCSessionDescription(sdpJson));
+          updateStatus('设置远端描述成功');
+
+          const answer = await pc.createAnswer();
+          answer.sdp = answer.sdp.replace(
+            'useinbandfec=1',
+            'useinbandfec=1; stereo=1; maxaveragebitrate=510000'
+          );
+          await pc.setLocalDescription(answer);
+          updateStatus('创建应答成功，发送给服务器');
+
+          ws.send(JSON.stringify(pc.localDescription));
+        }
+      } catch (e) {
+        showError(`SDP 处理失败: ${e.message}`);
+      }
+    }
+
+    // 处理 Source Added 消息
+    function handleSourceAdded(msg) {
+      updateStatus(`视频源已添加: ${JSON.stringify(msg)}`);
+      sendToRN({ type: 'sourceAdded', data: msg });
+    }
+
+    // 处理 Source Removed 消息
+    function handleSourceRemoved(msg) {
+      updateStatus(`视频源已移除: ${msg.Source?.Guid}`);
+      sendToRN({ type: 'sourceRemoved', data: msg });
+      // 可以选择停止播放或切换到空画面
+    }
+
+    // 创建 WebSocket 连接
+    function createWebSocket() {
+      updateStatus(`连接 WebSocket: ${wsUrl}`);
+
+      // 检测 WebSocket 是否可用
+      if (typeof WebSocket === 'undefined') {
+        showError('当前环境不支持 WebSocket');
+        return;
+      }
+
+      try {
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          updateStatus('WebSocket 已连接');
+          reconnectAttempts = 0;
+          sendToRN({ type: 'wsConnected' });
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            console.log('收到消息:', msg.MessageType);
+
+            switch (msg.MessageType) {
+              case 1: // SDP
+                handleSdpMessage(msg.SdpData);
+                break;
+              case 2: // Source Added
+                handleSourceAdded(msg);
+                break;
+              case 3: // Source Removed
+                handleSourceRemoved(msg);
+                break;
+              default:
+                updateStatus(`未知消息类型: ${msg.MessageType}`);
+            }
+          } catch (e) {
+            console.error('消息解析失败:', e);
+          }
+        };
+
+        ws.onerror = (error) => {
+          updateStatus('WebSocket 错误');
+          console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = (event) => {
+          updateStatus(`WebSocket 已关闭: ${event.code} ${event.reason}`);
+          sendToRN({ type: 'wsClosed', code: event.code, reason: event.reason });
+
+          // 自动重连
+          if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+            reconnectAttempts++;
+            updateStatus(`等待重连 (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+            setTimeout(createWebSocket, RECONNECT_DELAY);
+          } else {
+            showError('重连次数过多，请检查网络连接');
+          }
+        };
+      } catch (e) {
+        showError(`WebSocket 创建失败: ${e.message}`);
+      }
+    }
+
+    // 初始化
+    async function init() {
+      updateStatus('初始化中...');
+
+      try {
+        // 获取 sourceGuid
+        sourceGuid = getUrlParam('sourceGuid');
+        if (!sourceGuid) {
+          // 如果 URL 中没有 sourceGuid，尝试从 props 获取
+          sourceGuid = window.sourceGuid;
+        }
+
+        if (!sourceGuid) {
+          showError('未找到 sourceGuid 参数');
+          return;
+        }
+
+        updateStatus(`sourceGuid: ${sourceGuid}`);
+
+        // 构建 WebSocket URL
+        // 假设 WebSocket 服务器地址与当前页面同域，只是协议和端口不同
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host || '10.20.3.151:8066';
+        wsUrl = `${protocol}//${host}/ws?sourceGuid=${sourceGuid}`;
+
+        updateStatus(`WebSocket URL: ${wsUrl}`);
+
+        // 检查 WebRTC 是否可用
+        if (typeof RTCPeerConnection === 'undefined') {
+          showError('当前环境不支持 WebRTC');
+          return;
+        }
+
+        // 创建连接
+        createPeerConnection();
+        createWebSocket();
+
+        // 初始化流
+        stream = new MediaStream();
+        videoEl.srcObject = stream;
+
+        updateStatus('初始化完成，等待视频...');
+        sendToRN({ type: 'initialized', sourceGuid });
+
+      } catch (e) {
+        showError(`初始化失败: ${e.message}`);
+      }
+    }
+
+    // 清理资源
+    function cleanup() {
+      updateStatus('清理资源中...');
+
+      if (pc) {
+        pc.close();
+        pc = null;
+      }
+
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+
+      if (stream) {
+        stream = null;
+        videoEl.srcObject = null;
+      }
+
+      updateStatus('已清理完成');
+    }
+
+    // 监听来自 React Native 的消息
+    window.addEventListener('message', async function(event) {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('收到 RN 消息:', data);
+
+        switch (data.type) {
+          case 'play':
+            // 重新开始播放
+            cleanup();
+            if (data.sourceGuid) {
+              window.sourceGuid = data.sourceGuid;
+            }
+            init();
+            break;
+
+          case 'stop':
+            cleanup();
+            break;
+
+          case 'reconnect':
+            reconnectAttempts = 0;
+            cleanup();
+            init();
+            break;
+
+          case 'injectJavaScript':
+            // 执行注入的 JavaScript
+            eval(data.script);
+            break;
+
+          default:
+            console.log('未知消息类型:', data.type);
+        }
+      } catch (e) {
+        console.error('处理消息失败:', e);
+      }
+    });
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', init);
+
+    // 页面卸载时清理
+    window.addEventListener('beforeunload', cleanup);
+
+    // 页面隐藏时暂停
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        updateStatus('页面隐藏');
+      } else {
+        updateStatus('页面显示');
+      }
+    });
+  </script>
+</body>
+</html>

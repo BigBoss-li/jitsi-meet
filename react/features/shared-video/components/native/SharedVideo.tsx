@@ -99,7 +99,7 @@ class SharedVideo extends Component<IProps> {
      * @returns {React$Element}
      */
     render() {
-        const { isOwner, videoUrl } = this.props;
+        const { isOwner, videoUrl, dispatch } = this.props;
 
         if (!videoUrl) {
             return null;
@@ -112,6 +112,7 @@ class SharedVideo extends Component<IProps> {
                 pointerEvents = { isOwner ? 'auto' : 'none' }
                 style = { styles.videoContainer as ViewStyle } >
                 <ExtendedVideoManager
+                    dispatch = { dispatch }
                     layout = { signalLayout }
                     signals = { signals } />
             </View>

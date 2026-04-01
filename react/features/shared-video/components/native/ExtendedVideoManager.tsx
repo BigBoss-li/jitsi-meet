@@ -14,12 +14,18 @@ import styles from './styles';
 interface IProps {
 
     /**
+     * The Redux dispatch function.
+     */
+    dispatch: IStore['dispatch'];
+
+    /**
      * Is the video shared by the local user.
      *
      * @private
      */
     isOwner: boolean;
     layout?: string;
+
     signals: any;
 
     /**
@@ -39,7 +45,7 @@ class ExtendedVideoManager extends Component<IProps> {
      * @inheritdoc
      */
     render() {
-        const { signals, layout } = this.props;
+        const { signals, layout, dispatch } = this.props;
         const layoutMap = {
             1: 'ONE',
             2: 'TWO',
@@ -56,19 +62,29 @@ class ExtendedVideoManager extends Component<IProps> {
 
         switch (_layout) {
         case 'ONE':
-            _renderVideo = <ExtendedSingleVideo videoUrl = { videoUrl } />;
+            _renderVideo = (<ExtendedSingleVideo
+                dispatch = { dispatch }
+                videoUrl = { videoUrl } />);
             break;
         case 'TWO':
-            _renderVideo = <ExtendedDoubleVideo videoUrl = { videoUrl } />;
+            _renderVideo = (<ExtendedDoubleVideo
+                dispatch = { dispatch }
+                videoUrl = { videoUrl } />);
             break;
         case 'ONE_LARGE_TWO':
-            _renderVideo = <ExtendedOneLargeTwoVideo videoUrl = { videoUrl } />;
+            _renderVideo = (<ExtendedOneLargeTwoVideo
+                dispatch = { dispatch }
+                videoUrl = { videoUrl } />);
             break;
         case 'ONE_LARGE':
-            _renderVideo = <ExtendedOneLargeThreeVideo videoUrl = { videoUrl } />;
+            _renderVideo = (<ExtendedOneLargeThreeVideo
+                dispatch = { dispatch }
+                videoUrl = { videoUrl } />);
             break;
         default:
-            _renderVideo = <ExtendedMultipleVideo videoUrl = { videoUrl } />;
+            _renderVideo = (<ExtendedMultipleVideo
+                dispatch = { dispatch }
+                videoUrl = { videoUrl } />);
         }
 
         return (

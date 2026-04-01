@@ -1,2 +1,2 @@
-export { CentralControlAsync } from './CentralControlAsync';
+export { CentralControlAsync, CentralControlWebSocket } from './CentralControlAsync';
 export * from './types';
