@@ -12,7 +12,8 @@ import {
     SET_DISABLE_BUTTON,
     SET_SHARED_VIDEO_STATUS,
     SET_MOSAIC_OVERLAY,
-    REMOVE_MOSAIC_OVERLAY
+    REMOVE_MOSAIC_OVERLAY,
+    SET_EDIT_MODE
 } from './actionTypes';
 import { ShareVideoConfirmDialog, SharedVideoDialog } from './components';
 import { PLAYBACK_START, PLAYBACK_STATUSES } from './constants';
@@ -334,5 +335,21 @@ export function removeMosaicOverlay(videoIdx: number) {
     return {
         type: REMOVE_MOSAIC_OVERLAY,
         videoIdx
+    };
+}
+
+/**
+ * Sets the edit mode for mosaic overlay.
+ *
+ * @param {boolean} editMode - The edit mode state.
+ * @returns {{
+ *     type: SET_EDIT_MODE,
+ *     editMode: boolean
+ * }}
+ */
+export function setEditMode(editMode: boolean) {
+    return {
+        type: SET_EDIT_MODE,
+        editMode
     };
 }

@@ -7,7 +7,8 @@ import {
     SET_DISABLE_BUTTON,
     SET_SHARED_VIDEO_STATUS,
     SET_MOSAIC_OVERLAY,
-    REMOVE_MOSAIC_OVERLAY
+    REMOVE_MOSAIC_OVERLAY,
+    SET_EDIT_MODE
 } from './actionTypes';
 import { DEFAULT_ALLOWED_URL_DOMAINS } from './constants';
 
@@ -103,6 +104,13 @@ ReducerRegistry.register<ISharedVideoState>('features/shared-video',
         return {
             ...state,
             mosaicOverlays: rest
+        };
+    }
+
+    case SET_EDIT_MODE: {
+        return {
+            ...state,
+            editMode: action.editMode
         };
     }
 

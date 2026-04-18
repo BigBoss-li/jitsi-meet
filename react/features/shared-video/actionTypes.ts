@@ -68,3 +68,13 @@ export const SET_MOSAIC_OVERLAY = 'SET_MOSAIC_OVERLAY';
  * }
  */
 export const REMOVE_MOSAIC_OVERLAY = 'REMOVE_MOSAIC_OVERLAY';
+
+/**
+ * The type of the action which sets the edit mode for mosaic overlay.
+ *
+ * {
+ *     type: SET_EDIT_MODE,
+ *     editMode: boolean
+ * }
+ */
+export const SET_EDIT_MODE = 'SET_EDIT_MODE';

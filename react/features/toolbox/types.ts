@@ -25,6 +25,7 @@ export type ToolbarButton = 'camera' |
     'linktosalesforce' |
     'livestreaming' |
     'microphone' |
+    'mosaicoverlay' |
     'mute-everyone' |
     'mute-video-everyone' |
     'noisesuppression' |
