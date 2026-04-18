@@ -66,6 +66,23 @@ export interface IProps {
     _isOwner: boolean;
 
     /**
+     * Edit mode for mosaic overlay.
+     */
+    _editMode?: boolean;
+
+    /**
+     * Mosaic overlays state.
+     */
+    _mosaicOverlays?: Record<number, {
+        videoIdx: number;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        visible: boolean;
+    }>;
+
+    /**
      * Mutes local audio track.
      */
     _muteLocal: Function;
@@ -452,14 +469,16 @@ export default AbstractVideoManager;
  * @returns {IProps}
  */
 export function _mapStateToProps(state: IReduxState) {
-    const { ownerId, status, time, videoUrl, muted } = state['features/shared-video'];
+    const { editMode, mosaicOverlays, ownerId, status, time, videoUrl, muted } = state['features/shared-video'];
     const localParticipant = getLocalParticipant(state);
     const _isLocalAudioMuted = isLocalTrackMuted(state['features/base/tracks'], MEDIA_TYPE.AUDIO);
 
     return {
         _conference: getCurrentConference(state),
+        _editMode: editMode,
         _isLocalAudioMuted,
         _isOwner: ownerId === localParticipant?.id,
+        _mosaicOverlays: mosaicOverlays,
         _muted: muted,
         _ownerId: ownerId,
         _status: status,

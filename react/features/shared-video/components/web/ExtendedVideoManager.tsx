@@ -9,6 +9,7 @@ import AbstractVideoManager, { IProps, _mapDispatchToProps, _mapStateToProps } f
 import CentralControlPlayer from './CentralControlPlayer';
 // eslint-disable-next-line import/order
 import WebRTCPlayer from './WebRTCPlayer';
+import MosaicOverlay from './MosaicOverlay';
 
 // @ts-ignore
 import { enableDragDropTouch } from './drag-drop-touch.esm.min.js';
@@ -456,7 +457,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @inheritdoc
      */
     render() {
-        const { videoId, _signalLayout } = this.props;
+        const { videoId, _signalLayout, _editMode, _mosaicOverlays } = this.props;
 
         enableDragDropTouch();
 
