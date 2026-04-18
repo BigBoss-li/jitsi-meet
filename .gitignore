@@ -124,5 +124,5 @@ cert/*
 .roo/
 .amazonq/
 .github/copilot/
-.kittify/.dashboard
-.kittify/missions/__pycache__/
+.kittify/
+CLAUDE.md
