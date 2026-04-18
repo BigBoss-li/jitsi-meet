@@ -120,19 +120,39 @@ const MosaicOverlay: React.FC<IProps> = ({
             let newX = position.x;
             let newY = position.y;
 
-            if (resizeHandle.includes('e')) {
+            // Handle diagonal resizers (adjust both dimensions)
+            if (resizeHandle === 'se') {
                 newWidth = Math.max(50, resizeStartSize.current.width + deltaX);
-            }
-            if (resizeHandle.includes('w')) {
-                newWidth = Math.max(50, resizeStartSize.current.width - deltaX);
-                newX = position.x + (resizeStartSize.current.width - newWidth);
-            }
-            if (resizeHandle.includes('s')) {
                 newHeight = Math.max(50, resizeStartSize.current.height + deltaY);
-            }
-            if (resizeHandle.includes('n')) {
+            } else if (resizeHandle === 'sw') {
+                newWidth = Math.max(50, resizeStartSize.current.width - deltaX);
+                newHeight = Math.max(50, resizeStartSize.current.height + deltaY);
+                newX = position.x + (resizeStartSize.current.width - newWidth);
+            } else if (resizeHandle === 'ne') {
+                newWidth = Math.max(50, resizeStartSize.current.width + deltaX);
                 newHeight = Math.max(50, resizeStartSize.current.height - deltaY);
                 newY = position.y + (resizeStartSize.current.height - newHeight);
+            } else if (resizeHandle === 'nw') {
+                newWidth = Math.max(50, resizeStartSize.current.width - deltaX);
+                newHeight = Math.max(50, resizeStartSize.current.height - deltaY);
+                newX = position.x + (resizeStartSize.current.width - newWidth);
+                newY = position.y + (resizeStartSize.current.height - newHeight);
+            } else {
+                // Handle edge resizers (adjust single dimension)
+                if (resizeHandle.includes('e')) {
+                    newWidth = Math.max(50, resizeStartSize.current.width + deltaX);
+                }
+                if (resizeHandle.includes('w')) {
+                    newWidth = Math.max(50, resizeStartSize.current.width - deltaX);
+                    newX = position.x + (resizeStartSize.current.width - newWidth);
+                }
+                if (resizeHandle.includes('s')) {
+                    newHeight = Math.max(50, resizeStartSize.current.height + deltaY);
+                }
+                if (resizeHandle.includes('n')) {
+                    newHeight = Math.max(50, resizeStartSize.current.height - deltaY);
+                    newY = position.y + (resizeStartSize.current.height - newHeight);
+                }
             }
 
             // Ensure doesn't exceed container bounds
