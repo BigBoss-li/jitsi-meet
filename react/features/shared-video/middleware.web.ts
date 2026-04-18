@@ -2,10 +2,10 @@ import { CONFERENCE_JOIN_IN_PROGRESS } from '../base/conference/actionTypes';
 import { getLocalParticipant } from '../base/participants/functions';
 import MiddlewareRegistry from '../base/redux/MiddlewareRegistry';
 
+import { REMOVE_MOSAIC_OVERLAY, SET_MOSAIC_OVERLAY } from './actionTypes';
 import { setDisableButton } from './actions.web';
 import { MOSAIC_OVERLAY, PLAYBACK_STATUSES, SHARED_VIDEO } from './constants';
 import { isSharedVideoEnabled } from './functions';
-import { SET_MOSAIC_OVERLAY, REMOVE_MOSAIC_OVERLAY } from './actionTypes';
 
 import './middleware.any';
 
@@ -39,10 +39,10 @@ MiddlewareRegistry.register(({ dispatch, getState }) => next => action => {
 
         conference.addCommandListener(MOSAIC_OVERLAY, ({ attributes }: { attributes:
             Record<string, string>; }) => {
-            const { videoIdx, action, x, y, width, height, visible } = attributes;
+            const { videoIdx, action: overlayAction, x, y, width, height, visible } = attributes;
             const idx = parseInt(videoIdx, 10);
 
-            if (action === 'remove') {
+            if (overlayAction === 'remove') {
                 dispatch({
                     type: REMOVE_MOSAIC_OVERLAY,
                     videoIdx: idx
@@ -50,12 +50,13 @@ MiddlewareRegistry.register(({ dispatch, getState }) => next => action => {
             } else {
                 const overlay = {
                     videoIdx: idx,
-                    x: parseInt(x, 10),
-                    y: parseInt(y, 10),
-                    width: parseInt(width, 10),
-                    height: parseInt(height, 10),
+                    x: parseFloat(x),
+                    y: parseFloat(y),
+                    width: parseFloat(width),
+                    height: parseFloat(height),
                     visible: visible === 'true'
                 };
+
                 dispatch({
                     type: SET_MOSAIC_OVERLAY,
                     videoIdx: idx,

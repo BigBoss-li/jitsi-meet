@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
 
 import { SharedVideoButton } from './components';
-import { isSharedVideoEnabled } from './functions';
 import MosaicOverlayButton from './components/web/MosaicOverlayButton';
+import { isSharedVideoEnabled } from './functions';
 
 const shareVideo = {
     key: 'sharedvideo',
@@ -38,7 +38,19 @@ export function useMosaicOverlayButton() {
     const sharedVideoEnabled = useSelector(isSharedVideoEnabled);
     const hasSharedVideo = useSelector(state => {
         const sharedVideoState = state as any;
-        return Boolean(sharedVideoState['features/shared-video']?.videoUrl);
+        const videoUrl = sharedVideoState['features/shared-video']?.videoUrl;
+
+        if (!videoUrl) {
+            return false;
+        }
+
+        try {
+            const parsed = JSON.parse(videoUrl);
+
+            return Boolean(parsed.signals && parsed.signals.length > 0);
+        } catch {
+            return true;
+        }
     });
 
     if (sharedVideoEnabled && hasSharedVideo) {

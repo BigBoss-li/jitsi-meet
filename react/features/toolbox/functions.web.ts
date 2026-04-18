@@ -201,11 +201,14 @@ export function getVisibleButtons({
 }: IGetVisibleButtonsParams) {
     setButtonsNotifyClickMode(allButtons, buttonsWithNotifyClick);
 
+    // Feature buttons that should work without being explicitly configured in toolbarButtons
+    const featureButtons = [ 'mosaicoverlay' ];
+
     const filteredButtons = Object.keys(allButtons).filter(key =>
         typeof key !== 'undefined' // filter invalid buttons that may be comming from config.mainToolbarButtons
         // override
         && !jwtDisabledButtons.includes(key)
-        && isButtonEnabled(key, toolbarButtons));
+        && (featureButtons.includes(key) || isButtonEnabled(key, toolbarButtons)));
 
 
     const { order } = mainToolbarButtonsThresholds.find(({ width }) => clientWidth > width)

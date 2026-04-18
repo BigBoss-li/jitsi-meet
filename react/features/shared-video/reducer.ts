@@ -1,14 +1,14 @@
 import ReducerRegistry from '../base/redux/ReducerRegistry';
 
 import {
+    REMOVE_MOSAIC_OVERLAY,
     RESET_SHARED_VIDEO_STATUS,
     SET_ALLOWED_URL_DOMAINS,
     SET_CONFIRM_SHOW_VIDEO,
     SET_DISABLE_BUTTON,
-    SET_SHARED_VIDEO_STATUS,
+    SET_EDIT_MODE,
     SET_MOSAIC_OVERLAY,
-    REMOVE_MOSAIC_OVERLAY,
-    SET_EDIT_MODE
+    SET_SHARED_VIDEO_STATUS
 } from './actionTypes';
 import { DEFAULT_ALLOWED_URL_DOMAINS } from './constants';
 
@@ -23,8 +23,8 @@ export interface ISharedVideoState {
     confirmShowVideo?: boolean;
     disabled?: boolean;
     editMode?: boolean;
-    muted?: boolean;
     mosaicOverlays: Record<number, IMosaicOverlay>;
+    muted?: boolean;
     ownerId?: string;
     status?: string;
     time?: number;
@@ -38,12 +38,12 @@ export interface ISharedVideoState {
  * and re-exported here for ReducerRegistry convenience.
  */
 type IMosaicOverlay = {
+    height: number;
     videoIdx: number;
+    visible: boolean;
+    width: number;
     x: number;
     y: number;
-    width: number;
-    height: number;
-    visible: boolean;
 };
 
 /**
@@ -91,6 +91,7 @@ ReducerRegistry.register<ISharedVideoState>('features/shared-video',
 
     case SET_MOSAIC_OVERLAY: {
         const { videoIdx, overlay } = action;
+
         return {
             ...state,
             mosaicOverlays: {
@@ -102,7 +103,10 @@ ReducerRegistry.register<ISharedVideoState>('features/shared-video',
 
     case REMOVE_MOSAIC_OVERLAY: {
         const { videoIdx } = action;
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [videoIdx]: _, ...rest } = state.mosaicOverlays;
+
         return {
             ...state,
             mosaicOverlays: rest

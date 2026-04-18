@@ -1328,6 +1328,8 @@
         "surprised": "惊讶",
         "talkWhileMutedPopup": "想要发言吗？你被静音了。",
         "tileViewToggle": "切换画面模式",
+        "mosaicOverlayOn": "编辑遮罩",
+        "mosaicOverlayOff": "编辑完成",
         "toggleCamera": "切换摄像头",
         "unmute": "取消静音",
         "videoSettings": "视频设置",

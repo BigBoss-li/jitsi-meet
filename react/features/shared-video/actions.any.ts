@@ -6,14 +6,13 @@ import { hideDialog, openDialog } from '../base/dialog/actions';
 import { getLocalParticipant } from '../base/participants/functions';
 
 import {
+    REMOVE_MOSAIC_OVERLAY,
     RESET_SHARED_VIDEO_STATUS,
     SET_ALLOWED_URL_DOMAINS,
     SET_CONFIRM_SHOW_VIDEO,
-    SET_DISABLE_BUTTON,
-    SET_SHARED_VIDEO_STATUS,
+    SET_EDIT_MODE,
     SET_MOSAIC_OVERLAY,
-    REMOVE_MOSAIC_OVERLAY,
-    SET_EDIT_MODE
+    SET_SHARED_VIDEO_STATUS
 } from './actionTypes';
 import { ShareVideoConfirmDialog, SharedVideoDialog } from './components';
 import { PLAYBACK_START, PLAYBACK_STATUSES } from './constants';
@@ -295,12 +294,12 @@ export function hideConfirmPlayingDialog() {
  * The shape of a mosaic overlay.
  */
 export interface IMosaicOverlay {
+    height: number;
     videoIdx: number;
+    visible: boolean;
+    width: number;
     x: number;
     y: number;
-    width: number;
-    height: number;
-    visible: boolean;
 }
 
 /**

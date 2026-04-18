@@ -3,15 +3,14 @@ import React from 'react';
 import ReactPlayer from 'react-player';
 import { connect } from 'react-redux';
 
-import { PLAYBACK_STATUSES, MOSAIC_OVERLAY_DEFAULT_WIDTH, MOSAIC_OVERLAY_DEFAULT_HEIGHT } from '../../constants';
+import { PLAYBACK_STATUSES } from '../../constants';
+import { sendMosaicOverlayCommand } from '../../functions';
 
 import AbstractVideoManager, { IProps, _mapDispatchToProps, _mapStateToProps } from './AbstractVideoManager';
 import CentralControlPlayer from './CentralControlPlayer';
-// eslint-disable-next-line import/order
-import WebRTCPlayer from './WebRTCPlayer';
 import MosaicOverlay from './MosaicOverlay';
-import { setMosaicOverlay } from '../../actions.any';
-
+import WebRTCPlayer from './WebRTCPlayer';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { enableDragDropTouch } from './drag-drop-touch.esm.min.js';
 
@@ -31,6 +30,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     playerRef: React.RefObject<HTMLDivElement>;
     reactPlayersRef: Array<ReactPlayer | null>;
     playerBoxRefs: Map<number, React.RefObject<HTMLDivElement>>;
+    playerUrlCache: Map<number, string> = new Map();
 
     // player?: any;
 
@@ -236,6 +236,24 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
         return options;
     };
+
+    /**
+     * Get video URL with cache busting only when URL changes.
+     *
+     * @param {number} idx - Video index.
+     * @param {string} url - Video URL.
+     * @returns {string} - URL with cache busting if needed.
+     */
+    getVideoUrl(idx: number, url: string) {
+        const cached = this.playerUrlCache.get(idx);
+
+        if (cached === url) {
+            return cached;
+        }
+        this.playerUrlCache.set(idx, url);
+
+        return url;
+    }
 
     /**
      * 获取最高分辨率url.
@@ -462,27 +480,41 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @returns {void}
      */
     _onPlayerBoxClick(e: React.MouseEvent<HTMLDivElement>, videoIdx: number) {
-        const { _editMode, _isModerator, _mosaicOverlays } = this.props;
+        const { _conference, _editMode, _isModerator, _mosaicOverlays } = this.props;
 
         // Only create overlay in edit mode for moderator when clicking on empty area
         if (_editMode && _isModerator && !_mosaicOverlays?.[videoIdx]) {
             const boxRef = this.playerBoxRefs.get(videoIdx);
+
             if (boxRef?.current) {
                 const bounds = boxRef.current.getBoundingClientRect();
-                // Default to 100x100 at center
-                const defaultWidth = MOSAIC_OVERLAY_DEFAULT_WIDTH;
-                const defaultHeight = MOSAIC_OVERLAY_DEFAULT_HEIGHT;
+
+                // Default to 10% of container dimensions at center
+                const defaultWidthRatio = 0.1;
+                const defaultHeightRatio = 0.1;
+                const defaultWidth = bounds.width * defaultWidthRatio;
+                const defaultHeight = bounds.height * defaultHeightRatio;
                 const centerX = (bounds.width - defaultWidth) / 2;
                 const centerY = (bounds.height - defaultHeight) / 2;
 
+                // Store as ratios relative to container dimensions
+                // This ensures consistent overlay position/size across different screen sizes
                 const overlay = {
                     videoIdx,
-                    x: centerX,
-                    y: centerY,
-                    width: defaultWidth,
-                    height: defaultHeight,
+                    x: centerX / bounds.width,
+                    y: centerY / bounds.height,
+                    width: defaultWidth / bounds.width,
+                    height: defaultHeight / bounds.height,
                     visible: true
                 };
+
+                // Send XMPP command to sync with other participants
+                sendMosaicOverlayCommand({
+                    conference: _conference,
+                    videoIdx,
+                    action: 'add',
+                    overlay
+                });
 
                 // Dispatch Redux action
                 this.props._setMosaicOverlay(videoIdx, overlay);
@@ -500,21 +532,16 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
         enableDragDropTouch();
 
-        if (this.reactPlayersRef && this.reactPlayersRef.length > 0) {
-            this.reactPlayersRef.forEach(ref => {
-                if (ref !== null) {
-                    ref.getInternalPlayer('flv')?.destroy();
-                }
-            });
-        }
-
         let ele2;
 
         if (videoId) {
             const signalList = JSON.parse(videoId);
 
             if (signalList && signalList?.length > 0) {
-                this.reactPlayersRef = new Array(signalList.length);
+                // Only resize array if needed, don't replace it to preserve existing refs
+                if (!this.reactPlayersRef || this.reactPlayersRef.length !== signalList.length) {
+                    this.reactPlayersRef = new Array(signalList.length);
+                }
 
                 let maxSignals = -1;
                 let signalLayout = _signalLayout;
@@ -571,7 +598,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                                 this.reactPlayersRef[i] = refItem;
                                             }
                                         } }
-                                        { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                                        { ...this.getPlayerOptions(this.getVideoUrl(i, url)) } />
                                 );
                             } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
 
@@ -585,22 +612,23 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     data-idx = { i }
                                     draggable = { true }
                                     key = { i }
+                                    // eslint-disable-next-line react/jsx-no-bind
                                     onClick = { e => this._onPlayerBoxClick(e, i) }
                                     onDragEnter = { this._onDragEnter }
                                     onDragLeave = { this._onDragLeave }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onDragOver = { e => e.preventDefault() }
                                     onDragStart = { this._onDragStart }
-                                    onDrop = { this._onDrop }>
+                                    onDrop = { this._onDrop }
+                                    ref = { boxRef }>
                                     {videoPlayer}
-                                    { _editMode && _isModerator && _mosaicOverlays?.[i] && (
+                                    { _mosaicOverlays?.[i] && (
                                         <MosaicOverlay
-                                            videoIdx = { i }
                                             containerRef = { boxRef }
-                                            isModerator = { _isModerator }
-                                            editMode = { _editMode }
+                                            editMode = { Boolean(_editMode) }
+                                            isModerator = { Boolean(_isModerator) }
                                             overlay = { _mosaicOverlays[i] }
-                                        />
+                                            videoIdx = { i } />
                                     )}
                                 </div>
                             );
@@ -611,23 +639,24 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     data-idx = { i }
                                     draggable = { true }
                                     key = { i }
+                                    // eslint-disable-next-line react/jsx-no-bind
                                     onClick = { e => this._onPlayerBoxClick(e, i) }
                                     onDragEnter = { this._onDragEnter }
                                     onDragLeave = { this._onDragLeave }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onDragOver = { e => e.preventDefault() }
                                     onDragStart = { this._onDragStart }
-                                    onDrop = { this._onDrop }>
+                                    onDrop = { this._onDrop }
+                                    ref = { boxRef }>
                                     <div
                                         className = { 'no-signal' }>暂无信号</div>
-                                    { _editMode && _isModerator && _mosaicOverlays?.[i] && (
+                                    { _mosaicOverlays?.[i] && (
                                         <MosaicOverlay
-                                            videoIdx = { i }
                                             containerRef = { boxRef }
-                                            isModerator = { _isModerator }
-                                            editMode = { _editMode }
+                                            editMode = { Boolean(_editMode) }
+                                            isModerator = { Boolean(_isModerator) }
                                             overlay = { _mosaicOverlays[i] }
-                                        />
+                                            videoIdx = { i } />
                                     )}
                                 </div>
                             );
@@ -647,7 +676,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                             this.reactPlayersRef[0] = refItem;
                                         }
                                     } }
-                                    { ...this.getPlayerOptions(`${largeUrl}?_t=${new Date().getTime()}`) } />
+                                    { ...this.getPlayerOptions(this.getVideoUrl(0, largeUrl)) } />
                             );
                         } else if (largeUrl.startsWith('wss://') || largeUrl.startsWith('ws://')) {
 
@@ -668,22 +697,23 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                         data-idx = { 0 }
                         draggable = { true }
                         key = { 0 }
+                        // eslint-disable-next-line react/jsx-no-bind
                         onClick = { e => this._onPlayerBoxClick(e, 0) }
                         onDragEnter = { this._onDragEnter }
                         onDragLeave = { this._onDragLeave }
                         // eslint-disable-next-line react/jsx-no-bind
                         onDragOver = { e => e.preventDefault() }
                         onDragStart = { this._onDragStart }
-                        onDrop = { this._onDrop }>
+                        onDrop = { this._onDrop }
+                        ref = { boxRef0 }>
                         {videoPlayer2}
-                        { _editMode && _isModerator && _mosaicOverlays?.[0] && (
+                        { _mosaicOverlays?.[0] && (
                             <MosaicOverlay
-                                videoIdx = { 0 }
                                 containerRef = { boxRef0 }
-                                isModerator = { _isModerator }
-                                editMode = { _editMode }
+                                editMode = { Boolean(_editMode) }
+                                isModerator = { Boolean(_isModerator) }
                                 overlay = { _mosaicOverlays[0] }
-                            />
+                                videoIdx = { 0 } />
                         )}
                     </div>);
                     const rightItem = <div className = { 'shared-video__small' }>{smallItems}</div>;
@@ -722,7 +752,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                                 this.reactPlayersRef[i] = refItem;
                                             }
                                         } }
-                                        { ...this.getPlayerOptions(`${url}?_t=${new Date().getTime()}`) } />
+                                        { ...this.getPlayerOptions(this.getVideoUrl(i, url)) } />
                                 );
                             } else if (url.startsWith('wss://') || url.startsWith('ws://')) {
 
@@ -736,22 +766,23 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     data-idx = { i }
                                     draggable = { signalLayout !== 'ONE' }
                                     key = { i }
+                                    // eslint-disable-next-line react/jsx-no-bind
                                     onClick = { e => this._onPlayerBoxClick(e, i) }
                                     onDragEnter = { this._onDragEnter }
                                     onDragLeave = { this._onDragLeave }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onDragOver = { e => e.preventDefault() }
                                     onDragStart = { this._onDragStart }
-                                    onDrop = { this._onDrop }>
+                                    onDrop = { this._onDrop }
+                                    ref = { boxRef }>
                                     {videoPlayer}
-                                    { _editMode && _isModerator && _mosaicOverlays?.[i] && (
+                                    { _mosaicOverlays?.[i] && (
                                         <MosaicOverlay
-                                            videoIdx = { i }
                                             containerRef = { boxRef }
-                                            isModerator = { _isModerator }
-                                            editMode = { _editMode }
+                                            editMode = { Boolean(_editMode) }
+                                            isModerator = { Boolean(_isModerator) }
                                             overlay = { _mosaicOverlays[i] }
-                                        />
+                                            videoIdx = { i } />
                                     )}
                                 </div>
                             );
@@ -762,22 +793,23 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     data-idx = { i }
                                     draggable = { true }
                                     key = { i }
+                                    // eslint-disable-next-line react/jsx-no-bind
                                     onClick = { e => this._onPlayerBoxClick(e, i) }
                                     onDragEnter = { this._onDragEnter }
                                     onDragLeave = { this._onDragLeave }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onDragOver = { e => e.preventDefault() }
                                     onDragStart = { this._onDragStart }
-                                    onDrop = { this._onDrop }>
+                                    onDrop = { this._onDrop }
+                                    ref = { boxRef }>
                                     <div className = { 'no-signal' }>暂无信号</div>
-                                    { _editMode && _isModerator && _mosaicOverlays?.[i] && (
+                                    { _mosaicOverlays?.[i] && (
                                         <MosaicOverlay
-                                            videoIdx = { i }
                                             containerRef = { boxRef }
-                                            isModerator = { _isModerator }
-                                            editMode = { _editMode }
+                                            editMode = { Boolean(_editMode) }
+                                            isModerator = { Boolean(_isModerator) }
                                             overlay = { _mosaicOverlays[i] }
-                                        />
+                                            videoIdx = { i } />
                                     )}
                                 </div>
                             );

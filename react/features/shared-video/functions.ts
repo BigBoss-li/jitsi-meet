@@ -187,21 +187,21 @@ export function sendShareVideoCommand({ id, status, conference, localParticipant
  * @returns {void}
  */
 export function sendMosaicOverlayCommand({
-    conference,
-    videoIdx,
     action,
-    overlay
+    conference,
+    overlay,
+    videoIdx
 }: {
-    conference?: IJitsiConference;
-    videoIdx: number;
     action: 'add' | 'update' | 'remove';
+    conference?: IJitsiConference;
     overlay?: {
-        x: number;
-        y: number;
-        width: number;
         height: number;
         visible: boolean;
+        width: number;
+        x: number;
+        y: number;
     };
+    videoIdx: number;
 }) {
     if (!conference) {
         return;

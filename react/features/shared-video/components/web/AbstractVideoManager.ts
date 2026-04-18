@@ -16,8 +16,7 @@ import { NOTIFICATION_TIMEOUT_TYPE } from '../../../notifications/constants';
 import { updateSignalVideoOrder } from '../../../settings/actions.web';
 import { dockToolbox } from '../../../toolbox/actions';
 import { muteLocal } from '../../../video-menu/actions.any';
-import { setSharedVideoStatus, stopSharedVideo } from '../../actions.any';
-import { setMosaicOverlay } from '../../actions.any';
+import { setMosaicOverlay, setSharedVideoStatus, stopSharedVideo } from '../../actions.any';
 import { PLAYBACK_STATUSES } from '../../constants';
 
 const logger = Logger.getLogger(__filename);
@@ -55,9 +54,19 @@ export interface IProps {
     _dockToolbox: Function;
 
     /**
+     * Edit mode for mosaic overlay.
+     */
+    _editMode?: boolean;
+
+    /**
      * Indicates whether the local audio is muted.
     */
     _isLocalAudioMuted: boolean;
+
+    /**
+     * Is the local participant a moderator.
+     */
+    _isModerator?: boolean;
 
     /**
      * Is the video shared by the local user.
@@ -67,25 +76,15 @@ export interface IProps {
     _isOwner: boolean;
 
     /**
-     * Edit mode for mosaic overlay.
-     */
-    _editMode?: boolean;
-
-    /**
-     * Is the local participant a moderator.
-     */
-    _isModerator?: boolean;
-
-    /**
      * Mosaic overlays state.
      */
     _mosaicOverlays?: Record<number, {
+        height: number;
         videoIdx: number;
+        visible: boolean;
+        width: number;
         x: number;
         y: number;
-        width: number;
-        height: number;
-        visible: boolean;
     }>;
 
     /**
@@ -104,14 +103,14 @@ export interface IProps {
     _ownerId?: string;
 
     /**
-     * Updates the shared video status.
-     */
-    _setSharedVideoStatus: Function;
-
-    /**
      * Sets or updates a mosaic overlay for a video.
      */
     _setMosaicOverlay: Function;
+
+    /**
+     * Updates the shared video status.
+     */
+    _setSharedVideoStatus: Function;
 
     _signalLayout?: string;
 

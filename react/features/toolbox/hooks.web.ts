@@ -45,7 +45,7 @@ import ShareAudioButton from '../screen-share/components/web/ShareAudioButton';
 import { isScreenAudioSupported, isScreenVideoShared } from '../screen-share/functions';
 import { useSecurityDialogButton } from '../security/hooks.web';
 import SettingsButton from '../settings/components/web/SettingsButton';
-import { useSharedVideoButton, useMosaicOverlayButton } from '../shared-video/hooks';
+import { useMosaicOverlayButton, useSharedVideoButton } from '../shared-video/hooks';
 import SpeakerStats from '../speaker-stats/components/web/SpeakerStats';
 import { isSpeakerStatsDisabled } from '../speaker-stats/functions';
 import { useSpeakerStatsButton } from '../speaker-stats/hooks.web';
@@ -336,6 +336,7 @@ export function useToolboxButtons(
         download: _download,
         help: _help
     };
+
     const buttonKeys = Object.keys(buttons) as ToolbarButton[];
 
     buttonKeys.forEach(
