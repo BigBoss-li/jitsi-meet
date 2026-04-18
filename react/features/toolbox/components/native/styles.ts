@@ -101,7 +101,7 @@ const styles = {
         flexDirection: 'column',
         maxWidth: 580,
         marginLeft: 'auto',
-        marginRight: 'auto',
+        marginRight: 0,
         width: '100%',
         paddingLeft: BaseTheme.spacing[2],
         paddingRight: BaseTheme.spacing[2]
