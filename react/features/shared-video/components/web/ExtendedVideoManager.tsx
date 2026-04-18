@@ -762,6 +762,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     data-idx = { i }
                                     draggable = { true }
                                     key = { i }
+                                    onClick = { e => this._onPlayerBoxClick(e, i) }
                                     onDragEnter = { this._onDragEnter }
                                     onDragLeave = { this._onDragLeave }
                                     // eslint-disable-next-line react/jsx-no-bind
