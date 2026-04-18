@@ -55,3 +55,17 @@ export const DEFAULT_ALLOWED_URL_DOMAINS = [ YOUTUBE_URL_DOMAIN ];
  * @type {string}
  */
 export const MOSAIC_OVERLAY = 'mosaic-overlay';
+
+/**
+ * Default width for mosaic overlay in pixels.
+ *
+ * @type {number}
+ */
+export const MOSAIC_OVERLAY_DEFAULT_WIDTH = 100;
+
+/**
+ * Default height for mosaic overlay in pixels.
+ *
+ * @type {number}
+ */
+export const MOSAIC_OVERLAY_DEFAULT_HEIGHT = 100;

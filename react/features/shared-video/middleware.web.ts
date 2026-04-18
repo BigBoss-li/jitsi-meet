@@ -5,6 +5,7 @@ import MiddlewareRegistry from '../base/redux/MiddlewareRegistry';
 import { setDisableButton } from './actions.web';
 import { MOSAIC_OVERLAY, PLAYBACK_STATUSES, SHARED_VIDEO } from './constants';
 import { isSharedVideoEnabled } from './functions';
+import { SET_MOSAIC_OVERLAY, REMOVE_MOSAIC_OVERLAY } from './actionTypes';
 
 import './middleware.any';
 
@@ -43,7 +44,7 @@ MiddlewareRegistry.register(({ dispatch, getState }) => next => action => {
 
             if (action === 'remove') {
                 dispatch({
-                    type: 'REMOVE_MOSAIC_OVERLAY',
+                    type: REMOVE_MOSAIC_OVERLAY,
                     videoIdx: idx
                 });
             } else {
@@ -56,7 +57,7 @@ MiddlewareRegistry.register(({ dispatch, getState }) => next => action => {
                     visible: visible === 'true'
                 };
                 dispatch({
-                    type: 'SET_MOSAIC_OVERLAY',
+                    type: SET_MOSAIC_OVERLAY,
                     videoIdx: idx,
                     overlay
                 });

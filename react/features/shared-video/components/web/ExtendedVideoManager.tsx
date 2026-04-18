@@ -3,13 +3,14 @@ import React from 'react';
 import ReactPlayer from 'react-player';
 import { connect } from 'react-redux';
 
-import { PLAYBACK_STATUSES } from '../../constants';
+import { PLAYBACK_STATUSES, MOSAIC_OVERLAY_DEFAULT_WIDTH, MOSAIC_OVERLAY_DEFAULT_HEIGHT } from '../../constants';
 
 import AbstractVideoManager, { IProps, _mapDispatchToProps, _mapStateToProps } from './AbstractVideoManager';
 import CentralControlPlayer from './CentralControlPlayer';
 // eslint-disable-next-line import/order
 import WebRTCPlayer from './WebRTCPlayer';
 import MosaicOverlay from './MosaicOverlay';
+import { setMosaicOverlay } from '../../actions.any';
 
 // @ts-ignore
 import { enableDragDropTouch } from './drag-drop-touch.esm.min.js';
@@ -454,6 +455,42 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     }
 
     /**
+     * Handle click on player box to add mosaic overlay.
+     *
+     * @param {React.MouseEvent<HTMLDivElement>} e - Click event.
+     * @param {number} videoIdx - Video index.
+     * @returns {void}
+     */
+    _onPlayerBoxClick(e: React.MouseEvent<HTMLDivElement>, videoIdx: number) {
+        const { _editMode, _isModerator, _mosaicOverlays } = this.props;
+
+        // Only create overlay in edit mode for moderator when clicking on empty area
+        if (_editMode && _isModerator && !_mosaicOverlays?.[videoIdx]) {
+            const boxRef = this.playerBoxRefs.get(videoIdx);
+            if (boxRef?.current) {
+                const bounds = boxRef.current.getBoundingClientRect();
+                // Default to 100x100 at center
+                const defaultWidth = MOSAIC_OVERLAY_DEFAULT_WIDTH;
+                const defaultHeight = MOSAIC_OVERLAY_DEFAULT_HEIGHT;
+                const centerX = (bounds.width - defaultWidth) / 2;
+                const centerY = (bounds.height - defaultHeight) / 2;
+
+                const overlay = {
+                    videoIdx,
+                    x: centerX,
+                    y: centerY,
+                    width: defaultWidth,
+                    height: defaultHeight,
+                    visible: true
+                };
+
+                // Dispatch Redux action
+                this.props._setMosaicOverlay(videoIdx, overlay);
+            }
+        }
+    }
+
+    /**
      * Implements React Component's render.
      *
      * @inheritdoc
@@ -696,6 +733,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     data-idx = { i }
                                     draggable = { signalLayout !== 'ONE' }
                                     key = { i }
+                                    onClick = { e => this._onPlayerBoxClick(e, i) }
                                     onDragEnter = { this._onDragEnter }
                                     onDragLeave = { this._onDragLeave }
                                     // eslint-disable-next-line react/jsx-no-bind

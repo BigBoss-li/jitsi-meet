@@ -17,6 +17,7 @@ import { updateSignalVideoOrder } from '../../../settings/actions.web';
 import { dockToolbox } from '../../../toolbox/actions';
 import { muteLocal } from '../../../video-menu/actions.any';
 import { setSharedVideoStatus, stopSharedVideo } from '../../actions.any';
+import { setMosaicOverlay } from '../../actions.any';
 import { PLAYBACK_STATUSES } from '../../constants';
 
 const logger = Logger.getLogger(__filename);
@@ -106,6 +107,11 @@ export interface IProps {
      * Updates the shared video status.
      */
     _setSharedVideoStatus: Function;
+
+    /**
+     * Sets or updates a mosaic overlay for a video.
+     */
+    _setMosaicOverlay: Function;
 
     _signalLayout?: string;
 
@@ -527,6 +533,9 @@ export function _mapDispatchToProps(dispatch: IStore['dispatch']) {
         },
         _updateSignalVideoOrder: (urls: Array<string>) => {
             dispatch(updateSignalVideoOrder(urls));
+        },
+        _setMosaicOverlay: (videoIdx: number, overlay: any) => {
+            dispatch(setMosaicOverlay(videoIdx, overlay));
         }
     };
 }

@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { throttle } from 'lodash-es';
 
 import { getCurrentConference } from '../../../base/conference/functions';
 import { isLocalParticipantModerator } from '../../../base/participants/functions';
@@ -46,63 +47,23 @@ const MosaicOverlay: React.FC<IProps> = ({
     const resizeStartSize = useRef({ width: 0, height: 0 });
     const resizeStartPos = useRef({ x: 0, y: 0 });
 
-    // Inject styles on mount
-    useEffect(() => {
-        const style = document.createElement('style');
-        style.textContent = `
-            .mosaic-overlay {
-                position: absolute;
-                cursor: move;
-                background: repeating-conic-gradient(#808080 0% 25%, #ffffff 0% 50%) 50% / 20px 20px;
-                border: 2px solid rgba(0, 0, 0, 0.3);
-                box-sizing: border-box;
-                z-index: 100;
-                user-select: none;
-            }
-            .mosaic-overlay--editing {
-                border-color: rgba(33, 150, 243, 0.6);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            }
-            .mosaic-overlay__handle {
-                position: absolute;
-                width: 12px;
-                height: 12px;
-                background: white;
-                border: 1px solid #333;
-                border-radius: 2px;
-                z-index: 10;
-            }
-            .mosaic-overlay__handle--nw { top: -6px; left: -6px; cursor: nw-resize; }
-            .mosaic-overlay__handle--n { top: -6px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
-            .mosaic-overlay__handle--ne { top: -6px; right: -6px; cursor: ne-resize; }
-            .mosaic-overlay__handle--e { right: -6px; top: 50%; transform: translateY(-50%); cursor: e-resize; }
-            .mosaic-overlay__handle--se { bottom: -6px; right: -6px; cursor: se-resize; }
-            .mosaic-overlay__handle--s { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
-            .mosaic-overlay__handle--sw { bottom: -6px; left: -6px; cursor: sw-resize; }
-            .mosaic-overlay__handle--w { left: -6px; top: 50%; transform: translateY(-50%); cursor: w-resize; }
-            .mosaic-overlay__remove {
-                position: absolute;
-                top: -32px;
-                right: 0;
-                padding: 4px 10px;
-                background: #d32f2f;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            .mosaic-overlay__remove:hover {
-                background: #b71c1c;
-            }
-        `;
-        document.head.appendChild(style);
-
-        return () => {
-            document.head.removeChild(style);
-        };
-    }, []);
+    // Throttled send function for drag/resize sync (max once per 50ms)
+    const throttledSendUpdate = useCallback(throttle((videoIdx: number, pos: {x: number, y: number}, sz: {width: number, height: number}, vis: boolean) => {
+        if (conference) {
+            sendMosaicOverlayCommand({
+                conference,
+                videoIdx,
+                action: 'update',
+                overlay: {
+                    x: pos.x,
+                    y: pos.y,
+                    width: sz.width,
+                    height: sz.height,
+                    visible: vis
+                }
+            });
+        }
+    }, 50), [ conference ]);
 
     // Sync position and size with overlay prop changes
     useEffect(() => {
@@ -180,12 +141,15 @@ const MosaicOverlay: React.FC<IProps> = ({
 
             setSize({ width: newWidth, height: newHeight });
             setPosition({ x: newX, y: newY });
+
+            // Send throttled update during drag/resize
+            throttledSendUpdate(videoIdx, { x: newX, y: newY }, { width: newWidth, height: newHeight }, overlay.visible);
         }
-    }, [ isDragging, isResizing, resizeHandle, size, position, getContainerBounds ]);
+    }, [ isDragging, isResizing, resizeHandle, size, position, getContainerBounds, videoIdx, overlay, throttledSendUpdate ]);
 
     const handleMouseUp = useCallback(() => {
         if (isDragging || isResizing) {
-            // Send XMPP command to sync
+            // Final send (in case throttled send didn't fire)
             sendMosaicOverlayCommand({
                 conference,
                 videoIdx,
@@ -242,10 +206,6 @@ const MosaicOverlay: React.FC<IProps> = ({
         }
     }, [ editMode, isModerator ]);
 
-    if (!editMode || !isModerator) {
-        return null;
-    }
-
     return (
         <div
             className = { `mosaic-overlay${editMode ? ' mosaic-overlay--editing' : ''}` }
@@ -259,7 +219,7 @@ const MosaicOverlay: React.FC<IProps> = ({
                 height: size.height,
                 display: overlay.visible ? 'block' : 'none'
             }}>
-            {showRemoveButton && (
+            {showRemoveButton && isModerator && (
                 <button
                     className = 'mosaic-overlay__remove'
                     onClick = { handleRemove }>

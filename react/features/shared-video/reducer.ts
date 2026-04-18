@@ -34,15 +34,17 @@ export interface ISharedVideoState {
 
 /**
  * The shape of a mosaic overlay.
+ * Note: This interface is imported from actions.any.ts
+ * and re-exported here for ReducerRegistry convenience.
  */
-interface IMosaicOverlay {
+type IMosaicOverlay = {
     videoIdx: number;
     x: number;
     y: number;
     width: number;
     height: number;
     visible: boolean;
-}
+};
 
 /**
  * Reduces the Redux actions of the feature features/shared-video.
