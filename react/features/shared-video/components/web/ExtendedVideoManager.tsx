@@ -29,6 +29,7 @@ interface IState {
 class ExtendedVideoManager extends AbstractVideoManager<IState> {
     playerRef: React.RefObject<HTMLDivElement>;
     reactPlayersRef: Array<ReactPlayer | null>;
+    playerBoxRefs: Map<number, React.RefObject<HTMLDivElement>>;
 
     // player?: any;
 
@@ -52,6 +53,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
         };
 
         this.playerRef = React.createRef<HTMLDivElement>();
+        this.playerBoxRefs = new Map();
 
         this._onDragStart = this._onDragStart.bind(this);
         this._onDragLeave = this._onDragLeave.bind(this);
@@ -457,7 +459,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @inheritdoc
      */
     render() {
-        const { videoId, _signalLayout, _editMode, _mosaicOverlays } = this.props;
+        const { videoId, _signalLayout, _editMode, _isModerator, _mosaicOverlays } = this.props;
 
         enableDragDropTouch();
 
@@ -505,8 +507,17 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     const largeUrl = signalList[0] && signalList[0].meetingSignalOutputs.length > 0
                         ? this._getHeightResolutionUrl(signalList[0].meetingSignalOutputs) : '';
 
+                    // Initialize refs for player boxes
+                    for (let i = 0; i < maxSignals; i++) {
+                        if (!this.playerBoxRefs.has(i)) {
+                            this.playerBoxRefs.set(i, React.createRef<HTMLDivElement>());
+                        }
+                    }
+                    const boxRef0 = this.playerBoxRefs.get(0)!;
+
                     for (let i = 1; i < maxSignals; i++) {
                         const signal = signalList[i];
+                        const boxRef = this.playerBoxRefs.get(i)!;
 
                         if (signal) {
                             let videoPlayer;
@@ -544,6 +555,15 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     onDragStart = { this._onDragStart }
                                     onDrop = { this._onDrop }>
                                     {videoPlayer}
+                                    { _editMode && _isModerator && _mosaicOverlays?.[i] && (
+                                        <MosaicOverlay
+                                            videoIdx = { i }
+                                            containerRef = { boxRef }
+                                            isModerator = { _isModerator }
+                                            editMode = { _editMode }
+                                            overlay = { _mosaicOverlays[i] }
+                                        />
+                                    )}
                                 </div>
                             );
                         } else {
@@ -561,6 +581,15 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     onDrop = { this._onDrop }>
                                     <div
                                         className = { 'no-signal' }>暂无信号</div>
+                                    { _editMode && _isModerator && _mosaicOverlays?.[i] && (
+                                        <MosaicOverlay
+                                            videoIdx = { i }
+                                            containerRef = { boxRef }
+                                            isModerator = { _isModerator }
+                                            editMode = { _editMode }
+                                            overlay = { _mosaicOverlays[i] }
+                                        />
+                                    )}
                                 </div>
                             );
                         }
@@ -605,7 +634,18 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                         // eslint-disable-next-line react/jsx-no-bind
                         onDragOver = { e => e.preventDefault() }
                         onDragStart = { this._onDragStart }
-                        onDrop = { this._onDrop }>{videoPlayer2}</div>);
+                        onDrop = { this._onDrop }>
+                        {videoPlayer2}
+                        { _editMode && _isModerator && _mosaicOverlays?.[0] && (
+                            <MosaicOverlay
+                                videoIdx = { 0 }
+                                containerRef = { boxRef0 }
+                                isModerator = { _isModerator }
+                                editMode = { _editMode }
+                                overlay = { _mosaicOverlays[0] }
+                            />
+                        )}
+                    </div>);
                     const rightItem = <div className = { 'shared-video__small' }>{smallItems}</div>;
 
                     ele2 = (
@@ -620,6 +660,12 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     for (let i = 0; i < maxSignals; i++) {
 
                         const signal = signalList[i];
+
+                        // Create ref for player box if not exists
+                        if (!this.playerBoxRefs.has(i)) {
+                            this.playerBoxRefs.set(i, React.createRef<HTMLDivElement>());
+                        }
+                        const boxRef = this.playerBoxRefs.get(i)!;
 
                         if (signal) {
                             let videoPlayer;
@@ -657,6 +703,15 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     onDragStart = { this._onDragStart }
                                     onDrop = { this._onDrop }>
                                     {videoPlayer}
+                                    { _editMode && _isModerator && _mosaicOverlays?.[i] && (
+                                        <MosaicOverlay
+                                            videoIdx = { i }
+                                            containerRef = { boxRef }
+                                            isModerator = { _isModerator }
+                                            editMode = { _editMode }
+                                            overlay = { _mosaicOverlays[i] }
+                                        />
+                                    )}
                                 </div>
                             );
                         } else {
@@ -673,6 +728,15 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     onDragStart = { this._onDragStart }
                                     onDrop = { this._onDrop }>
                                     <div className = { 'no-signal' }>暂无信号</div>
+                                    { _editMode && _isModerator && _mosaicOverlays?.[i] && (
+                                        <MosaicOverlay
+                                            videoIdx = { i }
+                                            containerRef = { boxRef }
+                                            isModerator = { _isModerator }
+                                            editMode = { _editMode }
+                                            overlay = { _mosaicOverlays[i] }
+                                        />
+                                    )}
                                 </div>
                             );
                         }

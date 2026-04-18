@@ -9,7 +9,7 @@ import { IReduxState, IStore } from '../../../app/types';
 import { getCurrentConference } from '../../../base/conference/functions';
 import { IJitsiConference } from '../../../base/conference/reducer';
 import { MEDIA_TYPE } from '../../../base/media/constants';
-import { getLocalParticipant } from '../../../base/participants/functions';
+import { getLocalParticipant, isLocalParticipantModerator } from '../../../base/participants/functions';
 import { isLocalTrackMuted } from '../../../base/tracks/functions';
 import { showWarningNotification } from '../../../notifications/actions';
 import { NOTIFICATION_TIMEOUT_TYPE } from '../../../notifications/constants';
@@ -69,6 +69,11 @@ export interface IProps {
      * Edit mode for mosaic overlay.
      */
     _editMode?: boolean;
+
+    /**
+     * Is the local participant a moderator.
+     */
+    _isModerator?: boolean;
 
     /**
      * Mosaic overlays state.
@@ -472,11 +477,13 @@ export function _mapStateToProps(state: IReduxState) {
     const { editMode, mosaicOverlays, ownerId, status, time, videoUrl, muted } = state['features/shared-video'];
     const localParticipant = getLocalParticipant(state);
     const _isLocalAudioMuted = isLocalTrackMuted(state['features/base/tracks'], MEDIA_TYPE.AUDIO);
+    const isModerator = isLocalParticipantModerator(state);
 
     return {
         _conference: getCurrentConference(state),
         _editMode: editMode,
         _isLocalAudioMuted,
+        _isModerator: Boolean(isModerator),
         _isOwner: ownerId === localParticipant?.id,
         _mosaicOverlays: mosaicOverlays,
         _muted: muted,
