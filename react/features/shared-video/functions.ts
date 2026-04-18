@@ -5,6 +5,7 @@ import { toState } from '../base/redux/functions';
 
 import {
     ALLOW_ALL_URL_DOMAINS,
+    MOSAIC_OVERLAY,
     PLAYBACK_START,
     PLAYBACK_STATUSES,
     SHARED_VIDEO,
@@ -172,5 +173,54 @@ export function sendShareVideoCommand({ id, status, conference, localParticipant
             time,
             volume
         }
+    });
+}
+
+/**
+ * Sends mosaic overlay update command to all participants.
+ *
+ * @param {Object} options - The options for sending the command.
+ * @param {IJitsiConference} options.conference - The current conference.
+ * @param {number} options.videoIdx - The video index (0-3).
+ * @param {'add' | 'update' | 'remove'} options.action - The action type.
+ * @param {Object} options.overlay - The overlay data (for add/update).
+ * @returns {void}
+ */
+export function sendMosaicOverlayCommand({
+    conference,
+    videoIdx,
+    action,
+    overlay
+}: {
+    conference?: IJitsiConference;
+    videoIdx: number;
+    action: 'add' | 'update' | 'remove';
+    overlay?: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        visible: boolean;
+    };
+}) {
+    if (!conference) {
+        return;
+    }
+
+    const attributes: Record<string, string> = {
+        videoIdx: String(videoIdx),
+        action
+    };
+
+    if (overlay && action !== 'remove') {
+        attributes.x = String(overlay.x);
+        attributes.y = String(overlay.y);
+        attributes.width = String(overlay.width);
+        attributes.height = String(overlay.height);
+        attributes.visible = String(overlay.visible);
+    }
+
+    conference.sendCommandOnce(MOSAIC_OVERLAY, {
+        attributes
     });
 }
