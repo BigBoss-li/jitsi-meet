@@ -52,7 +52,15 @@ class ExtendedVideoManager extends Component<IProps> {
             3: 'FOUR',
             4: 'FOUR'
         };
-        const videoUrl = signals.map(item => item.meetingSignalOutputs[0].url).join(',');
+        const resolution = [ '1080P', '720P', '360P', '4K' ];
+        const target = signals;
+
+        const videoUrl = target.map(item => {
+            item.meetingSignalOutputs.sort((a, b) =>
+                resolution.indexOf(a.resolutionName) - resolution.indexOf(b.resolutionName));
+
+            return item.meetingSignalOutputs[0].url;
+        }).join(',');
         let _layout = layout;
         let _renderVideo = null;
 
