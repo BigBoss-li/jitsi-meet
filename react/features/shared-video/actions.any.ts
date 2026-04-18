@@ -9,7 +9,10 @@ import {
     RESET_SHARED_VIDEO_STATUS,
     SET_ALLOWED_URL_DOMAINS,
     SET_CONFIRM_SHOW_VIDEO,
-    SET_SHARED_VIDEO_STATUS
+    SET_DISABLE_BUTTON,
+    SET_SHARED_VIDEO_STATUS,
+    SET_MOSAIC_OVERLAY,
+    REMOVE_MOSAIC_OVERLAY
 } from './actionTypes';
 import { ShareVideoConfirmDialog, SharedVideoDialog } from './components';
 import { PLAYBACK_START, PLAYBACK_STATUSES } from './constants';
@@ -284,5 +287,52 @@ export function showConfirmPlayingDialog(actor: String, onSubmit: Function) {
 export function hideConfirmPlayingDialog() {
     return (dispatch: IStore['dispatch']) => {
         dispatch(hideDialog(ShareVideoConfirmDialog));
+    };
+}
+
+/**
+ * The shape of a mosaic overlay.
+ */
+export interface IMosaicOverlay {
+    videoIdx: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    visible: boolean;
+}
+
+/**
+ * Sets or updates a mosaic overlay for a video.
+ *
+ * @param {number} videoIdx - The video index (0-3).
+ * @param {IMosaicOverlay} overlay - The overlay data.
+ * @returns {{
+ *     type: SET_MOSAIC_OVERLAY,
+ *     videoIdx: number,
+ *     overlay: IMosaicOverlay
+ * }}
+ */
+export function setMosaicOverlay(videoIdx: number, overlay: IMosaicOverlay) {
+    return {
+        type: SET_MOSAIC_OVERLAY,
+        videoIdx,
+        overlay
+    };
+}
+
+/**
+ * Removes a mosaic overlay from a video.
+ *
+ * @param {number} videoIdx - The video index (0-3).
+ * @returns {{
+ *     type: REMOVE_MOSAIC_OVERLAY,
+ *     videoIdx: number
+ * }}
+ */
+export function removeMosaicOverlay(videoIdx: number) {
+    return {
+        type: REMOVE_MOSAIC_OVERLAY,
+        videoIdx
     };
 }

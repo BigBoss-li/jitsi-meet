@@ -5,24 +5,42 @@ import {
     SET_ALLOWED_URL_DOMAINS,
     SET_CONFIRM_SHOW_VIDEO,
     SET_DISABLE_BUTTON,
-    SET_SHARED_VIDEO_STATUS
+    SET_SHARED_VIDEO_STATUS,
+    SET_MOSAIC_OVERLAY,
+    REMOVE_MOSAIC_OVERLAY
 } from './actionTypes';
 import { DEFAULT_ALLOWED_URL_DOMAINS } from './constants';
 
 const initialState = {
-    allowedUrlDomains: DEFAULT_ALLOWED_URL_DOMAINS
+    allowedUrlDomains: DEFAULT_ALLOWED_URL_DOMAINS,
+    editMode: false,
+    mosaicOverlays: {}
 };
 
 export interface ISharedVideoState {
     allowedUrlDomains: Array<string>;
     confirmShowVideo?: boolean;
     disabled?: boolean;
+    editMode?: boolean;
     muted?: boolean;
+    mosaicOverlays: Record<number, IMosaicOverlay>;
     ownerId?: string;
     status?: string;
     time?: number;
     videoUrl?: string;
     volume?: number;
+}
+
+/**
+ * The shape of a mosaic overlay.
+ */
+interface IMosaicOverlay {
+    videoIdx: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    visible: boolean;
 }
 
 /**
@@ -65,6 +83,26 @@ ReducerRegistry.register<ISharedVideoState>('features/shared-video',
         return {
             ...state,
             allowedUrlDomains: action.allowedUrlDomains
+        };
+    }
+
+    case SET_MOSAIC_OVERLAY: {
+        const { videoIdx, overlay } = action;
+        return {
+            ...state,
+            mosaicOverlays: {
+                ...state.mosaicOverlays,
+                [videoIdx]: overlay
+            }
+        };
+    }
+
+    case REMOVE_MOSAIC_OVERLAY: {
+        const { videoIdx } = action;
+        const { [videoIdx]: _, ...rest } = state.mosaicOverlays;
+        return {
+            ...state,
+            mosaicOverlays: rest
         };
     }
 

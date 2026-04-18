@@ -48,3 +48,10 @@ export const ALLOW_ALL_URL_DOMAINS = '*';
  * The default white listed domains for shared video.
  */
 export const DEFAULT_ALLOWED_URL_DOMAINS = [ YOUTUBE_URL_DOMAIN ];
+
+/**
+ * Shared video mosaic overlay command.
+ *
+ * @type {string}
+ */
+export const MOSAIC_OVERLAY = 'mosaic-overlay';
