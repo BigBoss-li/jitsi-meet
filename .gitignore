@@ -126,3 +126,4 @@ cert/*
 .github/copilot/
 .kittify/
 CLAUDE.md
+kitty-specs/
