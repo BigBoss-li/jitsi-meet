@@ -1,108 +1,163 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Implementation Plan: SharedVideo 马赛克遮罩浮层
+*Path: kitty-specs/001-sharedvideo-mosaic-overlay/plan.md*
 
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
-
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+**Branch**: `meeting/develop` | **Date**: 2026-04-18 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/kitty-specs/001-sharedvideo-mosaic-overlay/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+在 SharedVideo 功能上实现马赛克遮罩浮层能力。管理员可为每个视频添加棋盘格遮罩，支持拖动定位和调整大小（50x50px ~ 视频尺寸），通过 XMPP 命令实时同步给所有参与者。
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
-
-## Charter Check
-
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-[Gates determined based on charter file]
+**Language/Version**: TypeScript/JavaScript (React 18, Redux)  
+**Primary Dependencies**: React, Redux, Jitsi Meet 内部模块  
+**Storage**: Redux 状态管理，XMPP 消息同步  
+**Testing**: 手动测试为主  
+**Target Platform**: Web (Jitsi Meet)
+**Project Type**: 现有项目的功能扩展  
+**Performance Goals**: 同步延迟 < 200ms，遮罩渲染不影响视频播放帧率（下降 < 5%）  
+**Constraints**: 仅管理员可操作遮罩，XMPP 消息体 < 1KB  
+**Scale/Scope**: 单个会议室，最多 4 个视频标签
 
 ## Project Structure
 
-### Documentation (this feature)
+### Source Code (jitsi-meet 仓库)
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+react/features/shared-video/
+├── actionTypes.ts              # [MODIFY] 新增 overlay action types
+├── actions.any.ts              # [MODIFY] 新增 setMosaicOverlay/removeMosaicOverlay
+├── constants.ts                # [MODIFY] 新增 MOSAIC_OVERLAY 命令常量
+├── functions.ts                # [MODIFY] 新增 sendMosaicOverlayCommand
+├── hooks.ts                    # [MODIFY] 新增 useMosaicOverlayButton
+├── middleware.web.ts           # [MODIFY] 新增 XMPP 命令监听
+├── reducer.ts                  # [MODIFY] 新增 mosaicOverlays 状态
+├── components/
+│   └── web/
+│       ├── ExtendedVideoManager.tsx  # [MODIFY] 集成 MosaicOverlay 组件
+│       └── MosaicOverlay.tsx         # [NEW] 遮罩组件
+└── hooks.ts                    # [MODIFY] useMosaicOverlayButton 注册
+
+react/features/toolbox/
+├── hooks.web.ts                # [MODIFY] 注册 mosaicoverlay 按钮
+└── components/web/
+    └── MosaicOverlayButton.tsx # [NEW] 工具栏按钮
+
+css/
+└── _shared-video.scss          # [MODIFY] 新增遮罩样式
 ```
 
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+## Implementation Phases
 
-```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+### Phase 1: Redux 状态管理
 
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+**文件**: `actionTypes.ts`
+```typescript
+SET_MOSAIC_OVERLAY = 'SET_MOSAIC_OVERLAY'
+REMOVE_MOSAIC_OVERLAY = 'REMOVE_MOSAIC_OVERLAY'
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**文件**: `reducer.ts`
+- 新增 `mosaicOverlays: Record<number, IMosaicOverlay>` 状态
+- IMosaicOverlay 接口: `{ videoIdx, x, y, width, height, visible }`
 
-## Complexity Tracking
+**文件**: `actions.any.ts`
+- `setMosaicOverlay(videoIdx, overlay)`
+- `removeMosaicOverlay(videoIdx)`
 
-*Fill ONLY if Charter Check has violations that must be justified*
+### Phase 2: 同步机制
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+**文件**: `constants.ts`
+```typescript
+export const MOSAIC_OVERLAY = 'mosaic-overlay';
+```
+
+**文件**: `functions.ts`
+- 参考 `sendShareVideoCommand` 实现模式
+- `sendMosaicOverlayCommand({ conference, videoIdx, action, overlay })`
+- 使用 `conference.sendCommandOnce(MOSAIC_OVERLAY, { attributes: {...} })`
+
+**文件**: `middleware.web.ts`
+- 添加 `conference.addCommandListener(MOSAIC_OVERLAY, ...)` 监听
+- 解析属性并 dispatch 对应 action
+
+### Phase 3: 遮罩组件
+
+**新建**: `components/web/MosaicOverlay.tsx`
+- CSS 棋盘格图案: `background: repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%)`
+- 拖动定位: onMouseDown/onMouseMove/onMouseUp
+- 8 向调整大小: 四角 + 四边中点
+- 尺寸约束: min 50x50px, max = 容器尺寸
+- 点击显示移除按钮
+
+**修改**: `ExtendedVideoManager.tsx`
+- 在每个 `react-player-box` 内渲染 MosaicOverlay
+- 从 Redux 获取 `isModerator` 和 `editMode`
+- 管理员点击视频时添加遮罩（或切换编辑模式）
+
+### Phase 4: 工具栏按钮
+
+**新建**: `components/web/MosaicOverlayButton.tsx`
+- 使用 `useSelector(isLocalParticipantModerator)` 检查权限
+- 切换 `editMode` 状态
+
+**修改**: `hooks.ts`
+- 新增 `useMosaicOverlayButton()` hook
+- 仅当 `isModerator && hasSharedVideo` 时返回按钮配置
+
+**修改**: `hooks.web.ts`
+- 调用 `useMosaicOverlayButton()` 并注册到 buttons 对象
+
+### Phase 5: 样式
+
+**修改**: `css/_shared-video.scss`
+```scss
+.mosaic-overlay { position: absolute; cursor: move; }
+.mosaic-overlay__checkerboard { /* 棋盘格图案 */ }
+.mosaic-overlay__handle { /* 8 向调整手柄 */ }
+.mosaic-overlay--editing { /* 编辑模式样式 */ }
+```
+
+## Data Model
+
+```typescript
+interface IMosaicOverlay {
+    videoIdx: number;      // 视频索引 (0-3)
+    x: number;             // 相对位置 X
+    y: number;             // 相对位置 Y
+    width: number;         // 宽度 px
+    height: number;        // 高度 px
+    visible: boolean;       // 是否显示
+}
+
+interface MosaicOverlayMessage {
+    videoIdx: number;
+    action: 'add' | 'update' | 'remove';
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+}
+```
+
+## Verification
+
+1. 启动 `npm start` 开发服务器
+2. 加入有 sharedvideo 的会议室
+3. 以管理员身份点击工具栏马赛克按钮
+4. 点击任意视频 → 确认遮罩出现在中心
+5. 拖动遮罩 → 确认位置同步到其他参与者
+6. 调整大小 → 确认同步
+7. 点击移除 → 确认同步
+8. 以非管理员身份确认无法操作
+
+## Reference Patterns
+
+| 模式 | 文件 | 行号 |
+|-----|------|-----|
+| XMPP 命令发送 | `functions.ts` | 162-176 |
+| XMPP 命令监听 | `middleware.web.ts` | 23-37 |
+| 权限检查 | `EndConferenceButton.tsx` | 39 |
+| 拖拽实现 | `ExtendedVideoManager.tsx` | 362-441 |
+| 按钮 Hook | `hooks.ts` | 17-23 |

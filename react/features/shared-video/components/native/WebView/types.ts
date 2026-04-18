@@ -2,66 +2,77 @@
  * WebView Props for React Native
  */
 export interface WebViewProps {
+
+    allowFileAccess?: boolean;
+
+    allowUniversalAccessFromFileURLs?: boolean;
+    allowsInlineMediaPlayback?: boolean;
+
+    // Android specific props
+    androidLayerType?: 'none' | 'software' | 'hardware';
+    applicationNameForUserAgent?: string;
+    automaticallyAdjustContentInsets?: boolean;
+    bounces?: boolean;
+    cacheEnabled?: boolean;
+
+    // Content props
+    contentInset?: { bottom: number; left: number; right: number; top: number; };
+    dataDetectorTypes?: string[];
+    domStorageEnabled?: boolean;
+    geolocationEnabled?: boolean;
+
+    hideKeyboardAccessoryView?: boolean;
+    javaScriptEnabled?: boolean;
+    mediaPlaybackRequiresUserAction?: boolean;
+
+    mixedContentMode?: 'never' | 'always' | 'compatibility';
+    onError?: (event: { nativeEvent: { code: number; description: string; }; }) => void;
+
+    onLoad?: (event: { nativeEvent: { url: string; }; }) => void;
+
+    onLoadEnd?: (event: { nativeEvent: { url: string; }; }) => void;
+
+    // Callbacks
+    onLoadStart?: (event: { nativeEvent: { url: string; }; }) => void;
+    onMessage?: (event: WebViewMessageEvent) => void;
+    onNavigationStateChange?: (event: {
+        nativeEvent: {
+            canGoBack: boolean;
+            canGoForward: boolean;
+            loading: boolean;
+            title: string;
+            url: string;
+        };
+    }) => void;
+    scalesPageToFit?: boolean;
+
+    scrollEnabled?: boolean;
+
+    showsHorizontalScrollIndicator?: boolean;
+
+    showsVerticalScrollIndicator?: boolean;
+
     // Source
     source?: {
-        uri?: string;
+        body?: string;
+        headers?: Record<string, string>;
         html?: string;
         method?: 'GET' | 'POST';
-        headers?: Record<string, string>;
-        body?: string;
+        uri?: string;
     };
 
     // Basic props
     style?: object;
-    javaScriptEnabled?: boolean;
-    domStorageEnabled?: boolean;
-    geolocationEnabled?: boolean;
-    allowsInlineMediaPlayback?: boolean;
-    mediaPlaybackRequiresUserAction?: boolean;
-    scalesPageToFit?: boolean;
-    bounces?: boolean;
-    scrollEnabled?: boolean;
-    showsHorizontalScrollIndicator?: boolean;
-    showsVerticalScrollIndicator?: boolean;
-
-    // Content props
-    contentInset?: { top: number; bottom: number; left: number; right: number };
-    automaticallyAdjustContentInsets?: boolean;
-    dataDetectorTypes?: string[];
-
-    // Auth props
-    userAgent?: string;
-    applicationNameForUserAgent?: string;
-
-    // Callbacks
-    onLoadStart?: (event: { nativeEvent: { url: string } }) => void;
-    onLoad?: (event: { nativeEvent: { url: string } }) => void;
-    onLoadEnd?: (event: { nativeEvent: { url: string } }) => void;
-    onError?: (event: { nativeEvent: { code: number; description: string } }) => void;
-    onMessage?: (event: WebViewMessageEvent) => void;
-    onNavigationStateChange?: (event: {
-        nativeEvent: {
-            url: string;
-            title: string;
-            loading: boolean;
-            canGoBack: boolean;
-            canGoForward: boolean;
-        };
-    }) => void;
 
     // iOS specific props
     useWebKit?: boolean;
-    hideKeyboardAccessoryView?: boolean;
-    allowFileAccess?: boolean;
-    allowUniversalAccessFromFileURLs?: boolean;
 
-    // Android specific props
-    androidLayerType?: 'none' | 'software' | 'hardware';
-    cacheEnabled?: boolean;
-    mixedContentMode?: 'never' | 'always' | 'compatibility';
+    // Auth props
+    userAgent?: string;
 }
 
 export interface NativeWebViewProps extends WebViewProps {
+
     // Native component requires these props
     testID?: string;
 }
