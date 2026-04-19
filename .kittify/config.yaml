@@ -1,10 +1,10 @@
 vcs:
   type: git
-agents:
-  available:
-  - claude
 project:
   uuid: e94113e3-2b9b-42de-8930-51e3aa747deb
   slug: jitsi-meet
   node_id: 1a8d3cd9d78f
   build_id: 10010f4f-88a4-40c2-97ad-c879eed01b2a
+tools:
+  available:
+  - claude

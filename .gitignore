@@ -127,3 +127,9 @@ cert/*
 .kittify/
 CLAUDE.md
 kitty-specs/
+.kittify/runtime/
+.kittify/events/
+.kittify/dossiers/
+kitty-specs/**/.kittify/dossiers/
+.kittify/derived/
+.kittify/.migration-backup/

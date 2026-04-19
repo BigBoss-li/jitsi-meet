@@ -5,10 +5,113 @@
 spec_kitty:
   version: 1.0.3
   initialized_at: '2026-04-01T21:48:15.683470'
-  last_upgraded_at: null
+  last_upgraded_at: '2026-04-19T06:33:11.397340+00:00'
+  project_uuid: 01KPJ72W5ADN8HQVF6ZPVZTZG7
+  schema_version: 3
+  schema_capabilities:
+  - canonical_context
+  - event_log_authority
+  - ownership_manifest
+  - thin_shims
 environment:
   python_version: 3.13.2
   platform: darwin
   platform_version: macOS-26.3.1-arm64-arm-64bit-Mach-O
 migrations:
-  applied: []
+  applied:
+  - id: 2.0.0a5_remove_wp_status_gitignore_rule
+    applied_at: '2026-04-19T14:33:10.887726'
+    result: skipped
+    notes: Not applicable
+  - id: 2.0.0_charter_directory
+    applied_at: '2026-04-19T14:33:10.891258'
+    result: skipped
+    notes: Not applicable
+  - id: 2.0.0_historical_status_migration
+    applied_at: '2026-04-19T14:33:10.892838'
+    result: skipped
+    notes: Not applicable
+  - id: 2.0.0_retire_git_hooks
+    applied_at: '2026-04-19T14:33:10.896370'
+    result: success
+    notes: 'Removed 3 managed git hook(s); Removed managed hook: pre-commit; Removed managed hook: pre-commit-agent-check; Removed managed hook: pre-commit-encoding-check'
+  - id: 2.0.1_fix_generated_command_templates
+    applied_at: '2026-04-19T14:33:10.909874'
+    result: skipped
+    notes: Not applicable
+  - id: 2.0.1_tool_config_key_rename
+    applied_at: '2026-04-19T14:33:10.914582'
+    result: success
+    notes: Renamed .kittify/config.yaml key `agents` -> `tools`
+  - id: 2.0.2_charter_context_bootstrap
+    applied_at: '2026-04-19T14:33:10.915958'
+    result: skipped
+    notes: Not applicable
+  - id: 2.0.6_consistency_sweep
+    applied_at: '2026-04-19T14:33:10.975564'
+    result: success
+    notes: 'migrated 0 identical and 57 customized legacy runtime asset(s); 001-sharedvideo-mosaic-overlay: wrote baseline meta.json; 001-sharedvideo-mosaic-overlay: rewrote 5 legacy prompt reference(s)'
+  - id: 2.0.7_fix_stale_overrides
+    applied_at: '2026-04-19T14:33:10.979358'
+    result: skipped
+    notes: Not applicable
+  - id: 2.0.9_state_gitignore
+    applied_at: '2026-04-19T14:33:10.980889'
+    result: success
+    notes: 'Added runtime state entries to .gitignore: .kittify/runtime/, .kittify/merge-state.json, .kittify/events/, .kittify/dossiers/, kitty-specs/**/.kittify/dossiers/'
+  - id: 2.0.11_install_skills
+    applied_at: '2026-04-19T14:33:10.984055'
+    result: success
+    notes:
+  - id: 2.0.11_remove_clarify_command
+    applied_at: '2026-04-19T14:33:10.986281'
+    result: success
+    notes: 'Removed: .claude/commands/spec-kitty.clarify.md; Removed 1 clarify command artifacts'
+  - id: 2.1.1_repair_skill_pack
+    applied_at: '2026-04-19T14:33:10.988428'
+    result: skipped
+    notes: Not applicable
+  - id: 2.1.2_fix_charter_doctrine_skill
+    applied_at: '2026-04-19T14:33:10.989932'
+    result: skipped
+    notes: Not applicable
+  - id: 2.1.2_fix_glossary_context_skill
+    applied_at: '2026-04-19T14:33:10.991760'
+    result: skipped
+    notes: Not applicable
+  - id: 2.1.2_fix_orchestrator_api_skill
+    applied_at: '2026-04-19T14:33:10.993502'
+    result: skipped
+    notes: Not applicable
+  - id: 2.1.2_fix_runtime_next_skill
+    applied_at: '2026-04-19T14:33:10.995353'
+    result: skipped
+    notes: Not applicable
+  - id: 2.1.2_install_git_workflow_skill
+    applied_at: '2026-04-19T14:33:10.998473'
+    result: success
+    notes: Installed .claude/skills/spec-kitty-git-workflow/SKILL.md; Installed .claude/skills/spec-kitty-git-workflow/references/git-operations-matrix.md; Installed .agents/skills/spec-kitty-git-workflow/SKILL.md; Installed .agents/skills/spec-kitty-git-workflow/references/git-operations-matrix.md
+  - id: 2.1.2_install_mission_system_skill
+    applied_at: '2026-04-19T14:33:11.001659'
+    result: success
+    notes: Installed .claude/skills/spec-kitty-mission-system/SKILL.md; Installed .claude/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md; Installed .agents/skills/spec-kitty-mission-system/SKILL.md; Installed .agents/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md
+  - id: 2.1.2_remove_release_skill
+    applied_at: '2026-04-19T14:33:11.003840'
+    result: skipped
+    notes: Not applicable
+  - id: 2.1.3_fix_planning_repository_terminology
+    applied_at: '2026-04-19T14:33:11.011038'
+    result: success
+    notes: .claude/commands/spec-kitty.tasks.md; .claude/commands/spec-kitty.specify.md; .claude/commands/spec-kitty.plan.md
+  - id: 2.1.3_restore_prompt_commands
+    applied_at: '2026-04-19T14:33:11.014654'
+    result: skipped
+    notes: Not applicable
+  - id: 2.1.4_enforce_command_file_state
+    applied_at: '2026-04-19T14:33:11.041842'
+    result: success
+    notes: 'Wrote prompt: .claude/commands/spec-kitty.analyze.md; Wrote prompt: .claude/commands/spec-kitty.charter.md; Wrote prompt: .claude/commands/spec-kitty.checklist.md; Wrote prompt: .claude/commands/spec-kitty.plan.md; Wrote prompt: .claude/commands/spec-kitty.research.md; Wrote prompt: .claude/commands/spec-kitty.specify.md; Wrote prompt: .claude/commands/spec-kitty.tasks.md; Wrote prompt: .claude/commands/spec-kitty.tasks-outline.md; Wrote prompt: .claude/commands/spec-kitty.tasks-packages.md; Wrote shim: .claude/commands/spec-kitty.accept.md; Wrote shim: .claude/commands/spec-kitty.dashboard.md; Wrote shim: .claude/commands/spec-kitty.implement.md; Wrote shim: .claude/commands/spec-kitty.merge.md; Wrote shim: .claude/commands/spec-kitty.review.md; Wrote shim: .claude/commands/spec-kitty.status.md; Wrote shim: .claude/commands/spec-kitty.tasks-finalize.md'
+  - id: 2.2.0_profile_context_deployment
+    applied_at: '2026-04-19T14:33:11.046893'
+    result: success
+    notes: Deployed .claude/commands/spec-kitty.profile-context.md
