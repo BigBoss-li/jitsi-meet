@@ -286,6 +286,26 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     }
 
     /**
+     * Get video resolution from meetingSignalOutputs.
+     *
+     * @param {Array<any>} signalOutputs - SignalOutputs.
+     * @returns {{ videoWidth: number, videoHeight: number }}
+     */
+    _getVideoResolution(signalOutputs: Array<any>) {
+        const res = signalOutputs?.[0]?.resolution;
+
+        if (res && res.includes('x')) {
+            const [ width, height ] = res.split('x').map(Number);
+
+            return { videoWidth: width || 1920,
+                videoHeight: height || 1080 };
+        }
+
+        return { videoWidth: 1920,
+            videoHeight: 1080 };
+    }
+
+    /**
      * 开始触摸事件.
      *
      * @param {React.DragEvent<HTMLDivElement>} e - 拖动event.
@@ -489,22 +509,18 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
             if (boxRef?.current) {
                 const bounds = boxRef.current.getBoundingClientRect();
 
-                // Default to 10% of container dimensions at center
+                // Default size: 10% of container dimensions
                 const defaultWidthRatio = 0.1;
                 const defaultHeightRatio = 0.1;
-                const defaultWidth = bounds.width * defaultWidthRatio;
-                const defaultHeight = bounds.height * defaultHeightRatio;
-                const centerX = (bounds.width - defaultWidth) / 2;
-                const centerY = (bounds.height - defaultHeight) / 2;
 
-                // Store as ratios relative to container dimensions
-                // This ensures consistent overlay position/size across different screen sizes
+                // Position: center of container (x=0, y=0 means overlay center at video center)
+                // Size is ratio relative to container dimensions
                 const overlay = {
                     videoIdx,
-                    x: centerX / bounds.width,
-                    y: centerY / bounds.height,
-                    width: defaultWidth / bounds.width,
-                    height: defaultHeight / bounds.height,
+                    x: 0, // 0 means center
+                    y: 0, // 0 means center
+                    width: defaultWidthRatio,
+                    height: defaultHeightRatio,
                     visible: true
                 };
 
@@ -622,14 +638,20 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     onDrop = { this._onDrop }
                                     ref = { boxRef }>
                                     {videoPlayer}
-                                    { _mosaicOverlays?.[i] && (
-                                        <MosaicOverlay
-                                            containerRef = { boxRef }
-                                            editMode = { Boolean(_editMode) }
-                                            isModerator = { Boolean(_isModerator) }
-                                            overlay = { _mosaicOverlays[i] }
-                                            videoIdx = { i } />
-                                    )}
+                                    { _mosaicOverlays?.[i] && (() => {
+                                        const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+
+                                        return (
+                                            <MosaicOverlay
+                                                containerRef = { boxRef }
+                                                editMode = { Boolean(_editMode) }
+                                                isModerator = { Boolean(_isModerator) }
+                                                overlay = { _mosaicOverlays[i] }
+                                                videoHeight = { videoHeight }
+                                                videoIdx = { i }
+                                                videoWidth = { videoWidth } />
+                                        );
+                                    })()}
                                 </div>
                             );
                         } else {
@@ -650,14 +672,20 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     ref = { boxRef }>
                                     <div
                                         className = { 'no-signal' }>暂无信号</div>
-                                    { _mosaicOverlays?.[i] && (
-                                        <MosaicOverlay
-                                            containerRef = { boxRef }
-                                            editMode = { Boolean(_editMode) }
-                                            isModerator = { Boolean(_isModerator) }
-                                            overlay = { _mosaicOverlays[i] }
-                                            videoIdx = { i } />
-                                    )}
+                                    { _mosaicOverlays?.[i] && (() => {
+                                        const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+
+                                        return (
+                                            <MosaicOverlay
+                                                containerRef = { boxRef }
+                                                editMode = { Boolean(_editMode) }
+                                                isModerator = { Boolean(_isModerator) }
+                                                overlay = { _mosaicOverlays[i] }
+                                                videoHeight = { videoHeight }
+                                                videoIdx = { i }
+                                                videoWidth = { videoWidth } />
+                                        );
+                                    })()}
                                 </div>
                             );
                         }
@@ -707,14 +735,20 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                         onDrop = { this._onDrop }
                         ref = { boxRef0 }>
                         {videoPlayer2}
-                        { _mosaicOverlays?.[0] && (
-                            <MosaicOverlay
-                                containerRef = { boxRef0 }
-                                editMode = { Boolean(_editMode) }
-                                isModerator = { Boolean(_isModerator) }
-                                overlay = { _mosaicOverlays[0] }
-                                videoIdx = { 0 } />
-                        )}
+                        { _mosaicOverlays?.[0] && (() => {
+                            const { videoWidth, videoHeight } = this._getVideoResolution(signalList[0]?.meetingSignalOutputs);
+
+                            return (
+                                <MosaicOverlay
+                                    containerRef = { boxRef0 }
+                                    editMode = { Boolean(_editMode) }
+                                    isModerator = { Boolean(_isModerator) }
+                                    overlay = { _mosaicOverlays[0] }
+                                    videoHeight = { videoHeight }
+                                    videoIdx = { 0 }
+                                    videoWidth = { videoWidth } />
+                            );
+                        })()}
                     </div>);
                     const rightItem = <div className = { 'shared-video__small' }>{smallItems}</div>;
 
@@ -776,14 +810,20 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     onDrop = { this._onDrop }
                                     ref = { boxRef }>
                                     {videoPlayer}
-                                    { _mosaicOverlays?.[i] && (
-                                        <MosaicOverlay
-                                            containerRef = { boxRef }
-                                            editMode = { Boolean(_editMode) }
-                                            isModerator = { Boolean(_isModerator) }
-                                            overlay = { _mosaicOverlays[i] }
-                                            videoIdx = { i } />
-                                    )}
+                                    { _mosaicOverlays?.[i] && (() => {
+                                        const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+
+                                        return (
+                                            <MosaicOverlay
+                                                containerRef = { boxRef }
+                                                editMode = { Boolean(_editMode) }
+                                                isModerator = { Boolean(_isModerator) }
+                                                overlay = { _mosaicOverlays[i] }
+                                                videoHeight = { videoHeight }
+                                                videoIdx = { i }
+                                                videoWidth = { videoWidth } />
+                                        );
+                                    })()}
                                 </div>
                             );
                         } else {
@@ -803,14 +843,20 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     onDrop = { this._onDrop }
                                     ref = { boxRef }>
                                     <div className = { 'no-signal' }>暂无信号</div>
-                                    { _mosaicOverlays?.[i] && (
-                                        <MosaicOverlay
-                                            containerRef = { boxRef }
-                                            editMode = { Boolean(_editMode) }
-                                            isModerator = { Boolean(_isModerator) }
-                                            overlay = { _mosaicOverlays[i] }
-                                            videoIdx = { i } />
-                                    )}
+                                    { _mosaicOverlays?.[i] && (() => {
+                                        const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+
+                                        return (
+                                            <MosaicOverlay
+                                                containerRef = { boxRef }
+                                                editMode = { Boolean(_editMode) }
+                                                isModerator = { Boolean(_isModerator) }
+                                                overlay = { _mosaicOverlays[i] }
+                                                videoHeight = { videoHeight }
+                                                videoIdx = { i }
+                                                videoWidth = { videoWidth } />
+                                        );
+                                    })()}
                                 </div>
                             );
                         }
