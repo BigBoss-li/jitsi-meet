@@ -116,6 +116,7 @@
     "react-native-youtube-iframe": "2.3.0",
     "react-player": "file:3rd/react-player-2.16.0.tgz",
     "react-redux": "7.2.9",
+    "react-rnd": "^10.5.3",
     "react-textarea-autosize": "8.3.0",
     "react-window": "1.8.6",
     "react-youtube": "10.1.0",

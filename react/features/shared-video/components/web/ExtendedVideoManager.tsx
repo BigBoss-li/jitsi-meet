@@ -501,6 +501,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      */
     _onPlayerBoxClick(e: React.MouseEvent<HTMLDivElement>, videoIdx: number) {
         const { _conference, _editMode, _isModerator, _mosaicOverlays } = this.props;
+        console.log('[MosaicOverlay] _onPlayerBoxClick - videoIdx:', videoIdx, 'editMode:', _editMode, 'isModerator:', _isModerator, 'hasOverlay:', !!_mosaicOverlays?.[videoIdx]);
 
         // Only create overlay in edit mode for moderator when clicking on empty area
         if (_editMode && _isModerator && !_mosaicOverlays?.[videoIdx]) {
@@ -640,6 +641,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     {videoPlayer}
                                     { _mosaicOverlays?.[i] && (() => {
                                         const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+                                        console.log('[MosaicOverlay] ONE_LARGE small render - videoIdx:', i, 'hasOverlay:', !!_mosaicOverlays?.[i], 'videoResolution:', videoWidth, videoHeight);
 
                                         return (
                                             <MosaicOverlay
@@ -674,6 +676,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                         className = { 'no-signal' }>暂无信号</div>
                                     { _mosaicOverlays?.[i] && (() => {
                                         const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+                                        console.log('[MosaicOverlay] ONE_LARGE small no-signal render - videoIdx:', i, 'hasOverlay:', !!_mosaicOverlays?.[i], 'videoResolution:', videoWidth, videoHeight);
 
                                         return (
                                             <MosaicOverlay
@@ -737,6 +740,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                         {videoPlayer2}
                         { _mosaicOverlays?.[0] && (() => {
                             const { videoWidth, videoHeight } = this._getVideoResolution(signalList[0]?.meetingSignalOutputs);
+                            console.log('[MosaicOverlay] ONE_LARGE render - videoIdx: 0, hasOverlay:', !!_mosaicOverlays?.[0], 'videoResolution:', videoWidth, videoHeight);
 
                             return (
                                 <MosaicOverlay
