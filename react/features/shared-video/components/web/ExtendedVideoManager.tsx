@@ -271,6 +271,21 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     }
 
     /**
+     * 获取1080P优先分辨率url（非单画面布局时使用）.
+     *
+     * @param {Array<any>} signalOutputs -signalOutputs.
+     * @returns {string}
+     */
+    _get1080pResolutionUrl(signalOutputs: Array<any>) {
+        const resolution = [ '1080P', '720P', '360P', '4K' ];
+        const target = signalOutputs;
+
+        target.sort((a, b) => resolution.indexOf(a.resolutionName) - resolution.indexOf(b.resolutionName));
+
+        return target[0].url;
+    }
+
+    /**
      * 获取最低分辨率url.
      *
      * @param {Array<any>} signalOutputs -signalOutputs.
@@ -501,15 +516,12 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      */
     _onPlayerBoxClick(e: React.MouseEvent<HTMLDivElement>, videoIdx: number) {
         const { _conference, _editMode, _isModerator, _mosaicOverlays } = this.props;
-        console.log('[MosaicOverlay] _onPlayerBoxClick - videoIdx:', videoIdx, 'editMode:', _editMode, 'isModerator:', _isModerator, 'hasOverlay:', !!_mosaicOverlays?.[videoIdx]);
 
         // Only create overlay in edit mode for moderator when clicking on empty area
         if (_editMode && _isModerator && !_mosaicOverlays?.[videoIdx]) {
             const boxRef = this.playerBoxRefs.get(videoIdx);
 
             if (boxRef?.current) {
-                const bounds = boxRef.current.getBoundingClientRect();
-
                 // Default size: 10% of container dimensions
                 const defaultWidthRatio = 0.1;
                 const defaultHeightRatio = 0.1;
@@ -586,7 +598,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                 if (signalLayout === 'ONE_LARGE_TWO' || signalLayout === 'ONE_LARGE') {
                     const smallItems = [];
                     const largeUrl = signalList[0] && signalList[0].meetingSignalOutputs.length > 0
-                        ? this._getHeightResolutionUrl(signalList[0].meetingSignalOutputs) : '';
+                        ? this._get1080pResolutionUrl(signalList[0].meetingSignalOutputs) : '';
 
                     // Initialize refs for player boxes
                     for (let i = 0; i < maxSignals; i++) {
@@ -640,8 +652,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     ref = { boxRef }>
                                     {videoPlayer}
                                     { _mosaicOverlays?.[i] && (() => {
-                                        const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
-                                        console.log('[MosaicOverlay] ONE_LARGE small render - videoIdx:', i, 'hasOverlay:', !!_mosaicOverlays?.[i], 'videoResolution:', videoWidth, videoHeight);
+                                        const { videoWidth, videoHeight }
+                                        = this._getVideoResolution(signal?.meetingSignalOutputs);
 
                                         return (
                                             <MosaicOverlay
@@ -675,8 +687,9 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     <div
                                         className = { 'no-signal' }>暂无信号</div>
                                     { _mosaicOverlays?.[i] && (() => {
-                                        const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
-                                        console.log('[MosaicOverlay] ONE_LARGE small no-signal render - videoIdx:', i, 'hasOverlay:', !!_mosaicOverlays?.[i], 'videoResolution:', videoWidth, videoHeight);
+                                        const { videoWidth, videoHeight }
+                                        = this._getVideoResolution(signal?.meetingSignalOutputs);
+
 
                                         return (
                                             <MosaicOverlay
@@ -739,8 +752,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                         ref = { boxRef0 }>
                         {videoPlayer2}
                         { _mosaicOverlays?.[0] && (() => {
-                            const { videoWidth, videoHeight } = this._getVideoResolution(signalList[0]?.meetingSignalOutputs);
-                            console.log('[MosaicOverlay] ONE_LARGE render - videoIdx: 0, hasOverlay:', !!_mosaicOverlays?.[0], 'videoResolution:', videoWidth, videoHeight);
+                            const { videoWidth, videoHeight }
+                            = this._getVideoResolution(signalList[0]?.meetingSignalOutputs);
 
                             return (
                                 <MosaicOverlay
@@ -777,7 +790,9 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
 
                         if (signal) {
                             let videoPlayer;
-                            const url = this._getHeightResolutionUrl(signal.meetingSignalOutputs);
+                            const url = signalLayout === 'ONE'
+                                ? this._getHeightResolutionUrl(signal.meetingSignalOutputs)
+                                : this._get1080pResolutionUrl(signal.meetingSignalOutputs);
 
                             if (url.endsWith('.flv') || url.endsWith('.m3u8') || url.endsWith('.mp4')) {
                                 videoPlayer = (
@@ -815,7 +830,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     ref = { boxRef }>
                                     {videoPlayer}
                                     { _mosaicOverlays?.[i] && (() => {
-                                        const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+                                        const { videoWidth, videoHeight }
+                                        = this._getVideoResolution(signal?.meetingSignalOutputs);
 
                                         return (
                                             <MosaicOverlay
@@ -848,7 +864,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                     ref = { boxRef }>
                                     <div className = { 'no-signal' }>暂无信号</div>
                                     { _mosaicOverlays?.[i] && (() => {
-                                        const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+                                        const { videoWidth, videoHeight }
+                                        = this._getVideoResolution(signal?.meetingSignalOutputs);
 
                                         return (
                                             <MosaicOverlay
