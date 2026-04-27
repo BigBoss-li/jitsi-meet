@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Rnd } from 'react-rnd';
 
 import { getCurrentConference } from '../../../base/conference/functions';
+import Icon from '../../../base/icons/components/Icon';
+import { IconCloseCircle } from '../../../base/icons/svg';
 import { IMosaicOverlay, removeMosaicOverlay, setMosaicOverlay } from '../../actions.any';
 import { sendMosaicOverlayCommand } from '../../functions';
 
@@ -39,6 +41,13 @@ const MosaicOverlay: React.FC<IProps> = ({
     const conference = useSelector(getCurrentConference);
 
     const [ showRemoveButton, setShowRemoveButton ] = useState(false);
+
+    // Hide remove button when edit mode is disabled
+    useEffect(() => {
+        if (!editMode) {
+            setShowRemoveButton(false);
+        }
+    }, [ editMode ]);
 
     // Store sync values in refs for accurate final position
     const syncValuesRef = useRef({
@@ -113,6 +122,8 @@ const MosaicOverlay: React.FC<IProps> = ({
         : 0;
 
     const handleDragStop = useCallback((e: any, data: { node: HTMLElement; x: number; y: number; }) => {
+        e.stopPropagation();
+
         const containerBounds = containerRef.current?.getBoundingClientRect();
 
         if (!containerBounds) {
@@ -181,6 +192,8 @@ const MosaicOverlay: React.FC<IProps> = ({
     }, [ conference, videoIdx, overlay.visible, dispatch ]);
 
     const handleResizeStop = useCallback((e: any, dir: string, ref: HTMLElement, delta: { height: number; width: number; }, pos: { x: number; y: number; }) => {
+        e.stopPropagation();
+
         const containerBounds = containerRef.current?.getBoundingClientRect();
 
         if (!containerBounds) {
@@ -273,10 +286,9 @@ const MosaicOverlay: React.FC<IProps> = ({
         overlay.visible ? '' : ' mosaic-overlay--hidden'
     }`;
 
-    // Rnd style with checkerboard background
+    // Rnd style
     const rndStyle: React.CSSProperties = {
-        background: 'repeating-conic-gradient(#808080 0% 25%, #ffffff 0% 50%) 50% / 20px 20px',
-        border: editMode ? '2px solid rgba(33, 150, 243, 0.6)' : '2px solid rgba(0, 0, 0, 0.3)',
+        border: editMode ? '2px solid rgba(33, 150, 243, 0.6)' : 'none',
         boxSizing: 'border-box',
         position: 'absolute',
         cursor: editMode && isModerator ? 'move' : 'default'
@@ -299,11 +311,11 @@ const MosaicOverlay: React.FC<IProps> = ({
                 height: initialHeight }}
             style = { rndStyle }>
             {showRemoveButton && isModerator && (
-                <button
+                <div
                     className = 'mosaic-overlay__remove'
                     onClick = { handleRemove }>
-                    ×
-                </button>
+                    <Icon src = { IconCloseCircle } />
+                </div>
             )}
         </Rnd>
     );

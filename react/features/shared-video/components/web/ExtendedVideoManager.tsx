@@ -515,23 +515,53 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
      * @returns {void}
      */
     _onPlayerBoxClick(e: React.MouseEvent<HTMLDivElement>, videoIdx: number) {
-        const { _conference, _editMode, _isModerator, _mosaicOverlays } = this.props;
+        const { _conference, _editMode, _isModerator, _mosaicOverlays, videoId } = this.props;
 
         // Only create overlay in edit mode for moderator when clicking on empty area
         if (_editMode && _isModerator && !_mosaicOverlays?.[videoIdx]) {
             const boxRef = this.playerBoxRefs.get(videoIdx);
 
             if (boxRef?.current) {
+                const containerBounds = boxRef.current.getBoundingClientRect();
+                const signalList = videoId ? JSON.parse(videoId) : [];
+                const signal = signalList[videoIdx];
+                const { videoWidth, videoHeight } = this._getVideoResolution(signal?.meetingSignalOutputs);
+
+                // Calculate video content position and size within container
+                const videoAspect = videoWidth / videoHeight;
+                const containerAspect = containerBounds.width / containerBounds.height;
+                let actualVideoWidth: number;
+                let actualVideoHeight: number;
+
+                if (videoAspect < containerAspect) {
+                    actualVideoHeight = containerBounds.height;
+                    actualVideoWidth = actualVideoHeight * videoAspect;
+                } else {
+                    actualVideoWidth = containerBounds.width;
+                    actualVideoHeight = actualVideoWidth / videoAspect;
+                }
+                const contentLeft = (containerBounds.width - actualVideoWidth) / 2;
+                const contentTop = (containerBounds.height - actualVideoHeight) / 2;
+                const videoCenterX = contentLeft + actualVideoWidth / 2;
+                const videoCenterY = contentTop + actualVideoHeight / 2;
+
+                // Get click position relative to container
+                const clickX = e.clientX - containerBounds.left;
+                const clickY = e.clientY - containerBounds.top;
+
+                // Convert click position to center-based ratio relative to video content
+                const overlayX = (clickX - videoCenterX) / actualVideoWidth;
+                const overlayY = (clickY - videoCenterY) / actualVideoHeight;
+
                 // Default size: 10% of container dimensions
                 const defaultWidthRatio = 0.1;
                 const defaultHeightRatio = 0.1;
 
-                // Position: center of container (x=0, y=0 means overlay center at video center)
-                // Size is ratio relative to container dimensions
+                // Position: overlay center at click position (overlayX, overlayY are ratios relative to video content center)
                 const overlay = {
                     videoIdx,
-                    x: 0, // 0 means center
-                    y: 0, // 0 means center
+                    x: overlayX,
+                    y: overlayY,
                     width: defaultWidthRatio,
                     height: defaultHeightRatio,
                     visible: true
@@ -639,7 +669,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                 <div
                                     className = { 'react-player-box' }
                                     data-idx = { i }
-                                    draggable = { true }
+                                    draggable = { !_editMode }
                                     key = { i }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onClick = { e => this._onPlayerBoxClick(e, i) }
@@ -673,7 +703,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                 <div
                                     className = { 'react-player-box box-no-signal' }
                                     data-idx = { i }
-                                    draggable = { true }
+                                    draggable = { !_editMode }
                                     key = { i }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onClick = { e => this._onPlayerBoxClick(e, i) }
@@ -739,7 +769,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                     const leftItem = (<div
                         className = 'shared-video__large react-player-box'
                         data-idx = { 0 }
-                        draggable = { true }
+                        draggable = { !_editMode }
                         key = { 0 }
                         // eslint-disable-next-line react/jsx-no-bind
                         onClick = { e => this._onPlayerBoxClick(e, 0) }
@@ -817,7 +847,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                 <div
                                     className = { 'react-player-box' }
                                     data-idx = { i }
-                                    draggable = { signalLayout !== 'ONE' }
+                                    draggable = { !_editMode && signalLayout !== 'ONE' }
                                     key = { i }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onClick = { e => this._onPlayerBoxClick(e, i) }
@@ -851,7 +881,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                                 <div
                                     className = { 'react-player-box box-no-signal' }
                                     data-idx = { i }
-                                    draggable = { true }
+                                    draggable = { !_editMode && signalLayout !== 'ONE' }
                                     key = { i }
                                     // eslint-disable-next-line react/jsx-no-bind
                                     onClick = { e => this._onPlayerBoxClick(e, i) }
