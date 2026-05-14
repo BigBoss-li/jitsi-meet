@@ -1,5 +1,4 @@
 /* eslint-disable no-invalid-this */
-import { throttle } from 'lodash-es';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Rnd } from 'react-rnd';
@@ -20,6 +19,10 @@ interface IProps {
     videoRef?: React.RefObject<HTMLVideoElement>;
     videoWidth?: number;
 }
+
+// Type aliases for react-rnd callbacks
+type RndDelta = { height: number; width: number; };
+type RndPosition = { x: number; y: number; };
 
 /**
  * MosaicOverlay component for displaying and manipulating a mosaic overlay on video.
@@ -59,29 +62,8 @@ const MosaicOverlay: React.FC<IProps> = ({
     const currentSizeRef = useRef({ width: 0,
         height: 0 });
 
-    // Throttled send function
-    const throttledSendUpdate = useCallback(
-        throttle(
-            (idx: number,
-                    pos: { x: number; y: number; }, sz: { height: number; width: number; }, vis: boolean) => {
-                if (conference) {
-                    sendMosaicOverlayCommand({
-                        conference,
-                        videoIdx: idx,
-                        action: 'update',
-                        overlay: {
-                            x: pos.x,
-                            y: pos.y,
-                            width: sz.width,
-                            height: sz.height,
-                            visible: vis
-                        }
-                    });
-                }
-            }, 50), [ conference ]);
-
     // Calculate position and size from overlay props
-    const containerBounds = containerRef.current?.getBoundingClientRect();
+    const _containerBounds = containerRef.current?.getBoundingClientRect();
 
     // Get video resolution from props or fallback
     const videoWidth = videoWidthProp || 1920;
@@ -89,44 +71,44 @@ const MosaicOverlay: React.FC<IProps> = ({
 
     // Get effective bounds (actual video display area, excluding black bars)
     const videoAspect = videoWidth / videoHeight;
-    const containerAspect = containerBounds ? containerBounds.width / containerBounds.height : 1;
+    const containerAspect = _containerBounds ? _containerBounds.width / _containerBounds.height : 1;
     let actualVideoWidth: number;
     let actualVideoHeight: number;
 
     if (videoAspect < containerAspect) {
-        actualVideoHeight = containerBounds ? containerBounds.height : 1;
+        actualVideoHeight = _containerBounds ? _containerBounds.height : 1;
         actualVideoWidth = actualVideoHeight * videoAspect;
     } else {
-        actualVideoWidth = containerBounds ? containerBounds.width : 1;
+        actualVideoWidth = _containerBounds ? _containerBounds.width : 1;
         actualVideoHeight = actualVideoWidth / videoAspect;
     }
-    const contentLeft = containerBounds ? (containerBounds.width - actualVideoWidth) / 2 : 0;
-    const contentTop = containerBounds ? (containerBounds.height - actualVideoHeight) / 2 : 0;
-    const videoCenterX = contentLeft + actualVideoWidth / 2;
-    const videoCenterY = contentTop + actualVideoHeight / 2;
+    const _contentLeft = _containerBounds ? (_containerBounds.width - actualVideoWidth) / 2 : 0;
+    const _contentTop = _containerBounds ? (_containerBounds.height - actualVideoHeight) / 2 : 0;
+    const videoCenterX = _contentLeft + (actualVideoWidth / 2);
+    const videoCenterY = _contentTop + (actualVideoHeight / 2);
 
     // Initial values derived from overlay props (center-based ratios relative to video content)
     // position: x=0 means overlay center at video center, y=0 means overlay center at video center
     // size: width/height are ratios relative to video content dimensions
-    const initialWidth = containerBounds
+    const initialWidth = _containerBounds
         ? Math.max(50, overlay.width * actualVideoWidth)
         : 100;
-    const initialHeight = containerBounds
+    const initialHeight = _containerBounds
         ? Math.max(50, overlay.height * actualVideoHeight)
         : 100;
-    const initialX = containerBounds
-        ? videoCenterX + overlay.x * actualVideoWidth - initialWidth / 2
+    const initialX = _containerBounds
+        ? videoCenterX + (overlay.x * actualVideoWidth) - (initialWidth / 2)
         : 0;
-    const initialY = containerBounds
-        ? videoCenterY + overlay.y * actualVideoHeight - initialHeight / 2
+    const initialY = _containerBounds
+        ? videoCenterY + (overlay.y * actualVideoHeight) - (initialHeight / 2)
         : 0;
 
     const handleDragStop = useCallback((e: any, data: { node: HTMLElement; x: number; y: number; }) => {
         e.stopPropagation();
 
-        const containerBounds = containerRef.current?.getBoundingClientRect();
+        const cBounds = containerRef.current?.getBoundingClientRect();
 
-        if (!containerBounds) {
+        if (!cBounds) {
             return;
         }
 
@@ -136,21 +118,21 @@ const MosaicOverlay: React.FC<IProps> = ({
 
         // Calculate effective video bounds (same as in render)
         const vAspect = vWidth / vHeight;
-        const cAspect = containerBounds.width / containerBounds.height;
+        const cAspect = cBounds.width / cBounds.height;
         let aVideoWidth: number;
         let aVideoHeight: number;
 
         if (vAspect < cAspect) {
-            aVideoHeight = containerBounds.height;
+            aVideoHeight = cBounds.height;
             aVideoWidth = aVideoHeight * vAspect;
         } else {
-            aVideoWidth = containerBounds.width;
+            aVideoWidth = cBounds.width;
             aVideoHeight = aVideoWidth / vAspect;
         }
-        const contentLeft = (containerBounds.width - aVideoWidth) / 2;
-        const contentTop = (containerBounds.height - aVideoHeight) / 2;
-        const vCenterX = contentLeft + aVideoWidth / 2;
-        const vCenterY = contentTop + aVideoHeight / 2;
+        const cLeft = (cBounds.width - aVideoWidth) / 2;
+        const cTop = (cBounds.height - aVideoHeight) / 2;
+        const vCenterX = cLeft + (aVideoWidth / 2);
+        const vCenterY = cTop + (aVideoHeight / 2);
 
         // Get current size from node
         const currentWidth = data.node.offsetWidth;
@@ -158,8 +140,8 @@ const MosaicOverlay: React.FC<IProps> = ({
 
         // data.x/y is the left/top position of the overlay
         // Convert to center-based ratio relative to video content center
-        const syncX = (data.x + currentWidth / 2 - vCenterX) / aVideoWidth;
-        const syncY = (data.y + currentHeight / 2 - vCenterY) / aVideoHeight;
+        const syncX = (data.x + (currentWidth / 2) - vCenterX) / aVideoWidth;
+        const syncY = (data.y + (currentHeight / 2) - vCenterY) / aVideoHeight;
 
         syncValuesRef.current = {
             x: syncX,
@@ -191,12 +173,13 @@ const MosaicOverlay: React.FC<IProps> = ({
         }));
     }, [ conference, videoIdx, overlay.visible, dispatch ]);
 
-    const handleResizeStop = useCallback((e: any, dir: string, ref: HTMLElement, delta: { height: number; width: number; }, pos: { x: number; y: number; }) => {
+    // eslint-disable-next-line max-params
+    const handleResizeStop = useCallback((e: any, dir: string, ref: HTMLElement, delta: RndDelta, pos: RndPosition) => {
         e.stopPropagation();
 
-        const containerBounds = containerRef.current?.getBoundingClientRect();
+        const cBounds = containerRef.current?.getBoundingClientRect();
 
-        if (!containerBounds) {
+        if (!cBounds) {
             return;
         }
 
@@ -206,21 +189,21 @@ const MosaicOverlay: React.FC<IProps> = ({
 
         // Calculate effective video bounds (same as in render)
         const vAspect = vWidth / vHeight;
-        const cAspect = containerBounds.width / containerBounds.height;
+        const cAspect = cBounds.width / cBounds.height;
         let aVideoWidth: number;
         let aVideoHeight: number;
 
         if (vAspect < cAspect) {
-            aVideoHeight = containerBounds.height;
+            aVideoHeight = cBounds.height;
             aVideoWidth = aVideoHeight * vAspect;
         } else {
-            aVideoWidth = containerBounds.width;
+            aVideoWidth = cBounds.width;
             aVideoHeight = aVideoWidth / vAspect;
         }
-        const contentLeft = (containerBounds.width - aVideoWidth) / 2;
-        const contentTop = (containerBounds.height - aVideoHeight) / 2;
-        const vCenterX = contentLeft + aVideoWidth / 2;
-        const vCenterY = contentTop + aVideoHeight / 2;
+        const cLeft = (cBounds.width - aVideoWidth) / 2;
+        const cTop = (cBounds.height - aVideoHeight) / 2;
+        const vCenterX = cLeft + (aVideoWidth / 2);
+        const vCenterY = cTop + (aVideoHeight / 2);
 
         const newWidth = ref.offsetWidth;
         const newHeight = ref.offsetHeight;
@@ -230,8 +213,8 @@ const MosaicOverlay: React.FC<IProps> = ({
             height: newHeight };
 
         // pos.x/y is the left/top position, convert to center-based ratio relative to video content
-        const syncX = (pos.x + newWidth / 2 - vCenterX) / aVideoWidth;
-        const syncY = (pos.y + newHeight / 2 - vCenterY) / aVideoHeight;
+        const syncX = (pos.x + (newWidth / 2) - vCenterX) / aVideoWidth;
+        const syncY = (pos.y + (newHeight / 2) - vCenterY) / aVideoHeight;
         const syncWidth = newWidth / aVideoWidth;
         const syncHeight = newHeight / aVideoHeight;
 

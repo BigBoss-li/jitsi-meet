@@ -1,40 +1,51 @@
-import React, { useRef } from 'react';
-import { Button, SafeAreaView, View } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { Button, SafeAreaView, StyleSheet, View } from 'react-native';
 
 import type { WebViewRef } from './WebView';
 
 import { WebView } from './index';
 
+const styles = StyleSheet.create({
+    flexOne: {
+        flex: 1
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        padding: 10
+    }
+});
+
 const WebViewExample = () => {
     const webViewRef = useRef<WebViewRef>(null);
 
-    const handleGoBack = () => {
+    const handleGoBack = useCallback(() => {
         webViewRef.current?.goBack();
-    };
+    }, []);
 
-    const handleGoForward = () => {
+    const handleGoForward = useCallback(() => {
         webViewRef.current?.goForward();
-    };
+    }, []);
 
-    const handleReload = () => {
+    const handleReload = useCallback(() => {
         webViewRef.current?.reload();
-    };
+    }, []);
 
-    const handleInjectScript = () => {
+    const handleInjectScript = useCallback(() => {
         webViewRef.current?.injectJavaScript('document.body.style.backgroundColor = \'red\';');
-    };
+    }, []);
 
-    const handlePostMessage = () => {
+    const handlePostMessage = useCallback(() => {
         webViewRef.current?.postMessage('Hello from React Native!');
-    };
+    }, []);
 
-    const handleOnMessage = (event: { nativeEvent: { data: string; }; }) => {
+    const handleOnMessage = useCallback((event: { nativeEvent: { data: string; }; }) => {
         console.log('Received message from WebView:', event.nativeEvent.data);
-    };
+    }, []);
 
     return (
-        <SafeAreaView style = {{ flex: 1 }}>
-            <View style = {{ flex: 1 }}>
+        <SafeAreaView style = { styles.flexOne }>
+            <View style = { styles.flexOne }>
                 <WebView
                     domStorageEnabled = { true }
                     javaScriptEnabled = { true }
@@ -42,10 +53,7 @@ const WebViewExample = () => {
                     ref = { webViewRef }
                     source = {{ uri: 'https://reactnative.dev' }} />
             </View>
-            <View
-                style = {{ flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    padding: 10 }}>
+            <View style = { styles.buttonRow }>
                 <Button
                     onPress = { handleGoBack }
                     title = 'Go Back' />

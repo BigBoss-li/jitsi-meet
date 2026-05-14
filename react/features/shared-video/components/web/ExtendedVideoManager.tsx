@@ -309,7 +309,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
     _getVideoResolution(signalOutputs: Array<any>) {
         const res = signalOutputs?.[0]?.resolution;
 
-        if (res && res.includes('x')) {
+        if (res?.includes('x')) {
             const [ width, height ] = res.split('x').map(Number);
 
             return { videoWidth: width || 1920,
@@ -542,8 +542,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                 }
                 const contentLeft = (containerBounds.width - actualVideoWidth) / 2;
                 const contentTop = (containerBounds.height - actualVideoHeight) / 2;
-                const videoCenterX = contentLeft + actualVideoWidth / 2;
-                const videoCenterY = contentTop + actualVideoHeight / 2;
+                const videoCenterX = contentLeft + (actualVideoWidth / 2);
+                const videoCenterY = contentTop + (actualVideoHeight / 2);
 
                 // Get click position relative to container
                 const clickX = e.clientX - containerBounds.left;
@@ -557,7 +557,8 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                 const defaultWidthRatio = 0.1;
                 const defaultHeightRatio = 0.1;
 
-                // Position: overlay center at click position (overlayX, overlayY are ratios relative to video content center)
+                // Position: overlay center at click position
+                // (overlayX, overlayY are ratios relative to video content center)
                 const overlay = {
                     videoIdx,
                     x: overlayX,
@@ -636,10 +637,12 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                             this.playerBoxRefs.set(i, React.createRef<HTMLDivElement>());
                         }
                     }
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     const boxRef0 = this.playerBoxRefs.get(0)!;
 
                     for (let i = 1; i < maxSignals; i++) {
                         const signal = signalList[i];
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const boxRef = this.playerBoxRefs.get(i)!;
 
                         if (signal) {
@@ -816,6 +819,7 @@ class ExtendedVideoManager extends AbstractVideoManager<IState> {
                         if (!this.playerBoxRefs.has(i)) {
                             this.playerBoxRefs.set(i, React.createRef<HTMLDivElement>());
                         }
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const boxRef = this.playerBoxRefs.get(i)!;
 
                         if (signal) {

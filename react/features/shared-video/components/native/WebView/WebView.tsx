@@ -21,7 +21,7 @@ export interface IWebViewRef {
     stopLoading: () => void;
 }
 
-interface WebViewProps {
+interface IWebViewProps {
     domStorageEnabled?: boolean;
     javaScriptEnabled?: boolean;
     onMessage?: (event: any) => void;
@@ -31,7 +31,7 @@ interface WebViewProps {
     style?: object;
 }
 
-const WebView = React.forwardRef<IWebViewRef, WebViewProps>(
+const WebView = React.forwardRef<IWebViewRef, IWebViewProps>(
     ({ style, source, javaScriptEnabled = true, domStorageEnabled = true, onMessage }, ref) => {
         const webViewRef = useRef<RNWebView>(null);
         const [ key, setKey ] = useState(0);

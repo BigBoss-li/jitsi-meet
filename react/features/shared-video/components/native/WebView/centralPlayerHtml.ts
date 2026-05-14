@@ -1,5 +1,5 @@
 /**
- * Central Control Player HTML 内容
+ * Central Control Player HTML 内容.
  */
 export const CENTRAL_PLAYER_HTML = `
 <!DOCTYPE html>

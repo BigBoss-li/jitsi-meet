@@ -1,7 +1,7 @@
 /**
- * WebView Props for React Native
+ * WebView Props for React Native.
  */
-export interface WebViewProps {
+export interface IWebViewProps {
 
     allowFileAccess?: boolean;
 
@@ -34,7 +34,7 @@ export interface WebViewProps {
 
     // Callbacks
     onLoadStart?: (event: { nativeEvent: { url: string; }; }) => void;
-    onMessage?: (event: WebViewMessageEvent) => void;
+    onMessage?: (event: IWebViewMessageEvent) => void;
     onNavigationStateChange?: (event: {
         nativeEvent: {
             canGoBack: boolean;
@@ -71,13 +71,13 @@ export interface WebViewProps {
     userAgent?: string;
 }
 
-export interface NativeWebViewProps extends WebViewProps {
+export interface INativeWebViewProps extends IWebViewProps {
 
     // Native component requires these props
     testID?: string;
 }
 
-export interface WebViewMessageEvent {
+export interface IWebViewMessageEvent {
     nativeEvent: {
         data: string;
     };
