@@ -1415,12 +1415,15 @@ class API {
      * conference.
      *
      * @param {string} id - User id.
+     * @param {Object} props - Additional properties.
+     * @param {Object} props.userDetail - The user detail of the participant.
      * @returns {void}
      */
-    notifyUserLeft(id) {
+    notifyUserLeft(id, props = {}) {
         this._sendEvent({
             name: 'participant-left',
-            id
+            id,
+            ...props
         });
     }
 

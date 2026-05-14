@@ -121,11 +121,15 @@ export function commonUserLeftHandling(
         conference: IJitsiConference,
         user: any) {
     const id = user.getId();
+    const identity = user.getIdentity()?.user;
 
     if (!user.isHidden()) {
         const isReplaced = user.isReplaced?.();
 
-        dispatch(participantLeft(id, conference, { isReplaced }));
+        dispatch(participantLeft(id, conference, {
+            isReplaced,
+            userDetail: identity
+        }));
     }
 }
 

@@ -196,14 +196,14 @@ MiddlewareRegistry.register(store => next => action => {
 
     case PARTICIPANT_LEFT: {
         const { participant } = action;
-        const { fakeParticipant } = participant;
+        const { fakeParticipant, userDetail } = participant;
 
         // Skip sending participant left event for fake participants.
         if (fakeParticipant) {
             break;
         }
 
-        APP.API.notifyUserLeft(action.participant.id);
+        APP.API.notifyUserLeft(action.participant.id, { userDetail });
         break;
     }
     case PARTICIPANT_JOINED: {

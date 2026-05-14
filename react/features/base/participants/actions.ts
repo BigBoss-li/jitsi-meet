@@ -341,6 +341,7 @@ export function updateRemoteParticipantFeatures(jitsiParticipant: any) {
  * @typedef {Object} participantLeftProps
  * @param {FakeParticipant|undefined} participantLeftProps.fakeParticipant - The type of fake participant.
  * @param {boolean} participantLeftProps.isReplaced - Whether the participant is to be replaced in the meeting.
+ * @param {Object|undefined} participantLeftProps.userDetail - The user detail of the participant.
  *
  * @returns {{
  *     type: PARTICIPANT_LEFT,
@@ -351,7 +352,7 @@ export function updateRemoteParticipantFeatures(jitsiParticipant: any) {
  * }}
  */
 export function participantLeft(id: string, conference?: IJitsiConference, participantLeftProps: {
-    fakeParticipant?: string; isReplaced?: boolean;
+    fakeParticipant?: string; isReplaced?: boolean; userDetail?: any;
 } = {}) {
     return {
         type: PARTICIPANT_LEFT,
@@ -359,7 +360,8 @@ export function participantLeft(id: string, conference?: IJitsiConference, parti
             conference,
             fakeParticipant: participantLeftProps.fakeParticipant,
             id,
-            isReplaced: participantLeftProps.isReplaced
+            isReplaced: participantLeftProps.isReplaced,
+            userDetail: participantLeftProps.userDetail
         }
     };
 }
