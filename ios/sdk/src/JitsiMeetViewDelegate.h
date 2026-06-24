@@ -138,6 +138,6 @@
  *
  * The `data` dictionary contains a `payload` key with the decoded payload.
  */
-- (void)onCustomXmppEvent:(NSDictionary *)data;
+- (void)customXmppEvent:(NSDictionary *)data;
 
 @end
