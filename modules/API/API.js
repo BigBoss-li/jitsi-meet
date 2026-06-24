@@ -535,7 +535,18 @@ function initCommands() {
 
             APP.store.dispatch(sendMessage(message, ignorePrivacy));
         },
-        'send-custom-xmpp-command': (target, payload) => {
+        'send-custom-xmpp-command': (first, second) => {
+            // The host page calls executeCommand with a single options object
+            // (see doc/api.md). The iframe transport spreads args into the
+            // dispatcher (see transport.on('event') below), so the object
+            // arrives as the first positional argument. We still accept the
+            // (target, payload) form defensively in case a caller passes two
+            // positional arguments.
+            const { target, payload } = first && typeof first === 'object' && !Array.isArray(first)
+                ? first
+                : { target: first,
+                    payload: second };
+
             APP.store.dispatch(sendCustomXmppCommand(target, payload));
         },
         'send-endpoint-text-message': (to, text) => {
