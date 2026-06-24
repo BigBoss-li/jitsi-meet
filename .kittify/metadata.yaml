@@ -3,9 +3,10 @@
 # DO NOT EDIT MANUALLY
 
 spec_kitty:
-  version: 3.1.10
+  version: 3.2.1
   initialized_at: '2026-04-01T21:48:15.683470'
-  last_upgraded_at: '2026-06-24T10:32:33.170264'
+  last_upgraded_at: '2026-06-24T10:40:34.146627'
+  schema_version: 3
 environment:
   python_version: 3.13.2
   platform: darwin
@@ -166,3 +167,155 @@ migrations:
       Removed: .claude/commands/spec-kitty.tasks-finalize.md; Removed: .claude/commands/spec-kitty.tasks-outline.md;
       Removed: .claude/commands/spec-kitty.tasks-packages.md; Removed: .claude/commands/spec-kitty.tasks.md;
       Removed empty directory: .claude/commands'
+  - id: 3.2.0a4_normalize_mission_lifecycle
+    applied_at: '2026-06-24T10:40:33.173932'
+    result: success
+    notes: '001-sharedvideo-mosaic-overlay: Backfilled mission identity metadata;
+      001-sharedvideo-mosaic-overlay: Normalized legacy mission_number type; 001-sharedvideo-mosaic-overlay:
+      Backfilled missing WP identity fields; 001-sharedvideo-mosaic-overlay: Rebuilt
+      status.events.jsonl (8 synthetic events, 0 corrected); 001-sharedvideo-mosaic-overlay:
+      Regenerated canonical status/progress/lifecycle views'
+  - id: 3.2.0a4_safe_globalize_commands
+    applied_at: '2026-06-24T10:40:33.181926'
+    result: success
+    notes: 'Preserved: .codex/prompts/spec-kitty.accept.md (no global equivalent at
+      ~/.codex/prompts/spec-kitty.accept.md); Preserved: .codex/prompts/spec-kitty.analyze.md
+      (no global equivalent at ~/.codex/prompts/spec-kitty.analyze.md); Preserved:
+      .codex/prompts/spec-kitty.charter.md (no global equivalent at ~/.codex/prompts/spec-kitty.charter.md);
+      Preserved: .codex/prompts/spec-kitty.checklist.md (no global equivalent at ~/.codex/prompts/spec-kitty.checklist.md);
+      Preserved: .codex/prompts/spec-kitty.dashboard.md (no global equivalent at ~/.codex/prompts/spec-kitty.dashboard.md);
+      Preserved: .codex/prompts/spec-kitty.implement.md (no global equivalent at ~/.codex/prompts/spec-kitty.implement.md);
+      Preserved: .codex/prompts/spec-kitty.merge.md (no global equivalent at ~/.codex/prompts/spec-kitty.merge.md);
+      Preserved: .codex/prompts/spec-kitty.plan.md (no global equivalent at ~/.codex/prompts/spec-kitty.plan.md);
+      Preserved: .codex/prompts/spec-kitty.research.md (no global equivalent at ~/.codex/prompts/spec-kitty.research.md);
+      Preserved: .codex/prompts/spec-kitty.review.md (no global equivalent at ~/.codex/prompts/spec-kitty.review.md);
+      Preserved: .codex/prompts/spec-kitty.specify.md (no global equivalent at ~/.codex/prompts/spec-kitty.specify.md);
+      Preserved: .codex/prompts/spec-kitty.status.md (no global equivalent at ~/.codex/prompts/spec-kitty.status.md);
+      Preserved: .codex/prompts/spec-kitty.tasks-finalize.md (no global equivalent
+      at ~/.codex/prompts/spec-kitty.tasks-finalize.md); Preserved: .codex/prompts/spec-kitty.tasks.md
+      (no global equivalent at ~/.codex/prompts/spec-kitty.tasks.md); Preserved: .codex/prompts/spec-kitty.tasks_outline.md
+      (no global equivalent at ~/.codex/prompts/spec-kitty.tasks_outline.md); Preserved:
+      .codex/prompts/spec-kitty.tasks_packages.md (no global equivalent at ~/.codex/prompts/spec-kitty.tasks_packages.md)'
+  - id: 3.2.0rc28_github_diff_attributes
+    applied_at: '2026-06-24T10:40:33.188247'
+    result: success
+    notes: 'Added .gitattributes entry: kitty-specs/**/status.json linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/status.events.jsonl linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/lanes.json linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/mission-events.jsonl linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/snapshot-latest.json linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/acceptance-matrix.json linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/occurrence_map.yaml linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/tasks/** linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/research/evidence-log.csv linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/research/source-register.csv linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/test-transcripts/** linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/baseline/** linguist-generated=true;
+      Added .gitattributes entry: kitty-specs/**/canary-evidence/** linguist-generated=true;
+      Added .gitattributes entry: .kittify/workspaces/** linguist-generated=true;
+      Added .gitattributes entry: .kittify/workspaces/** -diff; Added .gitattributes
+      entry: .kittify/migrations/** linguist-generated=true; Added .gitattributes
+      entry: .kittify/migrations/** -diff'
+  - id: 3.2.0rc30_fix_runtime_next_result_default
+    applied_at: '2026-06-24T10:40:33.194294'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc35_activate_builtin_mission_types
+    applied_at: '2026-06-24T10:40:33.204340'
+    result: success
+    notes: 'Added mission_type_activations: [''software-dev'', ''documentation'',
+      ''research'', ''plan'']'
+  - id: 3.2.0rc35_charter_bundle_v2
+    applied_at: '2026-06-24T10:40:33.210637'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc35_charter_manifest_defaults_repair
+    applied_at: '2026-06-24T10:40:33.216896'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc35_codex_to_skills
+    applied_at: '2026-06-24T10:40:33.223969'
+    result: success
+    notes: null
+  - id: 3.2.0rc35_default_charter_pack
+    applied_at: '2026-06-24T10:40:33.242463'
+    result: success
+    notes: activated_directives; activated_tactics; activated_styleguides; activated_toolguides;
+      activated_paradigms; activated_procedures; activated_agent_profiles; activated_mission_step_contracts;
+      activated_kinds
+  - id: 3.2.0rc35_fix_prompt_file_workaround
+    applied_at: '2026-06-24T10:40:33.248853'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc35_kittify_profile_handoff
+    applied_at: '2026-06-24T10:40:33.255026'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc35_pi_letta_agent_backfill
+    applied_at: '2026-06-24T10:40:33.270564'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc35_repository_root_checkout_terminology
+    applied_at: '2026-06-24T10:40:33.284357'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc35_spk_skill_pack
+    applied_at: '2026-06-24T10:40:33.369461'
+    result: success
+    notes: 'Installed 37 spk skill(s) for 1 agent(s) (71 managed files); Updated .kittify/skills-manifest.json
+      with spk skill entries; Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260624T024033Z/.claude/skills/spec-kitty-git-workflow/SKILL.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260624T024033Z/.claude/skills/spec-kitty-git-workflow/references/git-operations-matrix.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260624T024033Z/.claude/skills/spec-kitty-mission-system/SKILL.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260624T024033Z/.claude/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md'
+  - id: 3.2.0rc35_strip_selection_config
+    applied_at: '2026-06-24T10:40:33.382253'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc35_kittify_runtime_git_hygiene
+    applied_at: '2026-06-24T10:40:33.486440'
+    result: success
+    notes: Added .kittify/sync-state.json to .gitignore
+  - id: 3.2.0rc35_unified_bundle
+    applied_at: '2026-06-24T10:40:33.504888'
+    result: success
+    notes: '{"applied": false, "bundle_validation": {"missing_derived": [], "missing_tracked":
+      [], "passed": true, "unexpected": []}, "charter_present": false, "chokepoint_refreshed":
+      false, "duration_ms": 10, "errors": [], "migration_id": "3.2.0rc35_unified_bundle",
+      "target_version": "3.2.0rc35"}'
+  - id: 3.2.0rc35_update_planning_templates
+    applied_at: '2026-06-24T10:40:33.519730'
+    result: skipped
+    notes: Not applicable
+  - id: 3_2_0rc39_refresh_orientation_block
+    applied_at: '2026-06-24T10:40:33.564104'
+    result: skipped
+    notes: Not applicable
+  - id: 3_3_0_session_presence_all_harnesses
+    applied_at: '2026-06-24T10:40:33.579182'
+    result: skipped
+    notes: Not applicable
+  - id: 3_3_0_session_presence_claude_code
+    applied_at: '2026-06-24T10:40:33.617177'
+    result: success
+    notes: Wrote spec-kitty orientation to .claude/CLAUDE.md; Registered spec-kitty
+      session-start SessionStart hook; Registered spec-kitty session-stop Stop hook
+  - id: 3_3_0_op_record_schema_v2
+    applied_at: '2026-06-24T10:40:33.625188'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0rc43_retire_profile_context_command
+    applied_at: '2026-06-24T10:40:33.640796'
+    result: skipped
+    notes: Not applicable
+  - id: 0_9_3_surface_repair_wiring
+    applied_at: '2026-06-24T10:40:34.113452'
+    result: success
+    notes: 'surface_repair_wiring: probed 110 tool surface(s)'
+  - id: 0_9_4_roo_deprecation
+    applied_at: '2026-06-24T10:40:34.129396'
+    result: success
+    notes: Roo Code deprecation notice emitted (.roo/ preserved at /Users/lizhuangzhi/workspace/CHENSHEN/jitsi-meet/.roo)
+  - id: 3.2.0rc45_retire_standalone_skill_surface
+    applied_at: '2026-06-24T10:40:34.138301'
+    result: skipped
+    notes: Not applicable
