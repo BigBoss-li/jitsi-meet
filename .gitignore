@@ -127,6 +127,8 @@ cert/*
 .kittify/
 CLAUDE.md
 kitty-specs/
+!kitty-specs/*/status.events.jsonl
+!kitty-specs/*/status.json
 .kittify/runtime/
 .kittify/events/
 .kittify/dossiers/
