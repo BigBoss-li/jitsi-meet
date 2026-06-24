@@ -74,6 +74,7 @@ import {
     toggleChat
 } from '../../react/features/chat/actions';
 import { openChat } from '../../react/features/chat/actions.web';
+import { sendCustomXmppCommand } from '../../react/features/custom-xmpp';
 import {
     processExternalDeviceRequest
 } from '../../react/features/device-selection/functions';
@@ -533,6 +534,9 @@ function initCommands() {
             }
 
             APP.store.dispatch(sendMessage(message, ignorePrivacy));
+        },
+        'send-custom-xmpp-command': (target, payload) => {
+            APP.store.dispatch(sendCustomXmppCommand(target, payload));
         },
         'send-endpoint-text-message': (to, text) => {
             try {
