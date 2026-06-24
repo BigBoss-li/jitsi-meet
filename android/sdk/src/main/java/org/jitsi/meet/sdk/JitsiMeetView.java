@@ -18,12 +18,14 @@ package org.jitsi.meet.sdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.facebook.react.ReactRootView;
 
@@ -154,6 +156,43 @@ public class JitsiMeetView extends FrameLayout {
      */
     public void join(@Nullable JitsiMeetConferenceOptions options) {
         setProps(options != null ? options.asProps() : new Bundle());
+    }
+
+    /**
+     * Sends a custom XMPP command to a specific participant in the conference.
+     *
+     * This is the host-side bridge to the {@code SEND_CUSTOM_XMPP_COMMAND}
+     * action on the JavaScript side. After joining a conference, a host
+     * application can call this method to dispatch a custom XMPP command
+     * targeting a specific participant id, carrying an arbitrary JSON-serializable
+     * payload. The JS side (see the custom-xmpp feature module) will validate the
+     * payload and forward it over the XMPP channel.
+     *
+     * @param action - A logical action name. Defaults to
+     *                {@link ExternalAPIModule#SEND_CUSTOM_XMPP_COMMAND} when
+     *                {@code null}. Reserved for future use to disambiguate
+     *                different command families.
+     * @param targetId - The id of the participant the command is directed at.
+     *                   May be {@code null} or empty; the JS side will reject
+     *                   the action if missing.
+     * @param payload - An arbitrary JSON-serializable payload. May be
+     *                  {@code null}, in which case an empty map is forwarded.
+     */
+    public void sendCustomXmppCommand(
+            @Nullable String action,
+            @Nullable String targetId,
+            @Nullable Bundle payload) {
+        Intent intent = new Intent(BroadcastAction.Type.SEND_CUSTOM_XMPP_COMMAND.getAction());
+
+        if (payload != null) {
+            intent.putExtras(payload);
+        }
+        // Put the reserved keys last so they always win against any payload
+        // collisions; the JS side relies on these keys to dispatch the action.
+        intent.putExtra("action", action != null ? action : ExternalAPIModule.SEND_CUSTOM_XMPP_COMMAND);
+        intent.putExtra("target", targetId != null ? targetId : "");
+
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 
     /**

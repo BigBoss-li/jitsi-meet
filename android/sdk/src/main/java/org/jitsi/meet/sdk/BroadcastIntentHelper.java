@@ -43,6 +43,39 @@ public class BroadcastIntentHelper {
         return intent;
     }
 
+    /**
+     * Builds an Intent for {@link BroadcastAction.Type#SEND_CUSTOM_XMPP_COMMAND}
+     * that targets a specific participant with the supplied payload. Mirrors
+     * {@link JitsiMeetView#sendCustomXmppCommand(String, String, android.os.Bundle)}
+     * for hosts that prefer to dispatch the broadcast directly via the
+     * {@link androidx.localbroadcastmanager.content.LocalBroadcastManager}.
+     *
+     * @param action - A logical action name. May be {@code null}; the SDK
+     *                 defaults it to {@code SEND_CUSTOM_XMPP_COMMAND}.
+     * @param targetId - The id of the recipient participant. May be
+     *                   {@code null}; an empty string is sent in that case.
+     * @param payload - An arbitrary payload Bundle. May be {@code null}; no
+     *                  extra payload keys will be added in that case.
+     * @return A populated Intent with action
+     *         {@code org.jitsi.meet.SEND_CUSTOM_XMPP_COMMAND}.
+     */
+    public static Intent buildSendCustomXmppCommandIntent(
+            String action,
+            String targetId,
+            android.os.Bundle payload) {
+        Intent intent = new Intent(BroadcastAction.Type.SEND_CUSTOM_XMPP_COMMAND.getAction());
+
+        if (payload != null) {
+            intent.putExtras(payload);
+        }
+        // Reserved keys are written last so they always win any payload
+        // collisions; the JS bridge relies on these to dispatch the action.
+        intent.putExtra("action", action != null ? action : ExternalAPIModule.SEND_CUSTOM_XMPP_COMMAND);
+        intent.putExtra("target", targetId != null ? targetId : "");
+
+        return intent;
+    }
+
     public static Intent buildSetMeetingSignalsIntent(String meetingSignalsJson) {
         Intent intent = new Intent(BroadcastAction.Type.MEETING_SIGNAL.getAction());
         intent.putExtra("meetingSignals", meetingSignalsJson);

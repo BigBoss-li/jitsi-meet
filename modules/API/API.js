@@ -1231,6 +1231,20 @@ class API {
     }
 
     /**
+     * Notify external application (if API is enabled) that a custom XMPP event
+     * has been received.
+     *
+     * @param {Object} data - The decoded custom XMPP payload.
+     * @returns {void}
+     */
+    notifyCustomXmppEvent(data) {
+        this._sendEvent({
+            name: 'custom-xmpp-event',
+            data
+        });
+    }
+
+    /**
      * Notify external application (if API is enabled) that message was sent.
      *
      * @param {string} message - Message body.

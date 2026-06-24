@@ -51,6 +51,7 @@ import { getLocalTracks, isLocalTrackMuted } from '../../base/tracks/functions.n
 import { ITrack } from '../../base/tracks/types';
 import { CLOSE_CHAT, OPEN_CHAT } from '../../chat/actionTypes';
 import { closeChat, openChat, sendMessage, setPrivateMessageRecipient } from '../../chat/actions.native';
+import { CUSTOM_XMPP_EVENT_RECEIVED, sendCustomXmppCommand } from '../../custom-xmpp';
 import { updateCandidate, updateOffer } from '../../meeting-central-control/actions';
 import { setMeetingSignals } from '../../meeting-signal/actions';
 import { setRequestingSubtitles } from '../../subtitles/actions.any';
@@ -216,6 +217,13 @@ externalAPIEnabled && MiddlewareRegistry.register(store => next => action => {
 
         break;
     }
+
+    case CUSTOM_XMPP_EVENT_RECEIVED:
+        sendEvent(
+            store,
+            ExternalAPI.CUSTOM_XMPP_EVENT,
+            action.payload);
+        break;
 
     case CENTRAL_CONTROL_VIDEO: {
         const { videoUrl } = action;
@@ -459,6 +467,16 @@ function _registerForNativeEvents(store: IStore) {
         dispatch(sendMessage(message));
     });
 
+    eventEmitter.addListener(ExternalAPI.SEND_CUSTOM_XMPP_COMMAND, ({ target, payload }: any) => {
+        if (typeof target !== 'string' || !target) {
+            logger.error('sendCustomXmppCommand: missing target');
+
+            return;
+        }
+
+        dispatch(sendCustomXmppCommand(target, payload));
+    });
+
     eventEmitter.addListener(ExternalAPI.SET_CLOSED_CAPTIONS_ENABLED,
         ({ enabled, displaySubtitles, language }: any) => {
             dispatch(setRequestingSubtitles(enabled, displaySubtitles, language));
@@ -514,6 +532,7 @@ function _unregisterForNativeEvents() {
     eventEmitter.removeAllListeners(ExternalAPI.OPEN_CHAT);
     eventEmitter.removeAllListeners(ExternalAPI.CLOSE_CHAT);
     eventEmitter.removeAllListeners(ExternalAPI.SEND_CHAT_MESSAGE);
+    eventEmitter.removeAllListeners(ExternalAPI.SEND_CUSTOM_XMPP_COMMAND);
     eventEmitter.removeAllListeners(ExternalAPI.SET_CLOSED_CAPTIONS_ENABLED);
     eventEmitter.removeAllListeners(ExternalAPI.TOGGLE_CAMERA);
     eventEmitter.removeAllListeners(ExternalAPI.MEETING_SIGNAL);

@@ -1,0 +1,118 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        <title>Jitsi Meet - Custom XMPP Example</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                margin: 16px;
+            }
+            #custom-xmpp-log {
+                margin-top: 12px;
+                padding: 8px;
+                border: 1px solid #ccc;
+                min-height: 60px;
+                max-height: 240px;
+                overflow: auto;
+                background: #fafafa;
+                font-family: monospace;
+                font-size: 12px;
+            }
+            #custom-xmpp-log > div {
+                padding: 2px 0;
+                border-bottom: 1px solid #eee;
+            }
+            button {
+                margin-top: 8px;
+                padding: 6px 12px;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="https://meet.jit.si/external_api.js"></script>
+        <script>
+            // Track the most recent participant list so the "Send custom XMPP
+            // command" button can target a known peer. Mirrors the simple
+            // iframe form used by doc/examples/api.html.
+            var knownParticipantIds = [];
+            var localParticipantId = null;
+
+            var domain = "meet.jit.si";
+            var options = {
+                roomName: "JitsiMeetCustomXmppExample",
+                width: 700,
+                height: 480,
+                parentNode: undefined,
+                configOverwrite: {},
+                interfaceConfigOverwrite: {}
+            };
+            var api = new JitsiMeetExternalAPI(domain, options);
+
+            api.addEventListener('participantJoined', function (participant) {
+                knownParticipantIds.push(participant.participantId);
+                appendLog('Participant joined: ' + participant.participantId);
+            });
+
+            api.addEventListener('participantLeft', function (participant) {
+                knownParticipantIds = knownParticipantIds.filter(function (id) {
+                    return id !== participant.participantId;
+                });
+                appendLog('Participant left: ' + participant.participantId);
+            });
+
+            // Listen for the custom XMPP event and append every payload to the
+            // log so the operator can see the round-trip in both tabs.
+            api.addEventListener('customXmppEvent', function (payload) {
+                var line = document.createElement('div');
+
+                line.textContent = 'Event: ' + JSON.stringify(payload);
+                document.getElementById('custom-xmpp-log').appendChild(line);
+
+                // Optional convenience: if the sender marked the local user as
+                // the first joiner of a duplicate-user flow, hang up.
+                if (payload.action === 'duplicateDetected' && payload.role === 'firstJoiner') {
+                    api.executeCommand('hangup');
+                }
+            });
+
+            function appendLog(message) {
+                var line = document.createElement('div');
+
+                line.textContent = message;
+                document.getElementById('custom-xmpp-log').appendChild(line);
+            }
+
+            function sendCustomXmppCommand() {
+                // Pick any peer as the target. In a real duplicate-user flow
+                // the host page would resolve the target participantId from
+                // its own user model.
+                var target = knownParticipantIds[0];
+
+                if (!target) {
+                    appendLog('No remote participant available to target.');
+
+                    return;
+                }
+
+                var requestId = Date.now().toString();
+                var payload = {
+                    action: 'duplicateDetected',
+                    role: 'firstJoiner',
+                    requestId: requestId
+                };
+
+                api.executeCommand('sendCustomXmppCommand', {
+                    target: target,
+                    payload: payload
+                });
+                appendLog('Sent customXmppCommand to ' + target + ' (requestId=' + requestId + ')');
+            }
+        </script>
+
+        <button type="button" onclick="sendCustomXmppCommand()">
+            Send custom XMPP command
+        </button>
+        <div id="custom-xmpp-log"></div>
+    </body>
+</html>

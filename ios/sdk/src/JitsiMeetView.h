@@ -48,4 +48,23 @@
 - (void)setClosedCaptionsEnabled:(BOOL)enabled;
 - (void)toggleCamera;
 
+/**
+ * Sends a custom XMPP command to a remote participant. The native side
+ * dispatches an `SEND_CUSTOM_XMPP_COMMAND` event to the JavaScript engine
+ * where it is validated and forwarded via the conference's private message
+ * channel.
+ *
+ * @param action - An optional opaque verb describing the command. Currently
+ * only the dispatch is performed; the JavaScript side uses this for logging
+ * and routing.
+ * @param target - The id of the recipient participant. Must be non-nil for
+ * delivery; an empty string is forwarded to JS unchanged.
+ * @param payload - An arbitrary JSON-serialisable dictionary that becomes the
+ * XMPP private message body. nil is replaced with an empty dictionary to
+ * avoid NSNull crashes.
+ */
+- (void)sendCustomXmppCommand:(NSString * _Nullable)action
+                      target:(NSString * _Nullable)target
+                     payload:(NSDictionary * _Nullable)payload;
+
 @end

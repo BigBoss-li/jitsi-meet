@@ -35,6 +35,25 @@ class ExternalAPIModule extends ReactContextBaseJavaModule {
 
     public static final String NAME = "ExternalAPI";
 
+    /**
+     * The action name (used as a constant on the JS side as well) used by a
+     * host application to dispatch a custom XMPP command to a target
+     * participant through the SDK. The value mirrors
+     * {@code SEND_CUSTOM_XMPP_COMMAND} on the JS side (see WP02) and the
+     * iOS counterpart in WP04, so the strings MUST stay in sync
+     * character-for-character.
+     */
+    public static final String SEND_CUSTOM_XMPP_COMMAND = "SEND_CUSTOM_XMPP_COMMAND";
+
+    /**
+     * The action name (used as a constant on the JS side as well) emitted by
+     * the SDK to notify the host application that a custom XMPP event has
+     * been received from a remote participant. The value mirrors
+     * {@code CUSTOM_XMPP_EVENT} on the JS side and the iOS counterpart in
+     * WP04, so the strings MUST stay in sync character-for-character.
+     */
+    public static final String CUSTOM_XMPP_EVENT = "CUSTOM_XMPP_EVENT";
+
     private static final String TAG = NAME;
 
     private final BroadcastEmitter broadcastEmitter;
@@ -99,6 +118,8 @@ class ExternalAPIModule extends ReactContextBaseJavaModule {
         constants.put("TOGGLE_CAMERA", BroadcastAction.Type.TOGGLE_CAMERA.getAction());
         constants.put("MEETING_SIGNAL", BroadcastAction.Type.MEETING_SIGNAL.getAction());
         constants.put("SCREEN_RECORD", BroadcastAction.Type.SCREEN_RECORD.getAction());
+        constants.put("SEND_CUSTOM_XMPP_COMMAND", BroadcastAction.Type.SEND_CUSTOM_XMPP_COMMAND.getAction());
+        constants.put("CUSTOM_XMPP_EVENT", BroadcastEvent.Type.CUSTOM_XMPP_EVENT.getAction());
 
         return constants;
     }

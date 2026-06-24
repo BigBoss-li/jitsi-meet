@@ -26,6 +26,7 @@ import {
 } from '../base/participants/functions';
 import MiddlewareRegistry from '../base/redux/MiddlewareRegistry';
 import { getBaseUrl } from '../base/util/helpers';
+import { CUSTOM_XMPP_EVENT_RECEIVED } from '../custom-xmpp';
 import { appendSuffix } from '../display-name/functions';
 import { SUBMIT_FEEDBACK_ERROR, SUBMIT_FEEDBACK_SUCCESS } from '../feedback/actionTypes';
 import { SET_FILMSTRIP_VISIBLE } from '../filmstrip/actionTypes';
@@ -132,6 +133,10 @@ MiddlewareRegistry.register(store => next => action => {
 
     case DATA_CHANNEL_OPENED:
         APP.API.notifyDataChannelOpened();
+        break;
+
+    case CUSTOM_XMPP_EVENT_RECEIVED:
+        APP.API.notifyCustomXmppEvent(action.payload);
         break;
 
     case KICKED_OUT: {

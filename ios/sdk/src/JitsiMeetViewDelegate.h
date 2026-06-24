@@ -130,4 +130,14 @@
  */
 - (void)customOverflowMenuButtonPressed:(NSDictionary *)data;
 
+/**
+ * Called when a custom XMPP event has been decoded from a private message
+ * received from another participant. The JavaScript middlewares emit this
+ * event after validating and decoding the message body; the payload here
+ * contains the arbitrary host-supplied object that the sender encoded.
+ *
+ * The `data` dictionary contains a `payload` key with the decoded payload.
+ */
+- (void)onCustomXmppEvent:(NSDictionary *)data;
+
 @end

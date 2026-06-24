@@ -3,11 +3,13 @@
   "created_at": "2026-06-24T03:41:41.135621+00:00",
   "friendly_name": "Custom XMPP Command and Event Listener",
   "mission_id": "01KVVVG9CEX8XKANT1PCWTEJ5R",
-  "mission_number": null,
+  "mission_number": 1,
   "mission_slug": "custom-xmpp-command-and-event-01KVVVG9",
   "mission_type": "software-dev",
   "purpose_context": "Today Jitsi Meet's JitsiMeetExternalAPI exposes a fixed set of commands and events, so a host page that wants to coordinate a flow (e.g. detect a duplicate joiner and ask the first joiner to leave) cannot use a clean custom-XMPP-message channel. This mission adds one new command (sendCustomXmppCommand) and one new event (customXmppEvent) on top of the existing MUC private message transport, so the host page can drive such flows without modifying lib-jitsi-meet.",
   "purpose_tldr": "Allow host pages to send custom XMPP commands to a specified participant and receive a custom event back, so the host can implement flows like duplicate-user auto-eviction entirely from outside the meeting UI.",
   "slug": "custom-xmpp-command-and-event-01KVVVG9",
-  "target_branch": "meeting/develop"
+  "target_branch": "meeting/develop",
+  "vcs": "git",
+  "vcs_locked_at": "2026-06-24T05:25:28.879132+00:00"
 }

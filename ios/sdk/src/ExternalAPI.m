@@ -29,6 +29,12 @@ static NSString * const setVideoMutedAction = @"org.jitsi.meet.SET_VIDEO_MUTED";
 static NSString * const setClosedCaptionsEnabledAction = @"org.jitsi.meet.SET_CLOSED_CAPTIONS_ENABLED";
 static NSString * const toggleCameraAction = @"org.jitsi.meet.TOGGLE_CAMERA";
 
+// Custom XMPP command/event action types. The string values are exported via
+// constantsToExport and dispatched by the React Native bridge; they must
+// match the redux action type constants on the JS side.
+NSString * const SEND_CUSTOM_XMPP_COMMAND = @"SEND_CUSTOM_XMPP_COMMAND";
+NSString * const CUSTOM_XMPP_EVENT = @"CUSTOM_XMPP_EVENT";
+
 @implementation ExternalAPI
 
 static NSMapTable<NSString*, void (^)(NSArray* participantsInfo)> *participantInfoCompletionHandlers;
@@ -52,7 +58,9 @@ RCT_EXPORT_MODULE();
         @"SEND_CHAT_MESSAGE": sendChatMessageAction,
         @"SET_VIDEO_MUTED" : setVideoMutedAction,
         @"SET_CLOSED_CAPTIONS_ENABLED": setClosedCaptionsEnabledAction,
-        @"TOGGLE_CAMERA": toggleCameraAction
+        @"TOGGLE_CAMERA": toggleCameraAction,
+        @"SEND_CUSTOM_XMPP_COMMAND": SEND_CUSTOM_XMPP_COMMAND,
+        @"CUSTOM_XMPP_EVENT": CUSTOM_XMPP_EVENT
     };
 };
 
@@ -78,7 +86,9 @@ RCT_EXPORT_MODULE();
               sendChatMessageAction,
               setVideoMutedAction,
               setClosedCaptionsEnabledAction,
-              toggleCameraAction
+              toggleCameraAction,
+              SEND_CUSTOM_XMPP_COMMAND,
+              CUSTOM_XMPP_EVENT
     ];
 }
 
@@ -178,6 +188,18 @@ RCT_EXPORT_METHOD(sendEvent:(NSString *)name
 
 - (void)toggleCamera {
     [self sendEventWithName:toggleCameraAction body:nil];
+}
+
+- (void)sendCustomXmppCommand:(NSString * _Nullable)action
+                      target:(NSString * _Nullable)target
+                     payload:(NSDictionary * _Nullable)payload {
+    NSDictionary *data = @{
+        @"action": action ?: @"",
+        @"target": target ?: @"",
+        @"payload": payload ?: @{}
+    };
+
+    [self sendEventWithName:SEND_CUSTOM_XMPP_COMMAND body:data];
 }
 
 @end

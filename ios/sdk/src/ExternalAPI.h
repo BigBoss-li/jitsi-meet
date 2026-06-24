@@ -18,6 +18,14 @@
 
 static NSString * const sendEventNotificationName = @"org.jitsi.meet.SendEvent";
 
+// Custom XMPP command/event action types. The string values must match the
+// redux action type constants defined on the JavaScript side (see
+// react/features/custom-xmpp/actionTypes.ts). Do NOT change the values
+// without updating the corresponding JS action type — the native bridge uses
+// these strings to route events between the host app and the JS engine.
+extern NSString * const SEND_CUSTOM_XMPP_COMMAND;
+extern NSString * const CUSTOM_XMPP_EVENT;
+
 @interface ExternalAPI : RCTEventEmitter<RCTBridgeModule>
 
 - (void)sendHangUp;
@@ -31,5 +39,8 @@ static NSString * const sendEventNotificationName = @"org.jitsi.meet.SendEvent";
 - (void)sendSetVideoMuted:(BOOL)muted;
 - (void)sendSetClosedCaptionsEnabled:(BOOL)enabled;
 - (void)toggleCamera;
+- (void)sendCustomXmppCommand:(NSString * _Nullable)action
+                      target:(NSString * _Nullable)target
+                     payload:(NSDictionary * _Nullable)payload;
 
 @end

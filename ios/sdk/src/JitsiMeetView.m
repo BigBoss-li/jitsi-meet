@@ -143,6 +143,13 @@ static NSString *const PiPEnabledFeatureFlag = @"pip.enabled";
     [externalAPI toggleCamera];
 }
 
+- (void)sendCustomXmppCommand:(NSString * _Nullable)action
+                      target:(NSString * _Nullable)target
+                     payload:(NSDictionary * _Nullable)payload {
+    ExternalAPI *externalAPI = [[JitsiMeet sharedInstance] getExternalAPI];
+    [externalAPI sendCustomXmppCommand:action target:target payload:payload];
+}
+
 #pragma mark Private methods
 
 - (void)registerObservers {

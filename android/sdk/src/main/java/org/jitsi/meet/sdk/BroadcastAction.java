@@ -80,7 +80,8 @@ public class BroadcastAction {
         SET_CLOSED_CAPTIONS_ENABLED("org.jitsi.meet.SET_CLOSED_CAPTIONS_ENABLED"),
         TOGGLE_CAMERA("org.jitsi.meet.TOGGLE_CAMERA"),
         MEETING_SIGNAL("org.jitsi.meet.MEETING_SIGNAL"),
-        SCREEN_RECORD("org.jitsi.meet.SCREEN_RECORD");
+        SCREEN_RECORD("org.jitsi.meet.SCREEN_RECORD"),
+        SEND_CUSTOM_XMPP_COMMAND("org.jitsi.meet.SEND_CUSTOM_XMPP_COMMAND");
 
         private final String action;
 

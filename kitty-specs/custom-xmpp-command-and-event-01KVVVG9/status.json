@@ -1,0 +1,70 @@
+{
+  "event_count": 63,
+  "last_event_id": "01KVW7XNYHYDDKKGAFB3CSJVN0",
+  "materialized_at": "2026-06-24T07:18:42.897449+00:00",
+  "mission_number": "1",
+  "mission_slug": "custom-xmpp-command-and-event-01KVVVG9",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 7,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "merge",
+      "force_count": 3,
+      "lane": "done",
+      "last_event_id": "01KVW7XGGRCVDAWS2DHMMDZZGE",
+      "last_transition_at": "2026-06-24T07:18:37.336752+00:00"
+    },
+    "WP02": {
+      "actor": "merge",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KVW7XHF0ZKFEDG57B364QTVY",
+      "last_transition_at": "2026-06-24T07:18:38.304608+00:00"
+    },
+    "WP03": {
+      "actor": "merge",
+      "force_count": 3,
+      "lane": "done",
+      "last_event_id": "01KVW7XJAG902G4ZFGFAF35A93",
+      "last_transition_at": "2026-06-24T07:18:39.184967+00:00"
+    },
+    "WP04": {
+      "actor": "merge",
+      "force_count": 0,
+      "lane": "done",
+      "last_event_id": "01KVW7XK6BXG0XBE2CNZH8W1RG",
+      "last_transition_at": "2026-06-24T07:18:40.075670+00:00"
+    },
+    "WP05": {
+      "actor": "merge",
+      "force_count": 0,
+      "lane": "done",
+      "last_event_id": "01KVW7XM1EN8WC19J9MP2T7DBF",
+      "last_transition_at": "2026-06-24T07:18:40.942689+00:00"
+    },
+    "WP06": {
+      "actor": "merge",
+      "force_count": 0,
+      "lane": "done",
+      "last_event_id": "01KVW7XMZGRKFRDV106VC2RD22",
+      "last_transition_at": "2026-06-24T07:18:41.904493+00:00"
+    },
+    "WP07": {
+      "actor": "merge",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KVW7XNYHYDDKKGAFB3CSJVN0",
+      "last_transition_at": "2026-06-24T07:18:42.897449+00:00"
+    }
+  }
+}
