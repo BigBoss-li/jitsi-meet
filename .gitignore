@@ -126,9 +126,9 @@ cert/*
 .github/copilot/
 .kittify/
 CLAUDE.md
-kitty-specs/
-!kitty-specs/*/status.events.jsonl
-!kitty-specs/*/status.json
+# kitty-specs/ removed from ignore list so lane auto-rebase can stage
+# status.events.jsonl and status.json via git add --sparse.
+# The status files are required by Spec Kitty lane coordination.
 .kittify/runtime/
 .kittify/events/
 .kittify/dossiers/
