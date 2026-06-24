@@ -23,12 +23,18 @@ MiddlewareRegistry.register(store => next => action => {
                 // Per spec INV-2 only the message body is interesting; the
                 // participantId / timestamp / messageId are intentionally
                 // ignored so the host page never sees them.
+                //
+                // The private-message transport is shared with the chat
+                // feature (see react/features/chat/middleware.ts). Chat
+                // messages are not JSON, so tryDecodeCustomXmppMessage
+                // returns undefined for them. Per FR-006, invalid bodies
+                // MUST be silently dropped on the receiving end — do not
+                // log here. The user-visible chat path is owned by the chat
+                // feature's own listener.
                 const decoded = tryDecodeCustomXmppMessage(message);
 
                 if (decoded) {
                     store.dispatch(customXmppEventReceived(decoded));
-                } else {
-                    logger.error('Failed to decode custom XMPP message body');
                 }
             }
         );
