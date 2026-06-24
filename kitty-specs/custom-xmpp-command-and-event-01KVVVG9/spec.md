@@ -39,8 +39,8 @@ A host page embeds Jitsi Meet for two browser sessions of the same end user. The
 ### Scenario 2 — Message addressed to a participant that has already left
 
 - **Trigger**: host page sends a command for a `target` that already left the meeting.
-- **Flow**: jitsi-meet tries to dispatch; lib-jitsi-meet's existing send path returns a failure (the occupant JID is unknown).
-- **Outcome**: the `executeCommand` promise resolves with `{ ok: false, reason: 'targetNotFound' }`; the receiving side never sees an event; no error is surfaced to the sending user.
+- **Flow**: jitsi-meet passes the call to the MUC transport; lib-jitsi-meet's send path returns a failure (the occupant JID is unknown).
+- **Outcome**: a `console.error` is logged inside the iframe / RN app; the receiving side never sees an event; no error is surfaced to the sending host page.
 
 ### Scenario 3 — Receiver has no listener
 
@@ -51,13 +51,19 @@ A host page embeds Jitsi Meet for two browser sessions of the same end user. The
 ### Scenario 4 — Malformed payload
 
 - **Trigger**: a `payload` is not a serialisable JSON object, or it exceeds a reasonable size.
-- **Flow**: jitsi-meet rejects the command synchronously with `{ ok: false, reason: 'invalidPayload' }`. No XMPP traffic is generated.
+- **Flow**: jitsi-meet rejects the command synchronously and logs a `console.error`. No XMPP traffic is generated.
 
 ### Scenario 5 — Cross-platform
 
 - **Trigger**: sender is web, receiver is React Native (or vice versa).
 - **Flow**: the same command/event name and payload shape work on both platforms.
 - **Outcome**: the JSON payload survives the JS / native bridge; the receiver behaves identically.
+
+### Scenario 6 — Concurrent / duplicate sends
+
+- **Trigger**: two different host pages each detect the same duplicate user and both call `sendCustomXmppCommand` against the same target.
+- **Flow**: jitsi-meet enqueues both messages; the MUC transport delivers both to the target in arrival order. The target's host page receives two `customXmppEvent` with similar payloads.
+- **Outcome**: jitsi-meet does not de-duplicate. The target's host page SHOULD use a `requestId` (or the `action` field) inside the payload to make the handler idempotent. After this mission lands, jitsi-meet itself SHALL NOT de-duplicate or coalesce.
 
 ## Functional Requirements
 
@@ -66,11 +72,11 @@ A host page embeds Jitsi Meet for two browser sessions of the same end user. The
 | FR-001 | Proposed | jitsi-meet SHALL accept a new external API command `sendCustomXmppCommand` with arguments `{ target: string, payload: object }`, where `target` is a participant id as exposed by the conference and `payload` is any JSON-serialisable object owned by the host page. |
 | FR-002 | Proposed | When `sendCustomXmppCommand` is invoked, jitsi-meet SHALL resolve the target `participantId` to a MUC occupant JID and deliver the JSON-encoded `payload` to that JID using the existing MUC private message transport (`conference.sendMessage`). |
 | FR-003 | Proposed | jitsi-meet SHALL expose a new external API event `customXmppEvent` whose argument is the original `payload` object. The event SHALL fire only on the host page of the participant whose JID matched the `target`. |
-| FR-004 | Proposed | The sending `executeCommand` SHALL return a result object of shape `{ ok: boolean, reason?: string }`. `ok: true` means the message was handed to the MUC transport; it does not guarantee delivery. `ok: false` reasons SHALL include at least `invalidPayload`, `targetNotFound`, `conferenceNotJoined`. |
-| FR-005 | Proposed | jitsi-meet SHALL validate the `payload` synchronously: it MUST be a non-null object, JSON-serialisable, and at most 16 KiB serialised. Anything else is rejected with `invalidPayload` before any XMPP traffic. |
+| FR-004 | Proposed | The sending `executeCommand` SHALL follow the existing `JitsiMeetExternalAPI.executeCommand` contract: it is synchronous and returns `void`. jitsi-meet SHALL NOT extend this contract for this mission. If the command is malformed, jitsi-meet SHALL log to `console` and SHALL NOT notify the host page on success or failure. The host page can verify the round-trip by observing `customXmppEvent` arriving on the receiver's side. |
+| FR-005 | Proposed | jitsi-meet SHALL validate the `payload` synchronously before any XMPP traffic: it MUST be a non-null object, JSON-serialisable, and at most 16 KiB serialised. A payload that fails validation SHALL be dropped and a `console.error` SHALL be logged. The host page is informed of failure only indirectly (no `customXmppEvent` arrives on the receiver). |
 | FR-006 | Proposed | jitsi-meet SHALL subscribe to `JitsiConferenceEvents.PRIVATE_MESSAGE_RECEIVED` (or its native equivalent), parse the body as JSON, and re-emit it as `customXmppEvent` only when the body parses successfully. Malformed bodies SHALL be dropped silently on the receiving side. |
 | FR-007 | Proposed | The host page MUST be able to use `sendCustomXmppCommand` and `customXmppEvent` on both web and React Native (iOS + Android) builds of jitsi-meet, with identical semantics. |
-| FR-008 | Proposed | jitsi-meet SHALL support `sendCustomXmppCommand` in prejoin, in-meeting, and during the post-meeting-leave sequence as long as the conference is still joined on the receiving side. Calls after the receiver has left SHALL be rejected with `targetNotFound` (if the target has left) or `conferenceNotJoined` (if the local conference is gone). |
+| FR-008 | Proposed | jitsi-meet SHALL support `sendCustomXmppCommand` in prejoin, in-meeting, and during the post-meeting-leave sequence as long as the conference is still joined on the receiving side. Calls when the local conference is gone SHALL be dropped and a `console.error` SHALL be logged. Calls when the target participant is no longer in the meeting SHALL be passed to the MUC transport, which will return a delivery error; that error SHALL be logged and not surfaced to the host page. |
 
 ## Non-Functional Requirements
 
@@ -80,8 +86,8 @@ A host page embeds Jitsi Meet for two browser sessions of the same end user. The
 | NFR-002 | Proposed | The added code SHALL only use the documented public surface of `JitsiConference` (in particular `sendMessage`, `addListener` / `on` with `JitsiConferenceEvents.PRIVATE_MESSAGE_RECEIVED`, and `getParticipantById`). |
 | NFR-003 | Proposed | Round-trip latency from `executeCommand` invocation to `customXmppEvent` firing on the receiver SHALL be dominated by the XMPP transport, not by jitsi-meet's own processing. jitsi-meet's local handling SHALL add no more than 50 ms of synchronous work. |
 | NFR-004 | Proposed | The added code SHALL pass `npm run lint` and `npm run tsc:web` and `npm run tsc:native` with no new warnings. |
-| NFR-005 | Proposed | The added code SHALL be covered by unit tests for: payload validation, result-object shape, send-only-when-conference-joined, and receive-only-when-JSON-valid. The two-tab duplicate-eviction flow SHALL be covered by an end-to-end test in the existing external-api test suite. |
-| NFR-006 | Proposed | The added code SHALL not regress any existing `JitsiMeetExternalAPI` command or event; the full external-api test suite SHALL continue to pass. |
+| NFR-005 | Proposed | The added code SHALL be exercised by a manual two-tab end-to-end scenario using `doc/examples/api.html` (or a new sibling example file) that demonstrates: (a) the happy-path round-trip, (b) unknown target, (c) invalid payload, (d) cross-platform (web + RN) parity. |
+| NFR-006 | Proposed | The added code SHALL not regress any existing `JitsiMeetExternalAPI` command or event. Manual smoke-test of the existing `doc/examples/api.html` SHALL continue to work unchanged. |
 
 ## Constraints
 
@@ -96,17 +102,17 @@ A host page embeds Jitsi Meet for two browser sessions of the same end user. The
 
 ## Success Criteria
 
-- A two-tab automated test where the host page calls `sendCustomXmppCommand` from tab A to tab B (same user, same meeting) results in tab B receiving `customXmppEvent` with the exact payload, and tab A's `executeCommand` resolving with `{ ok: true }`.
-- An automated test that calls `sendCustomXmppCommand` with an unknown `target` resolves with `{ ok: false, reason: 'targetNotFound' }` and does not throw.
-- An automated test that calls `sendCustomXmppCommand` with a non-object or oversize `payload` resolves with `{ ok: false, reason: 'invalidPayload' }` and does not call `sendMessage` on the conference.
-- The same command and event work in a React Native build (verified by an iOS or Android test fixture) with no web-only code paths.
+- A manual two-tab test (using `doc/examples/api.html` or a small dedicated example) where the host page calls `sendCustomXmppCommand` from tab A to tab B (same user, same meeting) results in tab B receiving `customXmppEvent` with the exact payload.
+- A manual test that calls `sendCustomXmppCommand` with an unknown `target` does not throw to the host page; a `console.error` is logged inside the iframe / RN app.
+- A manual test that calls `sendCustomXmppCommand` with a non-object or oversize `payload` does not call `sendMessage` on the conference; a `console.error` is logged.
+- The same command and event work in a React Native build (verified by manual test on iOS or Android) with no web-only code paths.
 - The mission is implemented without modifying `lib-jitsi-meet` and without reading private fields of `JitsiConference` or `ChatRoom` from production code.
 
 ## Key Entities
 
 - **Command**: `sendCustomXmppCommand` — the host-page-driven verb.
   - Arguments: `{ target: string (participantId), payload: object }`
-  - Result: `{ ok: boolean, reason?: string }`
+  - Result: `void` (no synchronous return value; feedback arrives via `customXmppEvent` on the receiver's side)
 - **Event**: `customXmppEvent` — fired on the receiving host page.
   - Argument: the original `payload` object.
 - **Transport**: MUC private message (`<message type="chat" to="room@conf.example/occupant">` with a JSON string body), exposed to jitsi-meet via `conference.sendMessage` and `JitsiConferenceEvents.PRIVATE_MESSAGE_RECEIVED`.
@@ -118,7 +124,8 @@ A host page embeds Jitsi Meet for two browser sessions of the same end user. The
 - The MUC private message transport is the only path needed. No IQ-based custom command is required for this use case.
 - The receiving host page is responsible for any side effects (e.g. calling `hangup`). jitsi-meet does not auto-leave on receipt.
 - The 16 KiB payload cap is a reasonable upper bound for a host-page-driven flow and matches the typical MUC message size limit; if a flow needs more, it is out of scope and should be split or use a different transport.
-- An out-of-band `ok: true` does not mean the receiver processed the event; it means the sender handed the message to the XMPP transport. Delivery confirmation is not in scope.
+- The sending `executeCommand` is synchronous and returns `void`. The only way the host page can verify success is to wait for `customXmppEvent` to arrive on the receiver; no positive confirmation event is sent back to the sender. Failure is only observable through `console.error` inside the iframe / RN app.
+- Concurrent sends from the same host page are independent: jitsi-meet does not coordinate, debounce, or coalesce. The underlying MUC transport preserves FIFO order per (sender, target) pair, so back-to-back sends from the same host page to the same target are received in order. Cross-pair or cross-host concurrency is out of jitsi-meet's control: two host pages can each send a command to the same target, and the target's host page SHOULD treat the payload as idempotent (for example by using a `requestId` inside the payload, or by keying on the `action` field).
 
 ## Out of Scope
 
