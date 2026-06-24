@@ -70,7 +70,7 @@ Jitsi Meet 的 `JitsiMeetExternalAPI` 暴露了一组固定的 `executeCommand` 
 | ID | 状态 | 需求 |
 |----|--------|------|
 | FR-001 | Proposed | jitsi-meet **必须**接受一个新的 external API 命令 `sendCustomXmppCommand`，参数为 `{ target: string, payload: object }`，其中 `target` 是会议暴露的 participant id，`payload` 是宿主页面拥有的、任何可 JSON 序列化的对象。 |
-| FR-002 | Proposed | 调用 `sendCustomXmppCommand` 时，jitsi-meet **必须**把 `participantId` 解析为 MUC occupant JID，并通过现有的 MUC 私聊消息传输（`conference.sendMessage`）把 JSON 编码后的 `payload` 投递到该 JID。 |
+| FR-002 | Proposed | 调用 `sendCustomXmppCommand` 时，jitsi-meet **必须**把 `participantId` 解析为 MUC occupant JID，并通过现有的 MUC 私聊消息传输（`conference.sendPrivateTextMessage`）把 JSON 编码后的 `payload` 投递到该 JID。 |
 | FR-003 | Proposed | jitsi-meet **必须**暴露一个新的 external API 事件 `customXmppEvent`，参数为发送时的 `payload` 对象。事件**仅**在 JID 匹配 `target` 的那个参与者的宿主页面上触发。 |
 | FR-004 | Proposed | 发送侧的 `executeCommand` **必须**沿用现有的 `JitsiMeetExternalAPI.executeCommand` 契约：同步执行、返回 `void`。jitsi-meet 在本次 mission 中**不得**扩展该契约。命令不合法时，jitsi-meet **必须**打印到 `console` 且**不得**以任何方式向宿主页面通知成功或失败。宿主页面只能通过观察对端是否收到 `customXmppEvent` 来间接确认一次往返。 |
 | FR-005 | Proposed | 在产生任何 XMPP 流量之前，jitsi-meet **必须**对 `payload` 做同步校验：必须是非 null 的对象、可 JSON 序列化、序列化后大小不超过 16 KiB。校验失败的 payload **必须**被丢弃并打印 `console.error`。宿主页面只能通过"对端没有收到 `customXmppEvent`"这一间接现象得知失败。 |
@@ -83,7 +83,7 @@ Jitsi Meet 的 `JitsiMeetExternalAPI` 暴露了一组固定的 `executeCommand` 
 | ID | 状态 | 需求 |
 |----|--------|------|
 | NFR-001 | Proposed | 新增的命令和事件**必须**完全在 jitsi-meet 项目内实现。**不得**修改 `lib-jitsi-meet`，运行时也**不得**访问 `JitsiConference` 或 `ChatRoom` 的私有字段。 |
-| NFR-002 | Proposed | 新增代码**只**使用 `JitsiConference` 的文档化公开 API（特别是 `sendMessage`、对 `JitsiConferenceEvents.PRIVATE_MESSAGE_RECEIVED` 使用 `addListener` / `on`、以及 `getParticipantById`）。 |
+| NFR-002 | Proposed | 新增代码**只**使用 `JitsiConference` 的文档化公开 API（特别是 `sendPrivateTextMessage`、对 `JitsiConferenceEvents.PRIVATE_MESSAGE_RECEIVED` 使用 `addListener` / `on`、以及 `getParticipantById`）。 |
 | NFR-003 | Proposed | 从 `executeCommand` 被调用到接收方触发 `customXmppEvent` 的往返时延**必须**由 XMPP 传输层主导，而不是 jitsi-meet 自身的处理。jitsi-meet 自身的同步处理耗时**不得**超过 50 ms。 |
 | NFR-004 | Proposed | 新增代码**必须**通过 `npm run lint`、`npm run tsc:web` 和 `npm run tsc:native`，且**不得**引入新的告警。 |
 | NFR-005 | Proposed | 新增代码**必须**通过一个两标签页的端到端手测场景验证（使用 `doc/examples/api.html` 或新建的同目录示例文件），场景覆盖：(a) 正常路径往返；(b) 目标不存在；(c) payload 非法；(d) 跨平台（web + RN）等价。 |
@@ -104,7 +104,7 @@ Jitsi Meet 的 `JitsiMeetExternalAPI` 暴露了一组固定的 `executeCommand` 
 
 - 通过两标签页手测（使用 `doc/examples/api.html` 或独立的小型示例）：宿主页面从标签页 A 向标签页 B（同一用户同一会议）调用 `sendCustomXmppCommand`，标签页 B 收到 `customXmppEvent`，payload 与发送时完全一致。
 - 手测：使用一个不存在的 `target` 调用 `sendCustomXmppCommand` **不会**向宿主页面抛错；iframe / RN 应用内部打印 `console.error`。
-- 手测：使用非对象或超大的 `payload` 调用 `sendCustomXmppCommand` **不会**调用会议上的 `sendMessage`；打印 `console.error`。
+- 手测：使用非对象或超大的 `payload` 调用 `sendCustomXmppCommand` **不会**调用会议上的 `sendPrivateTextMessage`；打印 `console.error`。
 - 同一命令和事件在 React Native 构建中可用（iOS 或 Android 手测验证），**不**存在 web-only 的代码路径。
 - 本次 mission **不得**修改 `lib-jitsi-meet`，生产代码**不得**读取 `JitsiConference` 或 `ChatRoom` 的私有字段。
 
@@ -115,7 +115,7 @@ Jitsi Meet 的 `JitsiMeetExternalAPI` 暴露了一组固定的 `executeCommand` 
   - 返回值：`void`（没有同步返回值；反馈通过接收方的 `customXmppEvent` 体现）
 - **事件**：`customXmppEvent` — 在接收方的宿主页面上触发。
   - 参数：原始的 `payload` 对象。
-- **传输**：MUC 私聊消息（`<message type="chat" to="room@conf.example/occupant">`，body 为 JSON 字符串），jitsi-meet 通过 `conference.sendMessage` 发送，通过 `JitsiConferenceEvents.PRIVATE_MESSAGE_RECEIVED` 接收。
+- **传输**：MUC 私聊消息（`<message type="chat" to="room@conf.example/occupant">`，body 为 JSON 字符串），jitsi-meet 通过 `conference.sendPrivateTextMessage` 发送，通过 `JitsiConferenceEvents.PRIVATE_MESSAGE_RECEIVED` 接收。
 - **参与者身份**：通过 `JitsiConference.getParticipantById` 暴露的 `participantId`，并通过现有的 `participantJoined` / `participantUpdated` / `participantLeft` 事件传递到宿主页面。宿主页面负责把该 id 映射到自己的用户模型。
 
 ## 假设
