@@ -1,46 +1,46 @@
-# Data Model: Custom XMPP Command and Event Listener
+# 数据模型：自定义 XMPP 命令与事件监听
 
-**Phase**: 1 — Design
-**Mission**: `custom-xmpp-command-and-event-01KVVVG9`
-**Date**: 2026-06-24
+**阶段**：1 — Design
+**Mission**：`custom-xmpp-command-and-event-01KVVVG9`
+**日期**：2026-06-24
 
-## Entities
+## 实体
 
-### `CustomXmppCommand` (host page → jitsi-meet)
+### `CustomXmppCommand`（宿主页面 → jitsi-meet）
 
-A command issued from the host page. Lifted from `JitsiMeetExternalAPI.executeCommand`.
+由宿主页面发出的命令。来源是 `JitsiMeetExternalAPI.executeCommand`。
 
 ```ts
 type CustomXmppCommand = {
-    target: string;            // MUC participant id (the value of participant.id from the conference)
-    payload: CustomXmppPayload; // see below
+    target: string;            // MUC participant id（即会议中 participant.id 的值）
+    payload: CustomXmppPayload; // 见下文
 };
 ```
 
-- `target` — required. A non-empty string matching the `id` of a participant currently in the MUC. The conference is the source of truth for the occupant JID; the host page never sees the JID.
-- `payload` — required. See `CustomXmppPayload`.
+- `target`：必填。一个非空字符串，必须与会议中某个当前参与者的 `id` 一致。会议是 occupant JID 的事实来源；宿主页面永远看不到 JID。
+- `payload`：必填。参见 `CustomXmppPayload`。
 
-### `CustomXmppPayload` (wire body)
+### `CustomXmppPayload`（wire body）
 
-The host-page-owned JSON object that travels in the MUC private message body.
+随 MUC 私聊消息体一同传输的、由宿主页面自有的 JSON 对象。
 
 ```ts
 type CustomXmppPayload = {
-    action: string;            // e.g. "duplicateDetected"
-    [key: string]: unknown;    // host-page-specific extras, e.g. requestId, role, etc.
+    action: string;            // 例如 "duplicateDetected"
+    [key: string]: unknown;    // 宿主页面自定义的扩展字段，例如 requestId、role 等
 };
 ```
 
-- **Validation rules** (FR-005):
-  - `payload` MUST be a non-null, non-array, plain object.
-  - `payload.action` MUST be a non-empty string. (Convention only — not enforced by jitsi-meet, but the use case's duplicate-eviction flow requires it.)
-  - The serialised form `JSON.stringify(payload)` MUST be at most 16 384 bytes.
-  - `JSON.stringify` MUST NOT throw (no cycles, no `BigInt`, no functions). Use a `try/catch` and a length check.
-- **Open shape**: any other keys are allowed and forwarded verbatim. The host page owns the contract.
+- **校验规则**（FR-005）：
+  - `payload` **必须**是非 null、非数组的纯对象。
+  - `payload.action` **必须**是非空字符串（仅是约定，jitsi-meet 不会强制，但"重复用户退出"用例依赖它）。
+  - 序列化结果 `JSON.stringify(payload)` **必须**不超过 16 384 字节。
+  - `JSON.stringify` **不得**抛出异常（不能有循环引用、不能有 `BigInt`、不能有函数）。用 `try/catch` 配合长度检查来兜底。
+- **开放形态**：允许任何其他 key，原样转发。契约由宿主页面负责。
 
-### `CustomXmppCommandMessage` (jitsi-meet internal — wire body)
+### `CustomXmppCommandMessage`（jitsi-meet 内部 — wire body）
 
-The MUC private message body. Always a JSON-string-encoded `CustomXmppPayload`. The transport does not wrap it; the body is literally the JSON text.
+MUC 私聊消息体。始终是 `CustomXmppPayload` 的 JSON 字符串编码形式。传输层不再做包装；body 就是一段 JSON 文本。
 
 ```
 <message type="chat" to="room@conf.example/occupant-id">
@@ -48,19 +48,19 @@ The MUC private message body. Always a JSON-string-encoded `CustomXmppPayload`. 
 </message>
 ```
 
-- `body` is the JSON serialisation of `CustomXmppPayload`.
-- The receiver parses `body` with `JSON.parse` inside a `try/catch`. On failure, the message is dropped silently (FR-006).
-- The receiver does not interpret `action` — it just re-emits the parsed object as `customXmppEvent`.
+- `body` 是 `CustomXmppPayload` 的 JSON 序列化结果。
+- 接收方用 `JSON.parse` 解析 `body`，并用 `try/catch` 包住。失败时静默丢弃（FR-006）。
+- 接收方**不**解释 `action`，只是把解析结果原样作为 `customXmppEvent` 派发。
 
-### `CustomXmppEvent` (jitsi-meet → host page)
+### `CustomXmppEvent`（jitsi-meet → 宿主页面）
 
 ```ts
 type CustomXmppEvent = CustomXmppPayload;
 ```
 
-- The event argument IS the original `payload` (FR-003). Round-trip identity: `JSON.parse(JSON.stringify(payload)) === payload` modulo key order, which is irrelevant for `===` checks if the host page only checks `payload.action` and `payload.requestId`.
+- 事件参数**就是**原始的 `payload`（FR-003）。往返等价：忽略 key 顺序，`JSON.parse(JSON.stringify(payload))` 与 `payload` 等价；如果宿主页面只用 `payload.action` 和 `payload.requestId` 做判断，key 顺序不会影响 `===`。
 
-## Lifecycle
+## 生命周期
 
 ```
 [host page A]
@@ -81,11 +81,11 @@ type CustomXmppEvent = CustomXmppPayload;
     │
     │  <message> over MUC to target's occupant JID
     ▼
-[XMPP MUC transport on receiver]
+[接收端 XMPP MUC transport]
     │
     │  fires JitsiConferenceEvents.PRIVATE_MESSAGE_RECEIVED
     ▼
-[react/features/custom-xmpp/middleware.ts — receiver side]
+[react/features/custom-xmpp/middleware.ts — 接收侧]
     │
     │  1. JSON.parse(message) inside try/catch
     │  2. dispatch CUSTOM_XMPP_EVENT_RECEIVED with parsed payload
@@ -102,16 +102,16 @@ type CustomXmppEvent = CustomXmppPayload;
     api.addEventListener('customXmppEvent', (payload) => { ... })
 ```
 
-There is exactly one in-flight state: the message is in transit on the XMPP layer. jitsi-meet does not track it.
+in-flight 状态有且只有一种：消息正在 XMPP 层传输。jitsi-meet 自身不维护任何跟踪状态。
 
-## Invariants
+## 不变量
 
-- **INV-1**: A successful `sendCustomXmppCommand` MUST result in zero or one `customXmppEvent` on the receiver. Zero if the receiver has no listener or the body fails to parse.
-- **INV-2**: A `customXmppEvent` payload is `===` the original `payload` modulo key order; receivers MUST NOT depend on key order.
-- **INV-3**: `sendCustomXmppCommand` is best-effort. The MUC transport may drop messages under load or when the receiver is transiently disconnected. Callers MUST be tolerant of loss.
-- **INV-4**: Two host pages sending the same payload to the same target produce two `customXmppEvent`s on the receiver. jitsi-meet does not de-duplicate (per spec).
+- **INV-1**：一次成功的 `sendCustomXmppCommand` 在接收方**必须**产生零次或一次 `customXmppEvent`。零次的情况：接收方没有监听器，或 body 解析失败。
+- **INV-2**：`customXmppEvent` 的 payload 忽略 key 顺序后**等于**原始 `payload`；接收方**不得**依赖 key 顺序。
+- **INV-3**：`sendCustomXmppCommand` 是尽力而为的。MUC 传输层在负载较高或接收方短暂断连时可能丢消息。调用方**必须**容忍丢失。
+- **INV-4**：两个宿主页面分别向同一目标发送相同的 payload，接收方会收到**两次** `customXmppEvent`。jitsi-meet 不会去重（依 spec）。
 
-## Validation Function (informative)
+## 校验函数（参考实现）
 
 ```ts
 // react/features/custom-xmpp/functions.ts

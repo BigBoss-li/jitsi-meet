@@ -1,65 +1,66 @@
-# Quickstart: Manual Test for Custom XMPP Command and Event
+# 快速上手：自定义 XMPP 命令与事件的手测指南
 
-**Phase**: 1 — Design
-**Mission**: `custom-xmpp-command-and-event-01KVVVG9`
-**Date**: 2026-06-24
+**阶段**：1 — Design
+**Mission**：`custom-xmpp-command-and-event-01KVVVG9`
+**日期**：2026-06-24
 
-The mission does not introduce an automated test framework. This document is the runbook for the manual end-to-end scenarios from `spec.md`. It is the primary acceptance check.
+本次 mission **不**引入自动化测试框架。本文档是 `spec.md` 中端到端手测场景的 runbook，也是本次 mission 的主要验收手段。
 
-## Prerequisites
+## 前置条件
 
-- A running jitsi-meet build with this mission's changes merged.
-- A local Jitsi Meet backend (the public `meet.jit.si` works for web; for the iOS / Android checks you need a build that the host can connect to).
-- Two browser tabs of the same origin running `doc/examples/custom-xmpp-example.html` (the example page added by this mission).
+- 一个已经合入本次 mission 改动的 jitsi-meet 运行构建。
+- 一个可用的 Jitsi Meet 后端（web 端可以用公网的 `meet.jit.si`；iOS / Android 验证则需要一份本机能连到后端的构建）。
+- 同一浏览器的两个标签页都打开 `doc/examples/custom-xmpp-example.html`（本次 mission 新增的示例页）。
 
-## Test environment
+## 测试环境
 
-The mission adds one HTML example, `doc/examples/custom-xmpp-example.html`. It is a near-clone of `doc/examples/api.html` with three additions:
-- a "Send custom XMPP command" button that calls `api.executeCommand('sendCustomXmppCommand', { target, payload })`,
-- a "First-joiner leaves voluntarily" handler that listens for `customXmppEvent` and calls `api.executeCommand('hangup')`,
-- a `requestId` generated client-side and stamped onto every payload, used for de-duplication.
+本次 mission 新增一份 HTML 示例 `doc/examples/custom-xmpp-example.html`。它基本是 `doc/examples/api.html` 的克隆，加上三处扩展：
 
-To run the two-tab scenario, open the example in two browser windows / tabs of the same browser, point them at the same room name, and use the same `userInfo.name` (or whatever identity field the host page uses to detect duplicates).
+- 一个 "Send custom XMPP command" 按钮，调用 `api.executeCommand('sendCustomXmppCommand', { target, payload })`；
+- 一个 "First-joiner leaves voluntarily" 处理器，监听 `customXmppEvent` 并调用 `api.executeCommand('hangup')`；
+- 客户端为每次 payload 生成一个 `requestId` 并写进去，用于去重。
 
-## Scenario 1 — Happy path: duplicate detection and graceful eviction
+跑两标签页流程时：在同一浏览器的两个窗口 / 标签页中打开该示例，加入同一房间名，使用相同的 `userInfo.name`（或宿主页面用来判定重复的任意身份字段）。
 
-1. Open the example in tab A, join room `TestRoom` as `Alice`.
-2. Open the example in tab B, join room `TestRoom` as `Alice` (same identity).
-3. Tab A detects the duplicate (by comparing `participantJoined` event payloads against its own userId).
-4. Tab A calls `sendCustomXmppCommand` targeting tab A's own `participantId` (the first joiner), payload `{ action: 'duplicateDetected', requestId: 'r1' }`.
-5. Tab A receives `customXmppEvent` with the same payload, then calls `executeCommand('hangup')`.
-6. Tab A leaves. Tab B continues.
+## 场景 1 — 正常路径：检测重复用户并优雅退出
 
-**Pass criteria**:
-- Tab A's `participantLeft` event for the local user fires within ~1 second of step 4.
-- Tab B sees only one local participant (itself) after tab A leaves.
-- Tab A's console shows the `customXmppEvent` payload before the `hangup` is issued.
+1. 在标签页 A 中打开示例，以 `Alice` 加入房间 `TestRoom`。
+2. 在标签页 B 中打开同一示例，也以 `Alice` 加入房间 `TestRoom`（同一身份）。
+3. 标签页 A 检测到重复（通过把 `participantJoined` 事件中的字段与自己的 userId 对比）。
+4. 标签页 A 调用 `sendCustomXmppCommand`，目标是 A 自己的 `participantId`（即第一个先入会的那个），payload 为 `{ action: 'duplicateDetected', requestId: 'r1' }`。
+5. 标签页 A 收到 `customXmppEvent`，payload 与发送时一致，随即调用 `executeCommand('hangup')`。
+6. 标签页 A 退出。标签页 B 继续。
 
-## Scenario 2 — Unknown target
+**通过标准**：
+- 步骤 4 后约 1 秒内，标签页 A 针对本地用户触发 `participantLeft` 事件。
+- 标签页 A 离开后，标签页 B 中只剩一个本地参与者（自己）。
+- 标签页 A 的控制台在 `hangup` 被调用前先打印了 `customXmppEvent` 的 payload。
 
-1. Join tab A in room `TestRoom` as `Alice`.
-2. From tab A's devtools console, run:
+## 场景 2 — 目标不存在
+
+1. 在标签页 A 中以 `Alice` 加入房间 `TestRoom`。
+2. 在标签页 A 的 devtools 控制台执行：
    ```js
    api.executeCommand('sendCustomXmppCommand', {
        target: 'this-id-does-not-exist',
        payload: { action: 'noop' }
    });
    ```
-3. Tab A's iframe console logs a `console.error` from the jitsi-meet layer.
-4. No `customXmppEvent` fires anywhere (because no one is listening for a no-op and there is no participant with that id).
+3. 标签页 A 的 iframe 控制台中会打印一条来自 jitsi-meet 层的 `console.error`。
+4. 任何地方都不会触发 `customXmppEvent`（因为既没有人监听 `noop` 动作，也没有这个 id 的参与者）。
 
-**Pass criteria**: No exception thrown to the host page; `console.error` is present; nothing crashes.
+**通过标准**：不会向宿主页面抛错；存在 `console.error`；应用一切正常。
 
-## Scenario 3 — Invalid payload
+## 场景 3 — payload 非法
 
-From tab A's devtools console, run each of:
+在标签页 A 的 devtools 控制台依次执行：
 ```js
 api.executeCommand('sendCustomXmppCommand', { target: tabAId, payload: null });
 api.executeCommand('sendCustomXmppCommand', { target: tabAId, payload: 'a string' });
 api.executeCommand('sendCustomXmppCommand', { target: tabAId, payload: [] });
 api.executeCommand('sendCustomXmppCommand', {
     target: tabAId,
-    payload: { action: '', /* no action */ }
+    payload: { action: '' /* 没有 action */ }
 });
 api.executeCommand('sendCustomXmppCommand', {
     target: tabAId,
@@ -67,36 +68,36 @@ api.executeCommand('sendCustomXmppCommand', {
 });
 ```
 
-**Pass criteria**: Each call logs a `console.error` and does NOT call `sendPrivateTextMessage` on the conference (verifiable in the Network / xmpp logs if you have a debug build, or by absence of `customXmppEvent` on the receiver).
+**通过标准**：每次调用都打印 `console.error`，并且**不**调用会议上的 `sendPrivateTextMessage`（debug 构建里可以从 Network / xmpp 日志验证，或者通过接收方没有任何 `customXmppEvent` 间接验证）。
 
-## Scenario 4 — Cross-platform (React Native)
+## 场景 4 — 跨平台（React Native）
 
-1. Build and run the iOS or Android app with this mission's changes.
-2. From the host application (a minimal native shell that embeds `JitsiMeetView`), join room `TestRoom` as `Bob`.
-3. From a second native instance, join as `Bob`. (Two physical devices, or one device + one simulator, or one native + one web tab.)
-4. Trigger the duplicate-detected flow from the second instance.
-5. Verify the first instance receives the `customXmppEvent` callback and calls `hangUp`.
+1. 用本 mission 的改动构建并运行 iOS 或 Android app。
+2. 从宿主应用（一个把 `JitsiMeetView` 嵌入的极简 native 壳）以 `Bob` 加入房间 `TestRoom`。
+3. 从另一个 native 实例以 `Bob` 加入（两台真机，或一真机一模拟器，或一 native 一 web 标签页）。
+4. 在第二个实例上触发"重复用户检测"流程。
+5. 验证第一个实例收到 `customXmppEvent` 回调并调用 `hangUp`。
 
-**Pass criteria**: `customXmppEvent` fires on the first instance's host with the exact payload, and the first instance leaves the meeting.
+**通过标准**：第一个实例的宿主收到 `customXmppEvent`，payload 与发送时一致；第一个实例退出会议。
 
-## Scenario 5 — Regression: existing `doc/examples/api.html` works
+## 场景 5 — 回归：现有 `doc/examples/api.html` 仍正常工作
 
-1. Open `doc/examples/api.html` in a browser.
-2. Click each button (toggleAudio, toggleVideo, setLargeVideoParticipant, sendChatMessage, etc.) and confirm each still works.
+1. 在浏览器中打开 `doc/examples/api.html`。
+2. 依次点击各按钮（toggleAudio、toggleVideo、setLargeVideoParticipant、sendChatMessage 等），确认每一个都正常工作。
 
-**Pass criteria**: All existing commands and events still fire as before. The new `sendCustomXmppCommand` and `customXmppEvent` are absent from the list (because the example doesn't bind them), but the rest of the API surface is unchanged.
+**通过标准**：所有现有命令和事件仍按原有行为触发。新的 `sendCustomXmppCommand` 和 `customXmppEvent` 不在示例绑定列表中（因为示例里没绑），但其他 API 表面没有任何改变。
 
-## Scenario 6 — Concurrent / duplicate sends
+## 场景 6 — 并发 / 重复发送
 
-1. Open the example in tabs A, B, C. All join `TestRoom` as `Alice` (the host page uses `userInfo.name` for identity).
-2. Tab A detects the duplicate of itself (tab A is the first joiner) and sends `{ action: 'duplicateDetected', requestId: 'r1' }` to itself.
-3. Tab C also detects the duplicate and sends `{ action: 'duplicateDetected', requestId: 'r2' }` to tab A.
-4. Tab A receives two `customXmppEvent` events, with different `requestId`s.
+1. 在标签页 A、B、C 中分别打开示例，全部以 `Alice` 加入房间 `TestRoom`（宿主页面用 `userInfo.name` 判定身份）。
+2. 标签页 A 检测到自己的重复（A 是第一个先入会的），向自己发送 `{ action: 'duplicateDetected', requestId: 'r1' }`。
+3. 标签页 C 也检测到重复，向标签页 A 发送 `{ action: 'duplicateDetected', requestId: 'r2' }`。
+4. 标签页 A 收到两次 `customXmppEvent`，`requestId` 互不相同。
 
-**Pass criteria**: jitsi-meet delivers both events. The host page's handler uses `requestId` to decide whether it has already responded; if tab A has already left, the second `requestId` is ignored by the host page (not by jitsi-meet — jitsi-meet delivers everything it can).
+**通过标准**：jitsi-meet 投递两个事件。宿主页面的处理器用 `requestId` 决定自己是否已经响应过；如果标签页 A 已经退出，第二个 `requestId` 由宿主页面忽略（不是 jitsi-meet 忽略——jitsi-meet 会把能投的都投了）。
 
-## Notes
+## 备注
 
-- All `console.error` messages in these scenarios come from inside the jitsi-meet iframe / RN app, not from the host page.
-- The 16 KiB payload cap is enforced by `react/features/custom-xmpp/functions.ts`. A 20 KiB payload in Scenario 3 will be rejected before any XMPP traffic.
-- The 50 ms latency budget in NFR-003 is not measured manually; it is enforced by the simplicity of the implementation (validation + `JSON.stringify` + one `sendPrivateTextMessage` call).
+- 这些场景中的 `console.error` 都来自 jitsi-meet 的 iframe / RN 应用内部，不是宿主页面。
+- 16 KiB payload 上限由 `react/features/custom-xmpp/functions.ts` 强制。场景 3 中的 20 KiB payload 会在产生任何 XMPP 流量之前被拒。
+- NFR-003 中 50 ms 的时延预算**不**通过手测验证；它由实现的简单性（校验 + `JSON.stringify` + 一次 `sendPrivateTextMessage` 调用）自然保证。

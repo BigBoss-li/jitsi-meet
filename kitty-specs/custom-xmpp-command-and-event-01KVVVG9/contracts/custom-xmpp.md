@@ -1,73 +1,73 @@
-# Contract: Custom XMPP Command and Event
+# 契约：自定义 XMPP 命令与事件
 
-**Phase**: 1 — Design
-**Mission**: `custom-xmpp-command-and-event-01KVVVG9`
-**Date**: 2026-06-24
+**阶段**：1 — Design
+**Mission**：`custom-xmpp-command-and-event-01KVVVG9`
+**日期**：2026-06-24
 
-This is the public contract between a host page and the jitsi-meet iframe / React Native view. It mirrors the wiring inside `modules/API/external/external_api.js` (web) and the `ExternalAPI` native module (mobile).
+这是宿主页面与 jitsi-meet iframe / React Native 视图之间的公开契约。它与 `modules/API/external/external_api.js`（web 端）以及 `ExternalAPI` native 模块（移动端）的内部接线一一对应。
 
-## Command: `sendCustomXmppCommand`
+## 命令：`sendCustomXmppCommand`
 
-**Wire name (kebab-case)**: `send-custom-xmpp-command`
-**Public method**: `JitsiMeetExternalAPI.executeCommand('sendCustomXmppCommand', { target, payload })`
-**Return type**: `void` (synchronous)
+**Wire 名（kebab-case）**：`send-custom-xmpp-command`
+**公开方法**：`JitsiMeetExternalAPI.executeCommand('sendCustomXmppCommand', { target, payload })`
+**返回类型**：`void`（同步）
 
-### Arguments
+### 参数
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `target` | `string` | yes | The `participantId` of the receiving participant. The host page learns these from the existing `participantJoined` event. |
-| `payload` | `object` | yes | A JSON-encodable object owned by the host page. Must have a non-empty string `action` field by convention. Maximum 16 KiB serialised. |
+| 名称 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `target` | `string` | 是 | 接收参与者的 `participantId`。宿主页面通过现有的 `participantJoined` 事件获得这个 id。 |
+| `payload` | `object` | 是 | 宿主页面自有的、可以 JSON 编码的对象。按约定必须带一个非空字符串的 `action` 字段。序列化后大小不超过 16 KiB。 |
 
-### Behaviour
+### 行为
 
-| Pre-condition | Outcome |
-|---------------|---------|
-| `target` is not in the meeting anymore | jitsi-meet calls `conference.sendPrivateTextMessage`, which returns a transport-level error; jitsi-meet logs a `console.error`. The host page is not notified. |
-| `payload` fails validation (not an object, no `action`, oversize, non-serialisable) | jitsi-meet logs a `console.error` and does not call `sendPrivateTextMessage`. |
-| Local conference is not joined | jitsi-meet logs a `console.error` and does not call `sendPrivateTextMessage`. |
-| All pre-conditions pass | jitsi-meet calls `conference.sendPrivateTextMessage(target, JSON.stringify(payload))`. |
+| 前置条件 | 结果 |
+|----------|------|
+| `target` 已经不在会议里 | jitsi-meet 调用 `conference.sendPrivateTextMessage`，传输层返回错误；jitsi-meet 打印 `console.error`。**不**通知宿主页面。 |
+| `payload` 校验失败（非对象、没有 `action`、过大、不可序列化） | jitsi-meet 打印 `console.error`，**不**调用 `sendPrivateTextMessage`。 |
+| 本地会议尚未加入 | jitsi-meet 打印 `console.error`，**不**调用 `sendPrivateTextMessage`。 |
+| 所有前置条件通过 | jitsi-meet 调用 `conference.sendPrivateTextMessage(target, JSON.stringify(payload))`。 |
 
-### Concurrency
+### 并发
 
-- Two `executeCommand` calls from the same host page in quick succession are enqueued independently by the MUC transport. FIFO is preserved per (sender, target) pair.
-- Two host pages can each call `sendCustomXmppCommand` for the same target. Both calls land; the receiver sees two `customXmppEvent` events. jitsi-meet does not de-duplicate. The host page SHOULD use a `requestId` field in the payload to make the handler idempotent.
+- 同一宿主页面在短时间内连续两次 `executeCommand` 调用会被 MUC 传输层独立入队。FIFO 顺序在 (sender, target) 对上保持。
+- 两个宿主页面可以各自向同一目标调用 `sendCustomXmppCommand`。两次调用都会落地；接收方会看到两次 `customXmppEvent` 事件。jitsi-meet **不**去重。宿主页面**应当**在 payload 中用 `requestId` 字段让处理逻辑幂等。
 
-## Event: `customXmppEvent`
+## 事件：`customXmppEvent`
 
-**Wire name (camelCase)**: `customXmppEvent`
-**Public method**: `JitsiMeetExternalAPI.addEventListener('customXmppEvent', (payload) => { ... })`
+**Wire 名（camelCase）**：`customXmppEvent`
+**公开方法**：`JitsiMeetExternalAPI.addEventListener('customXmppEvent', (payload) => { ... })`
 
-### Argument
+### 参数
 
-| Name | Type | Description |
-|------|------|-------------|
-| (single) | `object` | The `payload` object that the sender passed in. Always a non-null object. |
+| 名称 | 类型 | 说明 |
+|------|------|------|
+| （单一参数） | `object` | 发送方传入的 `payload` 对象。始终是非 null 的对象。 |
 
-### When it fires
+### 触发时机
 
-- The receiver's jitsi-meet instance received a MUC private message addressed to it.
-- The body parsed as JSON and the parsed value is a non-null, non-array object.
-- The host page has registered a listener for `customXmppEvent`.
+- 接收方的 jitsi-meet 实例收到了一条发往自己的 MUC 私聊消息。
+- body 解析为 JSON，且解析结果是非 null、非数组的对象。
+- 宿主页面已为 `customXmppEvent` 注册了监听器。
 
-If the host page has not registered a listener, the message is dropped silently — no `console.error`, no retry.
+如果宿主页面没有注册监听器，消息会被静默丢弃——不打印 `console.error`，不重试。
 
-### When it does NOT fire
+### 不会触发的场景
 
-- The body failed to parse as JSON.
-- The body parsed to `null`, an array, or a non-object.
-- The sender is the same participant as the receiver (jitsi-meet does not deliver to self by default for MUC private messages).
-- The target participant is not currently joined to the conference.
+- body 解析 JSON 失败。
+- body 解析为 `null`、数组或非对象。
+- 发送方与接收方是同一个参与者（jitsi-meet 默认不会把 MUC 私聊消息投递给自己）。
+- 目标参与者当前未加入会议。
 
-## Examples
+## 示例
 
-### Host page — send
+### 宿主页面 — 发送
 
 ```js
 // tab A
 api.addEventListener('videoConferenceJoined', () => {
     api.executeCommand('sendCustomXmppCommand', {
-        target: firstJoinerId,                  // participantId of tab A's own user
+        target: firstJoinerId,                  // tab A 自己的 participantId
         payload: {
             action: 'duplicateDetected',
             requestId: 'req-123',
@@ -77,19 +77,19 @@ api.addEventListener('videoConferenceJoined', () => {
 });
 ```
 
-### Host page — receive
+### 宿主页面 — 接收
 
 ```js
-// tab A (the first joiner)
+// tab A（第一个先入会的）
 api.addEventListener('customXmppEvent', (payload) => {
     if (payload.action === 'duplicateDetected' && payload.role === 'firstJoiner') {
-        // I am the first joiner — leave voluntarily.
+        // 我是第一个先入会的——主动退出
         api.executeCommand('hangup');
     }
 });
 ```
 
-### React Native (host) — send
+### React Native（宿主）— 发送
 
 ```ts
 import { NativeModules } from 'react-native';
@@ -98,7 +98,7 @@ const { JitsiMeetView } = NativeModules;
 JitsiMeetView.sendCustomXmppCommand(target, payload);
 ```
 
-### React Native (host) — receive
+### React Native（宿主）— 接收
 
 ```ts
 import { NativeEventEmitter, NativeModules } from 'react-native';
@@ -111,13 +111,13 @@ emitter.addListener('customXmppEvent', payload => {
 });
 ```
 
-## Error handling matrix
+## 错误处理矩阵
 
-| Failure | Detected by | What the host page sees |
-|---------|-------------|-------------------------|
-| Unknown `target` | `conference.sendPrivateTextMessage` returns a transport error | Nothing. `console.error` in iframe / RN app. |
-| `payload` invalid | jitsi-meet (synchronous) | Nothing. `console.error` in iframe / RN app. |
-| Conference not joined | jitsi-meet (synchronous) | Nothing. `console.error` in iframe / RN app. |
-| Body fails to parse on receiver | jitsi-meet (synchronous) | Nothing. `console.error` in iframe / RN app. |
-| Receiver has no listener | jitsi-meet | Nothing. No `console.error`. |
-| Receiver already left | MUC transport | Nothing. `console.error` in sender's iframe / RN app. |
+| 失败 | 检测方 | 宿主页面看到什么 |
+|------|--------|------------------|
+| `target` 不存在 | `conference.sendPrivateTextMessage` 返回传输错误 | 无。iframe / RN 应用内部打印 `console.error`。 |
+| `payload` 非法 | jitsi-meet（同步） | 无。iframe / RN 应用内部打印 `console.error`。 |
+| 本地会议未加入 | jitsi-meet（同步） | 无。iframe / RN 应用内部打印 `console.error`。 |
+| 接收方 body 解析失败 | jitsi-meet（同步） | 无。iframe / RN 应用内部打印 `console.error`。 |
+| 接收方没有监听器 | jitsi-meet | 无。不打印 `console.error`。 |
+| 接收方已离开会议 | MUC 传输层 | 无。发送方的 iframe / RN 应用内部打印 `console.error`。 |

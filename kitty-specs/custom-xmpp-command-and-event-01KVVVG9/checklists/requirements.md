@@ -1,41 +1,42 @@
-# Specification Quality Checklist: Custom XMPP Command and Event Listener
+# 规范质量检查清单：自定义 XMPP 命令与事件监听
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-06-24
-**Feature**: [spec.md](../spec.md)
+**目的**：在进入 plan 阶段之前，验证规范的完整性和质量
+**创建日期**：2026-06-24
+**功能**：[spec.md](../spec.md)
 
-## Content Quality
+## 内容质量
 
-- [x] No implementation details (languages, frameworks, APIs) — the spec references `JitsiConference`, `JitsiMeetExternalAPI`, `sendMessage`, and `PRIVATE_MESSAGE_RECEIVED` because those are the **public contract** the feature has to integrate with, not because we are choosing the framework. No JSX, no class names, no React component names.
-- [x] Focused on user value and business needs — every requirement traces back to the duplicate-user flow and the host-page-driven channel.
-- [x] Written for non-technical stakeholders — scenarios are described in product language; the XMPP/MUC terms are flagged as transport, not the focus.
-- [x] All mandatory sections completed — Summary, Use Case, User Scenarios, FR, NFR, Constraints, Success Criteria, Key Entities, Assumptions, Out of Scope, Open Questions.
+- [x] 不包含实现细节（语言、框架、API）—— spec 中提及的 `JitsiConference`、`JitsiMeetExternalAPI`、`sendMessage`、`PRIVATE_MESSAGE_RECEIVED` 是**必须对接的公开契约**，而不是选定的框架。文中没有 JSX、没有类名、没有 React 组件名。
+- [x] 聚焦用户价值和业务诉求——每条需求都能追溯到"重复用户"流程和"宿主页面驱动的通道"上。
+- [x] 面向非技术干系人——场景用产品语言描述；XMPP / MUC 等术语被标注为传输层术语，不是重点。
+- [x] 所有必填章节已填完——概述、使用场景、用户场景、FR、NFR、约束、验收标准、关键实体、假设、范围之外、遗留问题。
 
-## Requirement Completeness
+## 需求完整性
 
-- [x] No `[NEEDS CLARIFICATION]` markers remain — all decisions confirmed with the requester.
-- [x] Requirements are testable and unambiguous — each FR/NFR has a single outcome that can be asserted.
-- [x] Requirement types are separated (Functional / Non-Functional / Constraints) — three tables, no mixing.
-- [x] IDs are unique across FR-###, NFR-###, and C-### entries — verified by hand.
-- [x] All requirement rows include a non-empty Status value — `Proposed` (FR/NFR) and `Confirmed` (Constraints).
-- [x] Non-functional requirements include measurable thresholds — NFR-003 is 50 ms, NFR-004 is "no new warnings", NFR-005 names specific test coverage.
-- [x] Success criteria are measurable — five concrete test outcomes.
-- [x] Success criteria are technology-agnostic — no React, no Redux, no Strophe mentioned; only public API names that ARE the contract.
-- [x] All acceptance scenarios are defined — five scenarios in the "User Scenarios & Testing" section.
-- [x] Edge cases are identified — Scenarios 2–4 cover target-not-found, no-listener, malformed-payload. Scenario 5 covers cross-platform.
-- [x] Scope is clearly bounded — Out of Scope section enumerates eight excluded items.
-- [x] Dependencies and assumptions identified — Assumptions lists five; C-001 names lib-jitsi-meet as an external dependency; C-002 names the transport.
+- [x] 不存在 `[NEEDS CLARIFICATION]` 标记——所有决策均已与需求方确认。
+- [x] 需求可测试且无歧义——每条 FR / NFR 都有单一可断言的产出。
+- [x] 需求类型相互分离（Functional / Non-Functional / Constraints）——三张表格，无混合。
+- [x] ID 在 FR-###、NFR-###、C-### 之间互不重复——已人工核对。
+- [x] 每条需求都带有非空 Status——FR / NFR 为 `Proposed`，Constraints 为 `Confirmed`。
+- [x] 非功能需求包含可度量阈值——NFR-003 是 50 ms，NFR-004 是"无新告警"，NFR-005 列出了具体的测试覆盖。
+- [x] 验收标准可度量——五个具体可测的测试结果。
+- [x] 验收标准与具体技术无关——没有提到 React、Redux、Strophe；只引用了属于契约本身的公开 API 名。
+- [x] 所有验收场景已定义——"用户场景与测试"小节中有 6 个场景。
+- [x] 已识别边界情况——场景 2–4 覆盖目标不存在、无监听器、payload 非法；场景 5 覆盖跨平台；场景 6 覆盖并发。
+- [x] 范围边界清晰——"范围之外"小节枚举了 8 个被排除项。
+- [x] 已识别依赖和假设——假设部分列了 6 项；C-001 把 lib-jitsi-meet 命名为外部依赖；C-002 指明了传输通道。
 
-## Feature Readiness
+## 功能就绪
 
-- [x] All functional requirements have clear acceptance criteria — FR-001..FR-008 are each either directly testable (e.g. FR-005 about `invalidPayload`) or matched to a scenario in the User Scenarios section.
-- [x] User scenarios cover primary flows — Scenario 1 is the happy path; Scenarios 2–5 cover the main branches.
-- [x] Feature meets measurable outcomes defined in Success Criteria — every success criterion maps back to a specific FR or NFR.
-- [x] No implementation details leak into specification — the spec says WHAT (`sendCustomXmppCommand` accepts `{target, payload}` and returns `{ok, reason}`), not HOW (no mention of redux thunks, middleware, action types, or feature-module file paths beyond C-005 which lists the existing dispatch pattern as a constraint, not an implementation prescription).
+- [x] 所有功能需求都有清晰的验收标准——FR-001..FR-008 每一条要么可以直接测试（例如 FR-005 关于 `invalidPayload`），要么对应到"用户场景"小节中的某个场景。
+- [x] 用户场景覆盖主流程——场景 1 是正常路径；场景 2–5 覆盖主要分支；场景 6 覆盖并发分支。
+- [x] 功能满足验收标准中定义的可度量结果——每条验收标准都能映射回具体的 FR 或 NFR。
+- [x] 没有实现细节泄漏到规范中——spec 描述的是 WHAT（`sendCustomXmppCommand` 接受 `{target, payload}`、返回 `void`），不是 HOW（没有提到 redux thunk、middleware、action type、feature 模块的文件路径；C-005 只是把现有派发模式列为约束，而不是实现规定）。
 
-## Notes
+## 备注
 
-- The spec intentionally does not invent a new XMPP stanza, namespace, or IQ — C-002 pins the transport to the existing MUC private message channel.
-- "Public API only" is locked in by NFR-001 / NFR-002 so plan/implement cannot drift into reading private fields of `JitsiConference`.
-- The "same user" rule is explicitly out of jitsi-meet's responsibility (C-003) — the host page owns identity and policy.
-- The 16 KiB payload cap in FR-005 is a defensible default for a host-page-driven control flow; if a future flow needs more it is out of scope, per the Assumptions section.
+- spec 故意没有引入新的 XMPP stanza、namespace 或 IQ——C-002 把传输限定在现有 MUC 私聊消息通道。
+- NFR-001 / NFR-002 锁定了"仅使用公开 API"，避免 plan / implement 阶段漂移到读取 `JitsiConference` 的私有字段。
+- C-003 把"同一人"规则明确排除在 jitsi-meet 职责之外——身份和策略由宿主页面承担。
+- FR-005 中的 16 KiB payload 上限是一个有据可依的默认值；如未来某个流程需要更多容量，按"假设"小节所述属于范围之外。
+- 决定不返回结果对象（同步 `void`）是 plan 阶段与用户讨论后确定的——spec 内的 FR-004 / FR-005 / 验收标准 / 假设部分都已相应更新。
