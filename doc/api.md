@@ -1,6 +1,8 @@
 # Jitsi Meet API
 
-This document has been moved [here](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-iframe).
+The full iframe / React Native API surface is documented in the
+[Jitsi Handbook](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-iframe).
+This page documents features added directly to the in-repo source.
 
 # `sendCustomXmppCommand` (command) and `customXmppEvent` (event)
 
@@ -80,7 +82,7 @@ Not triggered when:
 
 - The host page has no listener for `customXmppEvent` (the message is
   silently dropped).
-- The body fails to parse as JSON (logged, dropped).
+- The body fails to parse as JSON (silently dropped, per FR-006).
 
 Example (web):
 
